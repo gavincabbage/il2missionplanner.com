@@ -4,5 +4,8 @@ IL-2 BoS Mission Planner
 
 ## TODO
 
-- [ ] Fix distance scale (its times 10 now)
-- [ ] Get normalize and skeleton from bower
+- [ ] Fix grid calculator
+- [ ] Get leaflet.label from bower or something
+- [ ] Clear button
+- [ ] Undo button
+- [ ] Route planning
