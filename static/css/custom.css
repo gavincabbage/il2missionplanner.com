@@ -1,8 +1,24 @@
 /* Mobile first queries taken directly from skeleton.css */
 
-/*body {
-    font-family: "Times New Roman", Times, serif;
-}*/
+body {
+    margin-top: 10px;
+    font-family: 'Droid Serif', Arial, serif;
+    font-weight: 400;
+    color: white;
+    background-color: black;
+}
+
+#header {
+    text-align: center;
+}
+
+#header img {
+    float: left;
+}
+
+#header h1 {
+    padding-top: 5px;
+}
 
 #map {
     height: 200px;
