@@ -1,0 +1,16 @@
+{
+  "name": "bos-mission-planner",
+  "homepage": "https://github.com/gavincabbage/bos-mission-planner",
+  "authors": [
+    "Gavin Cabbage <gavincabbage@gmail.com>"
+  ],
+  "description": "IL-2: Battle of Stalingrad Mission Planner",
+  "main": "index.html",
+  "moduleType": [],
+  "license": "MIT",
+  "dependencies": {
+    "leaflet": "^0.7.7",
+    "leaflet-draw": "^0.3.0",
+    "skeleton": "^2.0.4"
+  }
+}
