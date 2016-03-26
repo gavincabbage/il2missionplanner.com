@@ -6,27 +6,28 @@ body {
     font-weight: 400;
     color: white;
     background-color: black;
+    min-width: 400px;
 }
 
-#header {
+div#header {
     text-align: center;
 }
 
-#header img {
+div#header img {
     float: left;
 }
 
-#header h1 {
+div#header h1 {
     padding-top: 6px;
 }
 
-#greeting p {
+div#greeting p {
     color: grey;
     font-family: 'Courier New', Courier, serif;
     text-align: center;
 }
 
-#footer p {
+div#footer p {
     margin-top: 10px;
     color: grey;
     font-family: 'Courier New', Courier, serif;
@@ -34,12 +35,14 @@ body {
     font-size: 8pt;
 }
 
-#footer p a {
+div#footer p a {
     color: white;
 }
 
-#map {
+div#map {
     height: 200px;
+    position: relative;
+    outline: none;
 }
 
 div.heading-icon {
@@ -50,25 +53,19 @@ div.heading-icon {
     margin: 0px 0px 0px 6px;
 }
 
-/* Larger than mobile */
-@media (min-width: 400px) {
-    #map {
-        height: 300px;
-        position: relative;
-        outline: none;
-    }
-}
-
 /* Larger than phablet */
 @media (min-width: 550px) {
-    #map {
+    div#map {
         height: 400px;
     }
 }
 
 /* Larger than tablet */
 @media (min-width: 750px) {
-    #map {
+    body {
+        overflow: hidden;
+    }
+    div#map {
         height: 600px;
     }
 }
