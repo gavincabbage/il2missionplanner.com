@@ -133,7 +133,7 @@
     var map = L.map('map', {
         crs: L.CRS.Simple,
         maxZoom: 11,
-        minZoom: 8,
+        minZoom: 9,
         attributionControl: false,
         drawControlTooltips: false
     });
