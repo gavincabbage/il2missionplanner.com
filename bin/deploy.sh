@@ -11,6 +11,7 @@ fi
 
 cd $HOME
 
+echo 123abczyx
 pwd
 ls
 
