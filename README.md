@@ -1,6 +1,6 @@
 # Il-2: Battle of Stalingrad Mission Planner
 
-Welcome to the `bos-mission-planner` repository.
+Welcome to the `bos-mission-planner` repository. This repository houses the code behind the Il-2: Battle of Stalingrad Mission Planner tool. 
 
 ## Contributing
 
