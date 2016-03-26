@@ -2,8 +2,8 @@
 
 set -e
 
-if [ "${TRAVIS_REPO_SLUG}" != "gavincabbage/bos-mission-planner" ||
-     "${TRAVIS_PULL_REQUEST}" != "false" ||
+if [ "${TRAVIS_REPO_SLUG}" != "gavincabbage/bos-mission-planner" || \
+     "${TRAVIS_PULL_REQUEST}" != "false" || \
      "${TRAVIS_BRANCH}" != "master" ]
 then
     echo "Aborting build"
