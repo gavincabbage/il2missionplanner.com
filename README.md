@@ -8,6 +8,7 @@ IL-2 BoS Mission Planner
 - [ ] Undo button
 - [x] Heading calculation
 - [x] Distance calculation
-- [ ] Fuel calculation
-- [ ] Altitude consideration
-- [x] Speed consideration
+- [ ] Fuel calculation (requires plane selection)
+- [ ] Altitude adjustment
+- [ ] Speed adjustment
+- [ ] Airfield data
