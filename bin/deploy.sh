@@ -10,6 +10,9 @@ then
     exit 1
 fi
 
+echo 456prevhereintherepo
+pwd
+
 cd $HOME
 
 echo 123abczyx
