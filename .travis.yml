@@ -1,9 +1,7 @@
 language: node_js
 node_js:
     - 5.3.0
-script:
-    - 'echo test123'
-after_success: bash ./bin/deploy.sh
+script: bash ./bin/deploy.sh
 env:
     global:
         GH_REF: github.com/gavincabbage/bos-mission-planner.git
