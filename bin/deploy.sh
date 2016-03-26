@@ -6,6 +6,7 @@ if [ "${TRAVIS_REPO_SLUG}" != "gavincabbage/bos-mission-planner" ||
      "${TRAVIS_PULL_REQUEST}" != "false" ||
      "${TRAVIS_BRANCH}" != "master" ]
 then
+    echo "Aborting build"
     exit 1
 fi
 
