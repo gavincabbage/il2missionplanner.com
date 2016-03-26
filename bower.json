@@ -11,6 +11,7 @@
   "dependencies": {
     "leaflet": "^0.7.7",
     "leaflet-draw": "^0.3.0",
-    "skeleton": "^2.0.4"
+    "skeleton": "^2.0.4",
+    "leaflet-polylinedecorator": "^1.0.1"
   }
 }

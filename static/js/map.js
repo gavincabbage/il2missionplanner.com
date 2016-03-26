@@ -10,28 +10,90 @@
         GRID_OFFSET = 37;
         GRID_ROW_DIFF = 3;
         MAP_FILE = 'img/map.png'
+        GRID_SIDE_LENGTH =
+                ((MAX_LAT-MIN_LAT)/GRIDS_TALL + (MAX_LONG - MIN_LONG)/GRIDS_WIDE) / 2;
+        RED_PATH_OPTIONS = {
+            color: '#ff0000',
+            fillColor: '#ff0000',
+            fill: true,
+            fillOpacity: 1,
+            opacity: 1,
+            weight: 1
+        }
+        RED_POLYLINE_OPTIONS = {
+            color: '#ff0000',
+            weight: 2,
+            opacity: 1
+        }
 
-    var getGridSideLength = function() {
-        var height = MAX_LAT - MIN_LAT;
-        var width = MAX_LONG - MIN_LONG;
-        return (height/GRIDS_TALL + width/GRIDS_WIDE) / 2;
-    };
-
-    var getRowSubtotal = function(lat, gridSideLength) {
+    function getRowSubtotal(lat) {
         var invertedLat = MAX_LAT - lat;
-        var numRows = Math.floor(invertedLat / gridSideLength);
+        var numRows = Math.floor(invertedLat / GRID_SIDE_LENGTH);
         var gridDiff = numRows * GRID_ROW_DIFF;
         return numRows * GRIDS_WIDE + gridDiff;
     }
 
-    var latLngToGrid = function(latLng) {
+    function latLngToGrid(latLng) {
         // TODO increase accuracy of this - not good enough to use yet
-        var gridSideLength = getGridSideLength();
-        var subtotal = getRowSubtotal(latLng.lat, gridSideLength);
-        var numCols = Math.floor(latLng.lng / gridSideLength);
+        console.log(GRID_SIDE_LENGTH);
+        var subtotal = getRowSubtotal(latLng.lat);
+        var numCols = Math.floor(latLng.lng / GRID_SIDE_LENGTH);
         var total = subtotal + numCols + GRID_OFFSET;
         return total;
     };
+
+    function mathDegreesToGeographic(degrees) {
+        if (degrees < 0) {
+            degrees += 360;
+        }
+        return (450 - degrees) % 360;
+    }
+
+    function calculateHeading(start, end) {
+        var radians = Math.atan2(end.lat - start.lat, end.lng - start.lng);
+        var degrees = radians * 180 / Math.PI;
+        degrees = mathDegreesToGeographic(degrees);
+        return degrees;
+    }
+
+    function applyNavigationToPolyline(polyline) {
+        polyline.setStyle(RED_POLYLINE_OPTIONS);
+
+        var decorator = L.polylineDecorator(polyline, {
+            patterns: [
+            {
+                repeat: false,
+                symbol: L.Symbol.arrowHead({
+                    pathOptions: RED_PATH_OPTIONS
+                })
+            }]
+        }).addTo(map);
+
+
+        var latLngs = polyline.getLatLngs();
+        for (ndx = 0; ndx < latLngs.length; ndx++) {
+            console.log(latLngs[ndx]);
+
+            if (ndx > 0) {
+                var circle = L.circleMarker(latLngs[ndx], RED_PATH_OPTIONS);
+                circle.setRadius(2);
+                map.addLayer(circle);
+                drawnItems.addLayer(circle);
+            }
+
+            if (ndx < latLngs.length-1) {
+                var heading = calculateHeading(latLngs[ndx], latLngs[ndx+1]);
+                L.marker(latLngs[ndx], {
+                    icon: L.divIcon({
+                        className: 'heading-icon',
+                        html: heading.toFixed(0) + '&deg;',
+                        iconAnchor: latLngs[ndx]
+                    })
+                }).addTo(map);
+            }
+        }
+        return polyline;
+    }
 
     var map = L.map('map', {
         crs: L.CRS.Simple,
@@ -61,13 +123,24 @@
 
     map.on('draw:created', function(e) {
 
-        // TODO DEBUG
         if (e.layerType === 'marker') {
             e.layer.bindLabel(e.layer.getLatLng().toString() + ', grid ' + latLngToGrid(e.layer.getLatLng()).toString());
+        } else if (e.layerType === 'polyline') {
+            e.layer = applyNavigationToPolyline(e.layer);
         }
 
+        console.log(e.layer);
         map.addLayer(e.layer);
         drawnItems.addLayer(e.layer);
+    });
+
+    map.on('draw:edited', function(e) {
+        console.log(e.layers);
+        e.layers.eachLayer(function(layer) {
+            if (typeof layer.getLatLngs !== 'undefined') {
+                applyNavigationToPolyline(layer);
+            }
+        })
     });
 
 })();

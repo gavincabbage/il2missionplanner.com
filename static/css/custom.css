@@ -24,6 +24,14 @@ body {
     height: 200px;
 }
 
+div.heading-icon {
+    color: black;
+    font-family: 'Courier New', Courier, serif;
+    font-size: 8pt;
+    font-weight: bold;
+    margin: 0px 0px 0px 6px;
+}
+
 /* Larger than mobile */
 @media (min-width: 400px) {
     #map {
