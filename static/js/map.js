@@ -6,13 +6,14 @@
         MIN_LONG = 0.089286,
         MAX_LONG = 3.125,
         GRIDS_WIDE = 33,
-        GRIDS_TALL = 22;
-        GRID_OFFSET = 37;
-        GRID_ROW_DIFF = 3;
-        MAP_FILE = 'img/map.png'
+        GRIDS_TALL = 22,
+        GRID_OFFSET = 37,
+        GRID_ROW_DIFF = 3,
+        MAP_FILE = 'img/map.png',
+        MAP_BOUNDS = [[MIN_LAT, MIN_LONG], [MAX_LAT, MAX_LONG]],
         GRID_SIDE_LENGTH =
-                ((MAX_LAT-MIN_LAT)/GRIDS_TALL + (MAX_LONG - MIN_LONG)/GRIDS_WIDE) / 2;
-        GRID_SIDE_DISTANCE = 10;
+                ((MAX_LAT-MIN_LAT)/GRIDS_TALL + (MAX_LONG - MIN_LONG)/GRIDS_WIDE) / 2,
+        GRID_SIDE_DISTANCE = 10,
         RED_PATH_OPTIONS = {
             color: '#ff0000',
             fillColor: '#ff0000',
@@ -20,15 +21,32 @@
             fillOpacity: 1,
             opacity: 1,
             weight: 1
-        }
+        },
         RED_POLYLINE_OPTIONS = {
             color: '#ff0000',
             weight: 2,
             opacity: 1
         }
+        DEFAULT_SPEED = 300
+    ;
+
+    function calculateDistance(start, end) {
+        var deltaLng = end.lng - start.lng;
+        var deltaLat = end.lat - start.lat;
+        return Math.sqrt(deltaLng*deltaLng + deltaLat*deltaLat);
+    }
 
     function convertLatLngDistance(distance) {
         return distance / GRID_SIDE_LENGTH * GRID_SIDE_DISTANCE;
+    }
+
+    function convertDistanceToTime(distance, speed) {
+        let hours = distance / speed;
+        let seconds = (hours * 3600);
+        let minutes = Math.floor(seconds / 60);
+        let secondsOver = seconds % 60;
+        let formattedSeconds = secondsOver < 10 ? '0'+secondsOver.toFixed(0) : secondsOver.toFixed(0);
+        return minutes.toFixed(0) + ':' + formattedSeconds;
     }
 
     function getRowSubtotal(lat) {
@@ -39,12 +57,11 @@
     }
 
     function latLngToGrid(latLng) {
-        console.log(GRID_SIDE_LENGTH);
         var subtotal = getRowSubtotal(latLng.lat);
         var numCols = Math.floor(latLng.lng / GRID_SIDE_LENGTH);
         var total = subtotal + numCols + GRID_OFFSET;
         return total;
-    };
+    }
 
     function mathDegreesToGeographic(degrees) {
         if (degrees < 0) {
@@ -58,6 +75,15 @@
         var degrees = radians * 180 / Math.PI;
         degrees = mathDegreesToGeographic(degrees);
         return degrees;
+    }
+
+    function setLanguage() {
+        L.drawLocal.draw.toolbar.buttons.polyline = 'Map a flight';
+        L.drawLocal.draw.toolbar.buttons.marker = 'Mark a location';
+        L.drawLocal.edit.toolbar.buttons.edit = 'Edit a flight';
+        L.drawLocal.edit.toolbar.buttons.editDisabled = 'No flights to edit';
+        L.drawLocal.edit.toolbar.buttons.delete = 'Delete a flight';
+        L.drawLocal.edit.toolbar.buttons.delete = 'No flights to delete';
     }
 
     function applyNavigationToPolyline(polyline) {
@@ -76,7 +102,6 @@
 
         var latLngs = polyline.getLatLngs();
         for (ndx = 0; ndx < latLngs.length; ndx++) {
-            console.log(latLngs[ndx]);
 
             if (ndx > 0) {
                 var circle = L.circleMarker(latLngs[ndx], RED_PATH_OPTIONS);
@@ -87,11 +112,14 @@
 
             if (ndx < latLngs.length-1) {
                 var heading = calculateHeading(latLngs[ndx], latLngs[ndx+1]);
+                var distance = convertLatLngDistance(calculateDistance(latLngs[ndx], latLngs[ndx+1]));
+                var time = convertDistanceToTime(distance, speed);
                 L.marker(latLngs[ndx], {
                     icon: L.divIcon({
                         className: 'heading-icon',
-                        html: heading.toFixed(0) + '&deg;',
-                        iconAnchor: latLngs[ndx]
+                        html: heading.toFixed(0) + '&deg;|' + distance.toFixed(1) + 'km.|' + time,
+                        iconAnchor: latLngs[ndx],
+                        iconSize: [100, 0]
                     })
                 }).addTo(map);
             }
@@ -99,14 +127,18 @@
         return polyline;
     }
 
+    setLanguage();
+    var speed = DEFAULT_SPEED;
+
     var map = L.map('map', {
         crs: L.CRS.Simple,
         maxZoom: 11,
         minZoom: 8,
-        attributionControl: false
+        attributionControl: false,
+        drawControlTooltips: false
     });
 
-    var bounds = [[MIN_LAT, MIN_LONG], [MAX_LAT, MAX_LONG]];
+    var bounds = MAP_BOUNDS;
     var image = L.imageOverlay(MAP_FILE, bounds).addTo(map);
     map.fitBounds(bounds);
 
@@ -126,20 +158,16 @@
     map.addControl(drawControl);
 
     map.on('draw:created', function(e) {
-
         if (e.layerType === 'marker') {
             e.layer.bindLabel(e.layer.getLatLng().toString() + ', grid ' + latLngToGrid(e.layer.getLatLng()).toString());
         } else if (e.layerType === 'polyline') {
             e.layer = applyNavigationToPolyline(e.layer);
         }
-
-        console.log(e.layer);
         map.addLayer(e.layer);
         drawnItems.addLayer(e.layer);
     });
 
     map.on('draw:edited', function(e) {
-        console.log(e.layers);
         e.layers.eachLayer(function(layer) {
             if (typeof layer.getLatLngs !== 'undefined') {
                 applyNavigationToPolyline(layer);

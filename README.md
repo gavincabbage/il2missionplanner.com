@@ -7,7 +7,7 @@ IL-2 BoS Mission Planner
 - [ ] Clear button
 - [ ] Undo button
 - [x] Heading calculation
-- [ ] Distance calculation
+- [x] Distance calculation
 - [ ] Fuel calculation
 - [ ] Altitude consideration
-- [ ] Speed consideration
+- [x] Speed consideration

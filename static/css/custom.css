@@ -20,6 +20,13 @@ body {
     padding-top: 5px;
 }
 
+#greeting {
+    color: grey;
+    font-family: 'Courier New', Courier, serif;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
 #map {
     height: 200px;
 }
