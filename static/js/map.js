@@ -12,6 +12,7 @@
         MAP_FILE = 'img/map.png'
         GRID_SIDE_LENGTH =
                 ((MAX_LAT-MIN_LAT)/GRIDS_TALL + (MAX_LONG - MIN_LONG)/GRIDS_WIDE) / 2;
+        GRID_SIDE_DISTANCE = 10;
         RED_PATH_OPTIONS = {
             color: '#ff0000',
             fillColor: '#ff0000',
@@ -26,6 +27,10 @@
             opacity: 1
         }
 
+    function convertLatLngDistance(distance) {
+        return distance / GRID_SIDE_LENGTH * GRID_SIDE_DISTANCE;
+    }
+
     function getRowSubtotal(lat) {
         var invertedLat = MAX_LAT - lat;
         var numRows = Math.floor(invertedLat / GRID_SIDE_LENGTH);
@@ -34,7 +39,6 @@
     }
 
     function latLngToGrid(latLng) {
-        // TODO increase accuracy of this - not good enough to use yet
         console.log(GRID_SIDE_LENGTH);
         var subtotal = getRowSubtotal(latLng.lat);
         var numCols = Math.floor(latLng.lng / GRID_SIDE_LENGTH);
