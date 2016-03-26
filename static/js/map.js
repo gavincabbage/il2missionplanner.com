@@ -89,15 +89,18 @@
     function applyNavigationToPolyline(polyline) {
         polyline.setStyle(RED_POLYLINE_OPTIONS);
 
-        var decorator = L.polylineDecorator(polyline, {
-            patterns: [
-            {
-                repeat: false,
-                symbol: L.Symbol.arrowHead({
-                    pathOptions: RED_PATH_OPTIONS
-                })
-            }]
-        }).addTo(map);
+        // TODO tried to create clear button with CRAYO code at bottom,
+        // it only works if I remove this shit because of some "t.off" not
+        // a function crap.... Do we need this? Also clean up clear button code
+        // var decorator = L.polylineDecorator(polyline, {
+        //     patterns: [
+        //     {
+        //         repeat: false,
+        //         symbol: L.Symbol.arrowHead({
+        //             pathOptions: RED_PATH_OPTIONS
+        //         })
+        //     }]
+        // }).addTo(map).addTo(drawnItems);
 
 
         var latLngs = polyline.getLatLngs();
@@ -121,7 +124,7 @@
                         iconAnchor: latLngs[ndx],
                         iconSize: [100, 0]
                     })
-                }).addTo(map);
+                }).addTo(map).addTo(drawnItems);
             }
         }
         return polyline;
@@ -174,5 +177,30 @@
             }
         })
     });
+
+/// CRAYO
+    L.Control.RemoveAll = L.Control.extend(
+{
+    options:
+    {
+        position: 'topleft',
+    },
+    onAdd: function (map) {
+        var controlDiv = L.DomUtil.create('div', 'leaflet-draw-toolbar leaflet-bar');
+        L.DomEvent
+            .addListener(controlDiv, 'click', L.DomEvent.stopPropagation)
+            .addListener(controlDiv, 'click', L.DomEvent.preventDefault)
+        .addListener(controlDiv, 'click', function () {
+            drawnItems.clearLayers();
+        });
+
+        var controlUI = L.DomUtil.create('a', 'leaflet-draw-edit-remove', controlDiv);
+        controlUI.title = 'Remove All Polygons';
+        controlUI.href = '#';
+        return controlDiv;
+    }
+});
+var removeAllControl = new L.Control.RemoveAll();
+map.addControl(removeAllControl);
 
 })();
