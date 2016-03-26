@@ -18,7 +18,8 @@ div#header img {
 }
 
 div#header h1 {
-    padding-top: 6px;
+    font-size: 4.2rem;
+    padding-top: 10px;
 }
 
 div#greeting p {
@@ -40,7 +41,7 @@ div#footer p a {
 }
 
 div#map {
-    height: 200px;
+    height: 400px;
     position: relative;
     outline: none;
 }
@@ -56,15 +57,12 @@ div.heading-icon {
 /* Larger than phablet */
 @media (min-width: 550px) {
     div#map {
-        height: 400px;
+        height: 500px;
     }
 }
 
 /* Larger than tablet */
 @media (min-width: 750px) {
-    body {
-        overflow: hidden;
-    }
     div#map {
         height: 600px;
     }
@@ -72,6 +70,13 @@ div.heading-icon {
 
 /* Larger than desktop */
 @media (min-width: 1000px) {
+    body {
+        overflow: hidden;
+    }
+    div#header h1 {
+        font-size: 5.0rem;
+        padding-top: 6px;
+    }
 }
 
 /* Larger than Desktop HD */
