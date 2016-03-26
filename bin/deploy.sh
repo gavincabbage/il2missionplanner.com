@@ -13,7 +13,7 @@ fi
 echo 456prevhereintherepo
 pwd
 
-cd $HOME
+cd ..
 
 echo 123abczyx
 pwd
