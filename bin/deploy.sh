@@ -33,7 +33,7 @@ git init
 
 echo HERE A
 
-git config user.name "Travis CI"
+git config user.name "Gavin Cabbage"
 git config user.email "gavincabbage@gmail.com"
 
 echo HERE B
