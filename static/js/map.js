@@ -77,7 +77,7 @@
         return degrees;
     }
 
-    function setLanguage() {
+    function setToolbarLanguage() {
         L.drawLocal.draw.toolbar.buttons.polyline = 'Map a flight';
         L.drawLocal.draw.toolbar.buttons.marker = 'Mark a location';
         L.drawLocal.edit.toolbar.buttons.edit = 'Edit a flight';
@@ -127,7 +127,7 @@
         return polyline;
     }
 
-    setLanguage();
+    setToolbarLanguage();
     var speed = DEFAULT_SPEED;
 
     var map = L.map('map', {
