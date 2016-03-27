@@ -13,6 +13,8 @@ fi
 echo 456prevhereintherepo
 pwd
 
+bower install
+
 cd ..
 
 echo 123abczyx
@@ -27,6 +29,7 @@ ls
 # complile step
 # will probably need to do bower install here
 cp -R bos-mission-planner/static/ dist/
+
 
 cd dist
 git init
