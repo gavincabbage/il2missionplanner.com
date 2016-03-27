@@ -77,26 +77,10 @@
         return degrees;
     }
 
-    function setToolbarLanguage() {
-        L.drawLocal.draw.toolbar.buttons.polyline = content.toolbar.buttons.polyline;
-        L.drawLocal.draw.toolbar.buttons.marker = content.toolbar.buttons.marker;
-        L.drawLocal.edit.toolbar.buttons.edit = content.toolbar.buttons.edit;
-        L.drawLocal.edit.toolbar.buttons.editDisabled = content.toolbar.buttons.editDisabled;
-        L.drawLocal.edit.toolbar.buttons.delete = content.toolbar.buttons.delete;
-        L.drawLocal.edit.toolbar.buttons.deleteDisabled = content.toolbar.buttons.deleteDisabled;
-    }
-
     function applyNavigationToPolyline(polyline) {
         polyline.setStyle(RED_POLYLINE_OPTIONS);
         var latLngs = polyline.getLatLngs();
         for (ndx = 0; ndx < latLngs.length; ndx++) {
-
-            if (ndx > 0) {
-                var circle = L.circleMarker(latLngs[ndx], RED_PATH_OPTIONS);
-                circle.setRadius(2);
-                map.addLayer(circle);
-                drawnItems.addLayer(circle);
-            }
 
             if (ndx < latLngs.length-1) {
                 var heading = calculateHeading(latLngs[ndx], latLngs[ndx+1]);
@@ -115,7 +99,6 @@
         return polyline;
     }
 
-    setToolbarLanguage();
     var speed = DEFAULT_SPEED;
 
     var map = L.map('map', {
@@ -129,21 +112,7 @@
     var bounds = MAP_BOUNDS;
     var image = L.imageOverlay(MAP_FILE, bounds).addTo(map);
     map.fitBounds(bounds);
-
-    //var drawnItems = new L.FeatureGroup();
     map.addLayer(drawnItems);
-
-    // var drawControl = new L.Control.Draw({
-    //     draw: {
-    //         polygon: false,
-    //         rectangle: false,
-    //         circle: false
-    //     },
-    //     edit: {
-    //         featureGroup: drawnItems
-    //     }
-    // });
-    // map.addControl(drawControl);
 
     map.on('draw:created', function(e) {
         if (e.layerType === 'marker') {
@@ -163,11 +132,7 @@
         })
     });
 
-    var flightCreationToolbar = new L.Control.FlightCreationToolbar({
-        edit: {
-            featureGroup: drawnItems
-        }
-    });
+    var flightCreationToolbar = new L.Control.FlightCreationToolbar();
     map.addControl(flightCreationToolbar);
 
     var flightEditToolbar = new L.Control.FlightEditToolbar();
