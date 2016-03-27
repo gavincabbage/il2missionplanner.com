@@ -10,42 +10,22 @@ then
     exit 0
 fi
 
-echo 456prevhereintherepo
+echo "New code merged to master, deploying to gh-pages"
 pwd
-
 bower install
-
 cd ..
-
-echo 123abczyx
 pwd
-ls
-#
-# exit 0
-
-# rm -rf dist
-# mkdir dist
-
-# complile step
-# will probably need to do bower install here
 cp -R bos-mission-planner/static/ dist/
-
 
 cd dist
 git init
-
-echo HERE A
-
 git config user.name "Gavin Cabbage"
 git config user.email "gavincabbage@gmail.com"
-
-echo HERE B
-
 git add .
 git commit -m "deploying bos-mission-planner to gh-pages"
 
-echo HERE C
+echo "Finished configuring repo, pushing..."
 
 git push --force --quiet "https://${GH_TOKEN}@${GH_REF}" master:gh-pages > /dev/null 2>&1
 
-echo HERE D
+echo "Deployed to gh-pages successfully!"
