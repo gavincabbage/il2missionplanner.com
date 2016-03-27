@@ -1,4 +1,4 @@
-(function() {
+(function(content, drawnItems) {
 
     const
         MIN_LAT = 0.0,
@@ -78,31 +78,16 @@
     }
 
     function setToolbarLanguage() {
-        L.drawLocal.draw.toolbar.buttons.polyline = 'Map a flight';
-        L.drawLocal.draw.toolbar.buttons.marker = 'Mark a location';
-        L.drawLocal.edit.toolbar.buttons.edit = 'Edit a flight';
-        L.drawLocal.edit.toolbar.buttons.editDisabled = 'No flights to edit';
-        L.drawLocal.edit.toolbar.buttons.delete = 'Delete a flight';
-        L.drawLocal.edit.toolbar.buttons.delete = 'No flights to delete';
+        L.drawLocal.draw.toolbar.buttons.polyline = content.toolbar.buttons.polyline;
+        L.drawLocal.draw.toolbar.buttons.marker = content.toolbar.buttons.marker;
+        L.drawLocal.edit.toolbar.buttons.edit = content.toolbar.buttons.edit;
+        L.drawLocal.edit.toolbar.buttons.editDisabled = content.toolbar.buttons.editDisabled;
+        L.drawLocal.edit.toolbar.buttons.delete = content.toolbar.buttons.delete;
+        L.drawLocal.edit.toolbar.buttons.deleteDisabled = content.toolbar.buttons.deleteDisabled;
     }
 
     function applyNavigationToPolyline(polyline) {
         polyline.setStyle(RED_POLYLINE_OPTIONS);
-
-        // TODO tried to create clear button with CRAYO code at bottom,
-        // it only works if I remove this shit because of some "t.off" not
-        // a function crap.... Do we need this? Also clean up clear button code
-        // var decorator = L.polylineDecorator(polyline, {
-        //     patterns: [
-        //     {
-        //         repeat: false,
-        //         symbol: L.Symbol.arrowHead({
-        //             pathOptions: RED_PATH_OPTIONS
-        //         })
-        //     }]
-        // }).addTo(map).addTo(drawnItems);
-
-
         var latLngs = polyline.getLatLngs();
         for (ndx = 0; ndx < latLngs.length; ndx++) {
 
@@ -145,20 +130,20 @@
     var image = L.imageOverlay(MAP_FILE, bounds).addTo(map);
     map.fitBounds(bounds);
 
-    var drawnItems = new L.FeatureGroup();
+    //var drawnItems = new L.FeatureGroup();
     map.addLayer(drawnItems);
 
-    var drawControl = new L.Control.Draw({
-        draw: {
-            polygon: false,
-            rectangle: false,
-            circle: false
-        },
-        edit: {
-            featureGroup: drawnItems
-        }
-    });
-    map.addControl(drawControl);
+    // var drawControl = new L.Control.Draw({
+    //     draw: {
+    //         polygon: false,
+    //         rectangle: false,
+    //         circle: false
+    //     },
+    //     edit: {
+    //         featureGroup: drawnItems
+    //     }
+    // });
+    // map.addControl(drawControl);
 
     map.on('draw:created', function(e) {
         if (e.layerType === 'marker') {
@@ -178,29 +163,14 @@
         })
     });
 
-/// CRAYO
-    L.Control.RemoveAll = L.Control.extend(
-{
-    options:
-    {
-        position: 'topleft',
-    },
-    onAdd: function (map) {
-        var controlDiv = L.DomUtil.create('div', 'leaflet-draw-toolbar leaflet-bar');
-        L.DomEvent
-            .addListener(controlDiv, 'click', L.DomEvent.stopPropagation)
-            .addListener(controlDiv, 'click', L.DomEvent.preventDefault)
-        .addListener(controlDiv, 'click', function () {
-            drawnItems.clearLayers();
-        });
+    var flightCreationToolbar = new L.Control.FlightCreationToolbar({
+        edit: {
+            featureGroup: drawnItems
+        }
+    });
+    map.addControl(flightCreationToolbar);
 
-        var controlUI = L.DomUtil.create('a', 'leaflet-draw-edit-remove', controlDiv);
-        controlUI.title = 'Remove All Polygons';
-        controlUI.href = '#';
-        return controlDiv;
-    }
-});
-var removeAllControl = new L.Control.RemoveAll();
-map.addControl(removeAllControl);
+    var flightEditToolbar = new L.Control.FlightEditToolbar();
+    map.addControl(flightEditToolbar);
 
-})();
+})(content, drawnItems);
