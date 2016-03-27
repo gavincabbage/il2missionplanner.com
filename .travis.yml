@@ -1,0 +1,7 @@
+language: node_js
+node_js: '5.3.0'
+script: bash ./bin/deploy.sh
+env:
+    global:
+        - GH_REF: github.com/gavincabbage/bos-mission-planner.git
+        - secure: dLFVu5tmA2xX/2Ia6Of6K/MEJXAH5LRMg4QXjNb+cAIVPHcmX6jkD5vZKbxyE9gHg/gynwszEe8fSaBgUgpILQ6xuszP23V4+6DMJKh7FvOCcNxGiAi1IctdK/yYtG/xwgmOA9m4HNsTcGFwcyMSKfu5BTw9Y5Jyxghj9bu7Ha33ZSghSC3kQM5b7xO1LYYp/P5EljM8Pc8W2Wxqub5Ow50k1Kt5tkeqJqOMusZY97Cb9OwlcKLSxcX+NOc3hEy/Yc4SmLvKgdzc3P5BxL3SzxnlRylqPFJgzF5BQAaKeaH919lt1R/nqDrvIbmW+27USp8bvcpJW7BxbZa8FAchq/dTtpqWlg5ZF4loxWm2ez2zAepJBgybtjgFjxGtbofehDBo2lkOQxzR3UzvIYrtEVgNHZuRuTiii5ShAjUUFHeSHExIDNjtNbv/JCgzJrADyyMHDMiKMRcXCcljF/GDk51z23IIErtnspT/Dor2ErOY7KpkZUvlTHtEDh9aYrb+QoZx0lVJ06wx4812HGA18lbqOSjm5g6BAks4tzkk9LW5hDw48NcysUqvgca7wWHSHVVO5J6ZzkXnaCdRi27A+yhxg3NTFMdWTRgae2OhHZTPzcq5T8m9IefuGBH9T9bGzPK37x9YePQeQAqsBhwOSbxpkocFHkfErxSQEBWwaP0=

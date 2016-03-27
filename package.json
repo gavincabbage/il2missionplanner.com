@@ -1,0 +1,22 @@
+{
+  "name": "bos-mission-planner",
+  "version": "1.0.0",
+  "description": "Il-2: Battle of Stalingrad Mission Planner",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"No tests implemented yet\" && exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gavincabbage/bos-mission-planner.git"
+  },
+  "author": "Gavin Cabbage <gavincabbage@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gavincabbage/bos-mission-planner/issues"
+  },
+  "homepage": "https://github.com/gavincabbage/bos-mission-planner#readme",
+  "devDependencies": {
+    "bower": "^1.7.7"
+  }
+}
