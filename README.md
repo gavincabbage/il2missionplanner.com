@@ -1,5 +1,7 @@
 # Il-2: Battle of Stalingrad Mission Planner
 
+[![Build Status](https://travis-ci.org/gavincabbage/bos-mission-planner.svg?branch=master)](https://travis-ci.org/gavincabbage/bos-mission-planner)
+
 Welcome to the `bos-mission-planner` repository. This repository houses the code behind the Il-2: Battle of Stalingrad Mission Planner tool. Currently, the tool is built entirely with clientside javascript, keeping things very simple, and I hope to keep it that way.
 
 ## Contributing
