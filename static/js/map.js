@@ -130,17 +130,49 @@
     setToolbarLanguage();
     var speed = DEFAULT_SPEED;
 
+    // var map = L.map('map', {
+    //     crs: L.CRS.Simple,
+    //     maxZoom: 11,
+    //     minZoom: 9,
+    //     attributionControl: false,
+    //     drawControlTooltips: false
+    // });
+    //
+    // var bounds = MAP_BOUNDS;
+    // var image = L.imageOverlay(MAP_FILE, bounds).addTo(map);
+    // map.fitBounds(bounds);
+
     var map = L.map('map', {
         crs: L.CRS.Simple,
-        maxZoom: 11,
-        minZoom: 9,
-        attributionControl: false,
-        drawControlTooltips: false
+        attributionControl: false
+    }).setView([0, 0], 2);
+
+    L.tileLayer('img/map/{z}/{x}/{y}.png', {
+        minZoom: 1,
+        maxZoom: 6,
+        noWrap: true,
+        tms: true,
+        continuousWorld: true
+    }).addTo(map);
+
+    L.marker([0,0]).bindLabel('HELLO THERE').addTo(map);
+    L.marker([0,1]).bindLabel('HELLO THERE').addTo(map);
+    L.marker([1,0]).bindLabel('HELLO THERE').addTo(map);
+    L.marker([1,1]).bindLabel('HELLO THERE').addTo(map);
+    L.marker([2,2]).bindLabel('HELLO THERE').addTo(map);
+
+    L.marker([0,10]).bindLabel('HELLO THERE').addTo(map);
+    L.marker([0,25]).bindLabel('HELLO THERE').addTo(map);
+    L.marker([0,252]).bindLabel('HELLO THERE').addTo(map);
+    L.marker([164,0]).bindLabel('HELLO THERE').addTo(map);
+
+    map.on('moveend', function() {
+     console.log(map.getBounds());
     });
 
-    var bounds = MAP_BOUNDS;
-    var image = L.imageOverlay(MAP_FILE, bounds).addTo(map);
-    map.fitBounds(bounds);
+console.log(map.project([0, 0], 1));
+    console.log(map.project([16128, 10496], 1));
+
 
     var drawnItems = new L.FeatureGroup();
     map.addLayer(drawnItems);
