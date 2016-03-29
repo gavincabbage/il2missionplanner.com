@@ -1,6 +1,15 @@
 /* Mobile first queries taken directly from skeleton.css */
 
 body {
+    padding: 0;
+    margin: 0;
+}
+html, body, #map {
+    height: 100%;
+}
+
+/*
+body {
     margin-top: 10px;
     font-family: 'Droid Serif', Arial, serif;
     font-weight: 400;
@@ -54,21 +63,21 @@ div.heading-icon {
     margin: 0px 0px 0px 6px;
 }
 
-/* Larger than phablet */
+/* Larger than phablet *
 @media (min-width: 550px) {
     div#map {
         height: 500px;
     }
 }
 
-/* Larger than tablet */
+/* Larger than tablet *
 @media (min-width: 750px) {
     div#map {
         height: 600px;
     }
 }
 
-/* Larger than desktop */
+/* Larger than desktop *
 @media (min-width: 1000px) {
     body {
         overflow: hidden;
@@ -79,6 +88,6 @@ div.heading-icon {
     }
 }
 
-/* Larger than Desktop HD */
+/* Larger than Desktop HD *
 @media (min-width: 1200px) {
-}
+}*/
