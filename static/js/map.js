@@ -189,15 +189,15 @@
     });
     map.addControl(drawControl);
     //
-    // map.on('draw:created', function(e) {
-    //     if (e.layerType === 'marker') {
-    //         e.layer.bindLabel(e.layer.getLatLng().toString() + ', grid ' + latLngToGrid(e.layer.getLatLng()).toString());
-    //     } else if (e.layerType === 'polyline') {
-    //         e.layer = applyNavigationToPolyline(e.layer);
-    //     }
-    //     map.addLayer(e.layer);
-    //     drawnItems.addLayer(e.layer);
-    // });
+    map.on('draw:created', function(e) {
+        if (e.layerType === 'marker') {
+            e.layer.bindLabel(e.layer.getLatLng().toString() + ', grid ' + latLngToGrid(e.layer.getLatLng()).toString());
+        } else if (e.layerType === 'polyline') {
+            //e.layer = applyNavigationToPolyline(e.layer);
+        }
+        map.addLayer(e.layer);
+        drawnItems.addLayer(e.layer);
+    });
     //
     // map.on('draw:edited', function(e) {
     //     e.layers.eachLayer(function(layer) {
