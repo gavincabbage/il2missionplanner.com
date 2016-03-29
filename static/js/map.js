@@ -174,20 +174,20 @@
     // console.log(map.project([16128, 10496], 1));
 
 
-    // var drawnItems = new L.FeatureGroup();
-    // map.addLayer(drawnItems);
-    //
-    // var drawControl = new L.Control.Draw({
-    //     draw: {
-    //         polygon: false,
-    //         rectangle: false,
-    //         circle: false
-    //     },
-    //     edit: {
-    //         featureGroup: drawnItems
-    //     }
-    // });
-    // map.addControl(drawControl);
+    var drawnItems = new L.FeatureGroup();
+    map.addLayer(drawnItems);
+
+    var drawControl = new L.Control.Draw({
+        draw: {
+            polygon: false,
+            rectangle: false,
+            circle: false
+        },
+        edit: {
+            featureGroup: drawnItems
+        }
+    });
+    map.addControl(drawControl);
     //
     // map.on('draw:created', function(e) {
     //     if (e.layerType === 'marker') {
