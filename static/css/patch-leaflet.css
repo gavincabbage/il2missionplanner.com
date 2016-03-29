@@ -1,0 +1,31 @@
+/* Unset spritesheet and replace with fontawesome icons */
+
+.leaflet-draw-toolbar a {
+    background-position: unset;
+    background-image: unset;
+}
+
+.leaflet-retina .leaflet-draw-toolbar a {
+    background-position: unset;
+    background-image: unset;
+}
+
+.leaflet-draw-draw-polyline:before {
+    content: "\f072";
+    font-family: FontAwesome;
+}
+
+.leaflet-draw-draw-marker:before {
+    content: "\f041";
+    font-family: FontAwesome;
+}
+
+.leaflet-draw-edit-edit:before {
+    content: "\f044";
+    font-family: FontAwesome;
+}
+
+.leaflet-draw-edit-remove:before {
+    content: "\f12d";
+    font-family: FontAwesome;
+}

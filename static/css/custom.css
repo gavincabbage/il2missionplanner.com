@@ -1,93 +1,10 @@
-/* Mobile first queries taken directly from skeleton.css */
-
 body {
+    font-family: 'Droid Serif', Arial, serif;
+    font-weight: 400;
     padding: 0;
     margin: 0;
 }
+
 html, body, #map {
     height: 100%;
 }
-
-/*
-body {
-    margin-top: 10px;
-    font-family: 'Droid Serif', Arial, serif;
-    font-weight: 400;
-    color: white;
-    background-color: black;
-    min-width: 400px;
-}
-
-div#header {
-    text-align: center;
-}
-
-div#header img {
-    float: left;
-}
-
-div#header h1 {
-    font-size: 4.2rem;
-    padding-top: 10px;
-}
-
-div#greeting p {
-    color: grey;
-    font-family: 'Courier New', Courier, serif;
-    text-align: center;
-}
-
-div#footer p {
-    margin-top: 10px;
-    color: grey;
-    font-family: 'Courier New', Courier, serif;
-    text-align: right;
-    font-size: 8pt;
-}
-
-div#footer p a {
-    color: white;
-}
-
-div#map {
-    height: 400px;
-    position: relative;
-    outline: none;
-}
-
-div.heading-icon {
-    color: black;
-    font-family: 'Courier New', Courier, serif;
-    font-size: 8pt;
-    font-weight: bold;
-    margin: 0px 0px 0px 6px;
-}
-
-/* Larger than phablet *
-@media (min-width: 550px) {
-    div#map {
-        height: 500px;
-    }
-}
-
-/* Larger than tablet *
-@media (min-width: 750px) {
-    div#map {
-        height: 600px;
-    }
-}
-
-/* Larger than desktop *
-@media (min-width: 1000px) {
-    body {
-        overflow: hidden;
-    }
-    div#header h1 {
-        font-size: 5.0rem;
-        padding-top: 6px;
-    }
-}
-
-/* Larger than Desktop HD *
-@media (min-width: 1200px) {
-}*/
