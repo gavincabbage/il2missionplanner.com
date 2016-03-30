@@ -1,4 +1,4 @@
-(function(content) {
+(function() {
 
     const
         SCALE_FACTOR = 7.14,
@@ -33,6 +33,7 @@
             rectangle: false,
             circle: false,
             polyline: {
+                showLength: false,
                 shapeOptions: {
                     color: RED,
                     weight: 2
@@ -47,23 +48,24 @@
 
     map.on('draw:created', function(e) {
 
-        if (e.layerType === 'polyline') {
-            L.polylineDecorator(e.layer, {
-                patterns: [
-                    {
-                        offset: 100,
-                        repeat: 300,
-                        symbol: L.Symbol.arrowHead({
-                            pathOptions: {
-                                opacity: 0,
-                                fillOpacity: 1,
-                                color: RED
-                            }
-                        })
-                    }
-                ]
-            }).addTo(map);
-        }
+        // TODO This does not work with edit
+        // if (e.layerType === 'polyline') {
+        //     L.polylineDecorator(e.layer, {
+        //         patterns: [
+        //             {
+        //                 offset: 100,
+        //                 repeat: 300,
+        //                 symbol: L.Symbol.arrowHead({
+        //                     pathOptions: {
+        //                         opacity: 0,
+        //                         fillOpacity: 1,
+        //                         color: RED
+        //                     }
+        //                 })
+        //             }
+        //         ]
+        //     }).addTo(map);
+        // }
 
         map.addLayer(e.layer);
         drawnItems.addLayer(e.layer);
@@ -76,9 +78,10 @@
     var layerCount = 0;
     map.on('draw:drawvertex', function(e) {
         console.log(e.layers.getLayers());
-        e.layers.eachLayer(function(layer) {
-            layer.bindLabel('hello').addTo(map);
-        });
+        // TODO Keeping for the text marker code below, will do soon
+        // e.layers.eachLayer(function(layer) {
+        //     layer.bindLabel('hello').addTo(map);
+        // });
         // e.layers.eachLayer(function(layer) {
         //     console.log(layer);
         // });
@@ -118,4 +121,4 @@
         [LAT_MAX + BORDER, LNG_MAX + BORDER]
     ));
 
-})(content);
+})();
