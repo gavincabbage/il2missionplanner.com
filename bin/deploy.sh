@@ -14,7 +14,6 @@ function preamble {
     set -o errexit
     set -o errtrace
     set -o nounset
-    set -o xtrace
     set -o pipefail
 }
 
