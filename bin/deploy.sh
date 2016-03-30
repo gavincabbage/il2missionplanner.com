@@ -54,10 +54,10 @@ function deploy_beta {
 function main() {
 
     # Do not deploy any PRs or code from other repos
-    if [ "${TRAVIS_REPO_SLUG}" != "${REPO}" ] || \
-       [ "${TRAVIS_PULL_REQUEST}" != "false" ] || \
-       ([ "${TRAVIS_BRANCH}" != "${PROD_BRANCH}" ] && \
-        [ "${TRAVIS_BRANCH}" != "${BETA_BRANCH}" ])
+    if [[ "${TRAVIS_REPO_SLUG}" != "${REPO}" ]] || \
+       [[ "${TRAVIS_PULL_REQUEST}" != "false" ]] || \
+       ([[ "${TRAVIS_BRANCH}" != "${PROD_BRANCH}" ]] && \
+        [[ "${TRAVIS_BRANCH}" != "${BETA_BRANCH}" ]])
     then
         abort "0" "No deploy necessary - exiting happily"
     fi
@@ -65,11 +65,11 @@ function main() {
     build()
 
     # Deploy depending on branch
-    if [ "${TRAVIS_BRANCH}" == "${PROD_BRANCH}" ]
+    if [[ "${TRAVIS_BRANCH}" == "${PROD_BRANCH}" ]]
     then
         ${LOG}"Deploying branch:${PROD_BRANCH} to production"
         deploy_prod()
-    elif [ "${TRAVIS_BRANCH}" == "${BETA_BRANCH}" ]
+    elif [[ "${TRAVIS_BRANCH}" == "${BETA_BRANCH}" ]]
     then
         ${LOG}"Deploying branch:${BETA_BRANCH} to beta"
         deploy_beta()
