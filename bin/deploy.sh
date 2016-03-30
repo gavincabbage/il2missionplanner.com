@@ -8,8 +8,7 @@ DIST="dist/"
 GIT_NAME="Gavin Cabbage"
 GIT_EMAIL="gavincabbage@gmail.com"
 GIT_COMMIT_MSG="deploying to gh-pages"
-
-LOG="echo ["`basename ${0}`"] "
+BASENAME=`basename "${0}"`
 
 function preamble {
     set -o errexit
@@ -19,35 +18,39 @@ function preamble {
     set -o pipefail
 }
 
+function log { # usage: log <message>
+    echo "[${BASENAME}] ${1}"
+}
+
 function abort { # usage: abort <code> <message>
-    ${LOG}${2}": exit "${1}
-    exit ${1}
+    log "${2}: exit ${1}"
+    exit "${1}"
 }
 
 function build {
-    $LOG"Starting build"
+    log "Starting build"
     bower install
-    $LOG"Build successful"
+    log "Build successful"
 }
 
 function deploy_prod {
-    $LOG"Starting prod deployment"
-    cp -R ${SRC} ${DIST}
-    $LOG"Ready for automatic deployment to S3"
+    log "Starting prod deployment"
+    cp -R "${SRC}" "${DIST}"
+    log "Ready for automatic deployment to S3"
 }
 
 function deploy_beta {
-    $LOG"Starting beta deployment"
+    log "Starting beta deployment"
     cd ..
-    cp -R bos-mission-planner/${SRC} ${DIST}
-    cd ${DIST}
-    $LOG"Initializing git repo"
+    cp -R "bos-mission-planner/${SRC}" "${DIST}"
+    cd "${DIST}"
+    log "Initializing git repo"
     git init
-    git config user.name ${GIT_NAME}
-    git config user.email ${GIT_EMAIL}
+    git config user.name "${GIT_NAME}"
+    git config user.email "${GIT_EMAIL}"
     git add .
-    git commit -m ${GIT_COMMIT_MSG}
-    $LOG"Pushing to gh-pages"
+    git commit -m "${GIT_COMMIT_MSG}"
+    log "Pushing to gh-pages"
     git push --force --quiet "https://${GH_TOKEN}@${GH_REF}" master:gh-pages > /dev/null 2>&1
 }
 
@@ -67,11 +70,11 @@ function main {
     # Deploy depending on branch
     if [[ "${TRAVIS_BRANCH}" == "${PROD_BRANCH}" ]]
     then
-        ${LOG}"Deploying branch:${PROD_BRANCH} to production"
+        log "Deploying branch:${PROD_BRANCH} to production"
         deploy_prod
     elif [[ "${TRAVIS_BRANCH}" == "${BETA_BRANCH}" ]]
     then
-        ${LOG}"Deploying branch:${BETA_BRANCH} to beta"
+        log "Deploying branch:${BETA_BRANCH} to beta"
         deploy_beta
     fi
 
