@@ -23,6 +23,7 @@ bower install
 cd ..
 pwd
 cp -R bos-mission-planner/static/ dist/
+echo "Copied successfully"
 
 cd dist
 git init
@@ -30,6 +31,7 @@ git config user.name "Gavin Cabbage"
 git config user.email "gavincabbage@gmail.com"
 git add .
 git commit -m "deploying bos-mission-planner to gh-pages"
+echo "Committed successfully"
 
 echo "Finished configuring repo, pushing..."
 
