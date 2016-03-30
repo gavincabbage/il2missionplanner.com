@@ -6,13 +6,15 @@ if [ "${TRAVIS_REPO_SLUG}" != "gavincabbage/bos-mission-planner" ] || \
    [ "${TRAVIS_PULL_REQUEST}" != "false" ] || \
    [ "${TRAVIS_BRANCH}" != "develop" ]
 then
-    echo "Not develop, aborting deploy happily"
-    exit 0
+    echo "Not develop, aborting beta deploy happily"
 
     if [ "${TRAVIS_BRANCH}" == "master" ]
     then
+        echo "Moving static to dist for master deploy"
         cp -R static/ dist/
     fi
+
+    exit 0
 fi
 
 echo "New code merged to master, deploying to gh-pages"
