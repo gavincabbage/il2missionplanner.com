@@ -4,10 +4,15 @@ set -e
 
 if [ "${TRAVIS_REPO_SLUG}" != "gavincabbage/bos-mission-planner" ] || \
    [ "${TRAVIS_PULL_REQUEST}" != "false" ] || \
-   [ "${TRAVIS_BRANCH}" != "master" ]
+   [ "${TRAVIS_BRANCH}" != "develop" ]
 then
-    echo "Not master, aborting deploy happily"
+    echo "Not develop, aborting deploy happily"
     exit 0
+
+    if [ "${TRAVIS_BRANCH}" == "master" ]
+    then
+        cp -R static/ dist/
+    fi
 fi
 
 echo "New code merged to master, deploying to gh-pages"
