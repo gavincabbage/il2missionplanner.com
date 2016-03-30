@@ -4,6 +4,8 @@
 
 Welcome to the `bos-mission-planner` repository. This repository houses the code behind the Il-2: Battle of Stalingrad Mission Planner tool, a simple client-side javascript application based primarily on [Leaflet](http://leafletjs.com/)
 
+Check out the [latest stable release in production](bosmissionplanner.com), or the [beta region](beta.bosmissionplanner.com) to see work in progress.
+
 ## Contributing
 
 Interested in contributing to this tool? Feel free to fork the project and open a PR when you're ready to contribute back. The code is under the MIT license, so you can basically do whatever you like with it.
