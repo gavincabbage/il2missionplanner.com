@@ -33,6 +33,9 @@ git add .
 git commit -m "deploying bos-mission-planner to gh-pages"
 echo "Committed successfully"
 
+echo "Branch info"
+git branch
+
 echo "Finished configuring repo, pushing..."
 
 git push --force --quiet "https://${GH_TOKEN}@${GH_REF}" master:gh-pages > /dev/null 2>&1
