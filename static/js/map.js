@@ -7,7 +7,8 @@
         LNG_MIN = 0,
         LNG_MAX = 252,
         BORDER = 5,
-        CENTER = [LAT_MAX / 2, LNG_MAX / 2]
+        CENTER = [LAT_MAX / 2, LNG_MAX / 2],
+        RED = '#ff0000'
     ;
 
     var map = L.map('map', {
@@ -33,7 +34,7 @@
             circle: false,
             polyline: {
                 shapeOptions: {
-                    color: '#ff0000',
+                    color: RED,
                     weight: 2
                 }
             }
@@ -45,6 +46,25 @@
     map.addControl(drawControl);
 
     map.on('draw:created', function(e) {
+
+        if (e.layerType === 'polyline') {
+            L.polylineDecorator(e.layer, {
+                patterns: [
+                    {
+                        offset: 100,
+                        repeat: 300,
+                        symbol: L.Symbol.arrowHead({
+                            pathOptions: {
+                                opacity: 0,
+                                fillOpacity: 1,
+                                color: RED
+                            }
+                        })
+                    }
+                ]
+            }).addTo(map);
+        }
+
         map.addLayer(e.layer);
         drawnItems.addLayer(e.layer);
     });
@@ -53,8 +73,12 @@
      console.log(map.getBounds());
     });
 
+    var layerCount = 0;
     map.on('draw:drawvertex', function(e) {
         console.log(e.layers.getLayers());
+        e.layers.eachLayer(function(layer) {
+            layer.bindLabel('hello').addTo(map);
+        });
         // e.layers.eachLayer(function(layer) {
         //     console.log(layer);
         // });
