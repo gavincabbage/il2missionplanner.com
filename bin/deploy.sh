@@ -48,7 +48,7 @@ function deploy_beta {
     git config user.name "${GIT_NAME}"
     git config user.email "${GIT_EMAIL}"
     git add .
-    git commit -m "${GIT_COMMIT_MSG}"
+    git commit --quiet -m "${GIT_COMMIT_MSG}"
     log "Pushing to gh-pages"
     git push --force --quiet "https://${GH_TOKEN}@${GH_REF}" master:gh-pages > /dev/null 2>&1
 }
