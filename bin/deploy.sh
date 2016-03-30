@@ -11,7 +11,7 @@ GIT_COMMIT_MSG="deploying to gh-pages"
 
 LOG="echo ["`basename ${0}`"] "
 
-function preamble() {
+function preamble {
     set -o errexit
     set -o errtrace
     set -o nounset
@@ -51,7 +51,7 @@ function deploy_beta {
     git push --force --quiet "https://${GH_TOKEN}@${GH_REF}" master:gh-pages > /dev/null 2>&1
 }
 
-function main() {
+function main {
 
     # Do not deploy any PRs or code from other repos
     if [[ "${TRAVIS_REPO_SLUG}" != "${REPO}" ]] || \
@@ -62,23 +62,21 @@ function main() {
         abort "0" "No deploy necessary - exiting happily"
     fi
 
-    build()
+    build
 
     # Deploy depending on branch
     if [[ "${TRAVIS_BRANCH}" == "${PROD_BRANCH}" ]]
     then
         ${LOG}"Deploying branch:${PROD_BRANCH} to production"
-        deploy_prod()
-    fi
-
-    if [[ "${TRAVIS_BRANCH}" == "${BETA_BRANCH}" ]]
+        deploy_prod
+    elif [[ "${TRAVIS_BRANCH}" == "${BETA_BRANCH}" ]]
     then
         ${LOG}"Deploying branch:${BETA_BRANCH} to beta"
-        deploy_beta()
+        deploy_beta
     fi
 
     abort "0" "Finished deployment successfully!"
 }
 
-preamble()
-main()
+preamble
+main
