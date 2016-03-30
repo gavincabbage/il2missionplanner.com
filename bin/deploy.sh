@@ -5,7 +5,7 @@ BETA_BRANCH="develop"
 PROD_BRANCH="master"
 SRC="static/"
 DIST="dist/"
-GIT_NAM="Gavin Cabbage"
+GIT_NAME="Gavin Cabbage"
 GIT_EMAIL="gavincabbage@gmail.com"
 GIT_COMMIT_MSG="deploying to gh-pages"
 
