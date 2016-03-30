@@ -17,7 +17,7 @@ then
     exit 0
 fi
 
-echo "New code merged to master, deploying to gh-pages"
+echo "New code merged to develop, deploying to gh-pages"
 pwd
 bower install
 cd ..
