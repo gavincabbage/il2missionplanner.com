@@ -69,7 +69,6 @@ function main() {
     then
         ${LOG}"Deploying branch:${PROD_BRANCH} to production"
         deploy_prod()
-
     elif [ "${TRAVIS_BRANCH}" == "${BETA_BRANCH}" ]
     then
         ${LOG}"Deploying branch:${BETA_BRANCH} to beta"
