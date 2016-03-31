@@ -98,7 +98,7 @@
                 showLength: false,
                 shapeOptions: {
                     color: RED,
-                    weight: 2
+                    weight: 3
                 }
             }
         },
