@@ -122,6 +122,7 @@
         console.log(e);
         deleteAssociatedLayers(e.layers);
         console.log('edited: after delete');
+        console.log(e.layers);
         e.layers.eachLayer(function(layer) {
             console.log('edited: each layer');
             if (layer.getLatLngs) {
