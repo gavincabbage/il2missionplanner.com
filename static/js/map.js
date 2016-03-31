@@ -109,14 +109,6 @@
         }
     });
 
-    map.on('moveend', function() {
-        console.log(map.getBounds());
-    });
-
-    map.on('draw:drawvertex', function(e) {
-        console.log(e.layers.getLayers());
-    });
-
     map.on('draw:deleted', function(e) {
         deleteAssociatedLayers(e.layers);
     });
@@ -124,7 +116,9 @@
     map.on('draw:edited', function(e) {
         deleteAssociatedLayers(e.layers);
         e.layers.eachLayer(function(layer) {
-            applyFlightPlan(layer);
+            if (layer.getLatLngs) {
+                applyFlightPlan(layer);
+            }
         });
     });
 
@@ -133,7 +127,8 @@
         [LAT_MAX + BORDER, LNG_MAX + BORDER]
     ));
 
-    var otherEvents = ['draw:deletestart', 'draw:deleteend', 'draw:editstop',
+    // debug other events
+    var otherEvents = ['draw:deletestart', 'draw:deleteend', 'draw:editstop', 'draw:drawvertex',
             'draw:editvertex', 'draw:editstart', 'draw:drawstop', 'draw:drawstart']
     for (var i = 0; i < otherEvents.length; i++) {
         map.on(otherEvents[i], function(e) {
