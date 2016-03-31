@@ -101,6 +101,9 @@
     });
     map.addControl(drawControl);
 
+    var titleControl = new L.Control.TitleControl({});
+    map.addControl(titleControl);
+
     map.on('draw:created', function(e) {
         map.addLayer(e.layer);
         drawnItems.addLayer(e.layer);
