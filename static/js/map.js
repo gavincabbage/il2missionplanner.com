@@ -117,6 +117,8 @@
     });
 
     map.on('draw:edited', function(e) {
+        console.log('edited fired');
+        console.log(e);
         deleteAssociatedLayers(e.layers);
         e.layers.eachLayer(function(layer) {
             if (layer.getLatLngs) {
