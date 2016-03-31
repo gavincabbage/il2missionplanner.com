@@ -2,12 +2,12 @@
 
 .leaflet-draw-toolbar a {
     background-position: unset;
-    background-image: unset;
+    background-image: none;
 }
 
 .leaflet-retina .leaflet-draw-toolbar a {
     background-position: unset;
-    background-image: unset;
+    background-image: none;
 }
 
 .leaflet-draw-draw-polyline:before {
