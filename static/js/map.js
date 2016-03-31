@@ -70,7 +70,7 @@
     var map = L.map('map', {
         crs: L.CRS.Simple,
         attributionControl: false
-    }).setView([0, 0], 2);
+    }).setView(CENTER, 3);
 
     L.tileLayer('img/map/{z}/{x}/{y}.png', {
         minZoom: 1,
