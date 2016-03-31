@@ -12,6 +12,8 @@
         DEFAULT_SPEED = 300
     ;
 
+    var map, drawnItems, hiddenLayers;
+
     // patch a leaflet bug, see https://github.com/bbecquet/Leaflet.PolylineDecorator/issues/17
     L.PolylineDecorator.include(L.Mixin.Events);
 
@@ -86,13 +88,34 @@
 
         map.eachLayer(function(layer) {
             if (toDelete.indexOf(layer.parentId) != -1) {
-                drawnItems.removeLayer(layer);
                 map.removeLayer(layer);
+            }
+        });
+        hiddenLayers.eachLayer(function(layer) {
+            if (toDelete.indexOf(layer.parentId) != -1) {
+                hiddenLayers.removeLayer(layer);
             }
         });
     }
 
-    var map = L.map('map', {
+    function transferChildLayer(from, to) {
+        from.eachLayer(function(layer) {
+            if (typeof layer.parentId !== 'undefined') {
+                from.removeLayer(layer);
+                to.addLayer(layer);
+            }
+        });
+    }
+
+    function showChildLayers() {
+        transferChildLayer(hiddenLayers, map);
+    }
+
+    function hideChildLayers() {
+        transferChildLayer(map, hiddenLayers);
+    }
+
+    map = L.map('map', {
         crs: L.CRS.Simple,
         attributionControl: false
     }).setView(CENTER, 3);
@@ -105,9 +128,9 @@
         continuousWorld: true
     }).addTo(map);
 
-    var drawnItems = new L.FeatureGroup();
+    drawnItems = new L.FeatureGroup();
     map.addLayer(drawnItems);
-    var hiddenLayers = new L.FeatureGroup();
+    hiddenLayers = new L.FeatureGroup();
 
     var editOptions = {
         selectedPathOptions: {
@@ -164,22 +187,20 @@
     });
 
     map.on('draw:editstart', function(e) {
-        map.eachLayer(function(layer) {
-            if (typeof layer.parentId !== 'undefined') {
-                map.removeLayer(layer);
-                hiddenLayers.addLayer(layer);
-            }
-        });
+        hideChildLayers();
     });
 
     map.on('draw:editstop', function(e) {
-        hiddenLayers.eachLayer(function(layer) {
-            if (typeof layer.parentId !== 'undefined') {
-                hiddenLayers.removeLayer(layer);
-                map.addLayer(layer);
-            }
-        });
-    })
+        showChildLayers();
+    });
+
+    map.on('draw:deletestart', function(e) {
+        hideChildLayers();
+    });
+
+    map.on('draw:deletestop', function(e) {
+        showChildLayers();
+    });
 
     map.setMaxBounds(new L.LatLngBounds(
         [LAT_MIN - BORDER, LNG_MIN - BORDER],
