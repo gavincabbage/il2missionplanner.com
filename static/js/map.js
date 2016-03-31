@@ -12,6 +12,9 @@
         DEFAULT_SPEED = 300
     ;
 
+    // patch a leaflet bug, see https://github.com/bbecquet/Leaflet.PolylineDecorator/issues/17
+    L.PolylineDecorator.include(L.Mixin.Events);
+
     function calculateDistance(a, b) {
 		var dx = b.lng - a.lng;
         var dy = b.lat - a.lat;
@@ -166,16 +169,16 @@
                 map.removeLayer(layer);
                 hiddenLayers.addLayer(layer);
             }
-        })
+        });
     });
 
     map.on('draw:editstop', function(e) {
-        map.eachLayer(function(layer) {
+        hiddenLayers.eachLayer(function(layer) {
             if (typeof layer.parentId !== 'undefined') {
                 hiddenLayers.removeLayer(layer);
                 map.addLayer(layer);
             }
-        })
+        });
     })
 
     map.setMaxBounds(new L.LatLngBounds(
