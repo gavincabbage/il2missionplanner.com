@@ -41,15 +41,26 @@
             var heading = calculateHeading(coords[i], coords[i+1]).toString();
             var markerContent = distance + 'km | ' + heading + '&deg;';
             var marker =  L.marker(coords[i], {
+                clickable: false,
                 icon: L.divIcon({
                     className: 'flight-vertext',
                     html: markerContent,
                     iconAnchor: coords[i],
-                    iconSize: [100, 0]
+                    iconSize: [250, 0]
                 })
             });
             marker.parentId = id;
             marker.addTo(map).addTo(drawnItems);
+            var circle = L.circleMarker(coords[i], {
+                fill: true,
+                color: RED,
+                fillColor: RED,
+                fillOpacity: 0.8,
+                opacity: 0.8,
+                radius: 3
+            });
+            circle.parentId = id;
+            circle.addTo(map).addTo(drawnItems);
         }
     }
 
@@ -73,7 +84,7 @@
     }).setView(CENTER, 3);
 
     L.tileLayer('img/map/{z}/{x}/{y}.png', {
-        minZoom: 1,
+        minZoom: 2,
         maxZoom: 6,
         noWrap: true,
         tms: true,
@@ -86,7 +97,7 @@
     var editOptions = {
         selectedPathOptions: {
             maintainColor: true,
-            opacity: 0.5
+            opacity: 0.4
         }
     }
     var drawControl = new L.Control.Draw({
@@ -98,7 +109,8 @@
                 showLength: false,
                 shapeOptions: {
                     color: RED,
-                    weight: 3
+                    weight: 3,
+                    opacity: 0.8
                 }
             }
         },
