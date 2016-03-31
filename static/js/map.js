@@ -33,9 +33,30 @@
         return degrees.toFixed(1);
     }
 
+    function newFlightDecorator(route) {
+        return L.polylineDecorator(route, {
+            patterns: [
+                {
+                    offset: 100,
+                    repeat: 300,
+                    symbol: L.Symbol.arrowHead({
+                        pathOptions: {
+                            opacity: 0,
+                            fillOpacity: 1,
+                            color: RED
+                        }
+                    })
+                }
+            ]
+        });
+    }
+
     function applyFlightPlan(route) {
         var id = route._leaflet_id;
         var coords = route.getLatLngs();
+        var decorator = newFlightDecorator(route);
+        decorator.parentId = id;
+        decorator.addTo(map);
         for (var i = 0; i < coords.length-1; i++) {
             var distance = calculateDistance(coords[i], coords[i+1]).toString();
             var heading = calculateHeading(coords[i], coords[i+1]).toString();
@@ -50,17 +71,7 @@
                 })
             });
             marker.parentId = id;
-            marker.addTo(map).addTo(drawnItems);
-            var circle = L.circleMarker(coords[i], {
-                fill: true,
-                color: RED,
-                fillColor: RED,
-                fillOpacity: 0.8,
-                opacity: 0.8,
-                radius: 3
-            });
-            circle.parentId = id;
-            circle.addTo(map).addTo(drawnItems);
+            marker.addTo(map);
         }
     }
 
@@ -70,7 +81,7 @@
             toDelete.push(layer._leaflet_id);
         });
 
-        drawnItems.eachLayer(function(layer) {
+        map.eachLayer(function(layer) {
             if (toDelete.indexOf(layer.parentId) != -1) {
                 drawnItems.removeLayer(layer);
                 map.removeLayer(layer);
@@ -93,6 +104,7 @@
 
     var drawnItems = new L.FeatureGroup();
     map.addLayer(drawnItems);
+    var hiddenLayers = new L.FeatureGroup();
 
     var editOptions = {
         selectedPathOptions: {
@@ -125,6 +137,7 @@
     map.addControl(titleControl);
 
     map.on('draw:created', function(e) {
+        console.log(e);
         map.addLayer(e.layer);
         drawnItems.addLayer(e.layer);
         if (e.layerType === 'polyline') {
@@ -133,22 +146,37 @@
     });
 
     map.on('draw:deleted', function(e) {
+        console.log(e);
         deleteAssociatedLayers(e.layers);
     });
 
     map.on('draw:edited', function(e) {
-        console.log('edited fired');
         console.log(e);
         deleteAssociatedLayers(e.layers);
-        console.log('edited: after delete');
-        console.log(e.layers);
         e.layers.eachLayer(function(layer) {
-            console.log('edited: each layer');
             if (layer.getLatLngs) {
                 applyFlightPlan(layer);
             }
         });
     });
+
+    map.on('draw:editstart', function(e) {
+        map.eachLayer(function(layer) {
+            if (typeof layer.parentId !== 'undefined') {
+                map.removeLayer(layer);
+                hiddenLayers.addLayer(layer);
+            }
+        })
+    });
+
+    map.on('draw:editstop', function(e) {
+        map.eachLayer(function(layer) {
+            if (typeof layer.parentId !== 'undefined') {
+                hiddenLayers.removeLayer(layer);
+                map.addLayer(layer);
+            }
+        })
+    })
 
     map.setMaxBounds(new L.LatLngBounds(
         [LAT_MIN - BORDER, LNG_MIN - BORDER],
