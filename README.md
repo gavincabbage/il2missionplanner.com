@@ -16,7 +16,7 @@ Interested in contributing to this tool? Feel free to fork the project and open 
 
 ## Development Setup
 
-Clone the repository. In the repository directory, run `npm install` followed by `bower install` to fetch dependencies. Then navigate to the index file in a web browser (e.g. `file:///path/to/index.html`) to access the site. 
+Clone the repository. In the repository directory, run `npm install` followed by `bower install` to fetch dependencies. Then navigate to the index file in a web browser (e.g. `file:///path/to/index.html`) to access the site. Currently most of the app is in `map.js` and `controls.js`. There aren't any unit tests yet because I'm lazy and learning how to use Leaflet, but eventually my anxiety will get the better of me and I'll write some tests.
 
 ## Contact
 
