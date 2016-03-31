@@ -21,7 +21,7 @@
 		var dx = b.lng - a.lng;
         var dy = b.lat - a.lat;
         var raw = SCALE_FACTOR * Math.sqrt(dx * dx + dy * dy);
-        return raw.toFixed(0);
+        return raw.toFixed(1);
 	}
 
     function mathDegreesToGeographic(degrees) {
@@ -35,14 +35,14 @@
         var radians = Math.atan2(end.lat - start.lat, end.lng - start.lng);
         var degrees = radians * 180 / Math.PI;
         degrees = mathDegreesToGeographic(degrees);
-        return degrees.toFixed(1);
+        return degrees.toFixed(0);
     }
 
     function newFlightDecorator(route) {
         return L.polylineDecorator(route, {
             patterns: [
                 {
-                    offset: 100,
+                    offset: 6,
                     repeat: 300,
                     symbol: L.Symbol.arrowHead({
                         pathOptions: {
@@ -65,7 +65,7 @@
         for (var i = 0; i < coords.length-1; i++) {
             var distance = calculateDistance(coords[i], coords[i+1]).toString();
             var heading = calculateHeading(coords[i], coords[i+1]).toString();
-            var markerContent = distance + 'km | ' + heading + '&deg;';
+            var markerContent = distance + 'km. | ' + heading + '&deg;';
             var marker =  L.marker(coords[i], {
                 clickable: false,
                 icon: L.divIcon({
@@ -161,6 +161,13 @@
 
     var titleControl = new L.Control.TitleControl({});
     map.addControl(titleControl);
+
+    var clearControl = new L.Control.ClearButton({}, function() {
+        drawnItems.clearLayers();
+        hideChildLayers();
+        hiddenLayers.clearLayers();
+    });
+    map.addControl(clearControl);
 
     map.on('draw:created', function(e) {
         console.log(e);
