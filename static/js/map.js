@@ -39,7 +39,7 @@
         for (var i = 0; i < coords.length-1; i++) {
             var distance = calculateDistance(coords[i], coords[i+1]).toString();
             var heading = calculateHeading(coords[i], coords[i+1]).toString();
-            var markerContent = distance + 'km, ' + heading + '&deg;';
+            var markerContent = distance + 'km | ' + heading + '&deg;';
             var marker =  L.marker(coords[i], {
                 icon: L.divIcon({
                     className: 'flight-vertext',
@@ -62,6 +62,7 @@
         drawnItems.eachLayer(function(layer) {
             if (toDelete.indexOf(layer.parentId) != -1) {
                 drawnItems.removeLayer(layer);
+                map.removeLayer(layer);
             }
         });
     }
@@ -120,7 +121,9 @@
         console.log('edited fired');
         console.log(e);
         deleteAssociatedLayers(e.layers);
+        console.log('edited: after delete');
         e.layers.eachLayer(function(layer) {
+            console.log('edited: each layer');
             if (layer.getLatLngs) {
                 applyFlightPlan(layer);
             }
