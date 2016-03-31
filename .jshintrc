@@ -1,0 +1,16 @@
+{
+    "esversion": 6,
+    "curly": true,
+    "eqeqeq": true,
+    "freeze": true,
+    "funcscope": true,
+    "latedef": true,
+    "shadow": true,
+    "undef": true,
+    "unused": true,
+    "globals": {
+        "L": true,
+        "console": true,
+        "clearFn": true
+    }
+}
