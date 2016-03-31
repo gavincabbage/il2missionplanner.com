@@ -83,6 +83,12 @@
     var drawnItems = new L.FeatureGroup();
     map.addLayer(drawnItems);
 
+    var editOptions = {
+        selectedPathOptions: {
+            maintainColor: true,
+            opacity: 0.5
+        }
+    }
     var drawControl = new L.Control.Draw({
         draw: {
             polygon: false,
@@ -97,7 +103,8 @@
             }
         },
         edit: {
-            featureGroup: drawnItems
+            featureGroup: drawnItems,
+            edit: L.Browser.touch ? false : editOptions
         }
     });
     map.addControl(drawControl);
