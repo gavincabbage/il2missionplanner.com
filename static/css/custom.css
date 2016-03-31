@@ -7,6 +7,19 @@ html, body, #map {
     height: 100%;
 }
 
+div.title-control {
+    font-family: 'Droid Serif', Arial, serif;
+    font-weight: 700;
+    font-size: 12pt;
+}
+
 div.flight-vertext {
     font-family: 'Courier New', Courier, monospace;
+    font-weight: 400;
+}
+
+@media(max-width: 400px) {
+    div.title-control {
+        max-width: 260px;
+    }
 }

@@ -1,14 +1,16 @@
-// (function() {
-//
-//     // Monkey patch existing Leaflet.draw classes
-//
-//     // L.Draw.Polyline = L.Draw.Polyline.extend({
-//     //     options: {
-//     //         shapeOptions: {
-//     //             color: '#ff0000',
-//     //             weight: 2
-//     //         }
-//     //     }
-//     // });
-//
-// })();
+(function() {
+
+    L.Control.TitleControl = L.Control.extend({
+
+        options: {
+            position: 'topright'
+        },
+
+        onAdd: function(map) {
+            var container = L.DomUtil.create('div', 'title-control');
+            container.innerHTML = 'Il-2: Battle of Stalingrad Mission Planner';
+            return container;
+        }
+    });
+
+})();
