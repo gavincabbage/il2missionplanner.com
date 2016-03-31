@@ -6,7 +6,7 @@
             position: 'topright'
         },
 
-        onAdd: function(map) {
+        onAdd: function() {
             var container = L.DomUtil.create('div', 'title-control');
             container.innerHTML = 'Il-2: Battle of Stalingrad Mission Planner';
             return container;
@@ -25,7 +25,7 @@
             clearFn = fn;
         },
 
-        onAdd: function(map) {
+        onAdd: function() {
             var container = L.DomUtil.create('div', 'leaflet-bar');
             var link = L.DomUtil.create('a', 'fa fa-trash', container);
             link.addEventListener('click', function() {

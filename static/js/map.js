@@ -2,14 +2,14 @@
 
     const
         SCALE_FACTOR = 1.40056,
-        LAT_MIN = 0
+        LAT_MIN = 0,
         LAT_MAX = 164,
         LNG_MIN = 0,
         LNG_MAX = 252,
         BORDER = 5,
         CENTER = [LAT_MAX / 2, LNG_MAX / 2],
         RED = '#ff0000'
-        DEFAULT_SPEED = 300
+        //DEFAULT_SPEED = 300
     ;
 
     var map, drawnItems, hiddenLayers;
@@ -81,18 +81,18 @@
     }
 
     function deleteAssociatedLayers(parentLayers) {
-        var toDelete = []
+        var toDelete = [];
         parentLayers.eachLayer(function(layer) {
             toDelete.push(layer._leaflet_id);
         });
 
         map.eachLayer(function(layer) {
-            if (toDelete.indexOf(layer.parentId) != -1) {
+            if (toDelete.indexOf(layer.parentId) !== -1) {
                 map.removeLayer(layer);
             }
         });
         hiddenLayers.eachLayer(function(layer) {
-            if (toDelete.indexOf(layer.parentId) != -1) {
+            if (toDelete.indexOf(layer.parentId) !== -1) {
                 hiddenLayers.removeLayer(layer);
             }
         });
@@ -128,6 +128,11 @@
         continuousWorld: true
     }).addTo(map);
 
+    map.setMaxBounds(new L.LatLngBounds(
+        [LAT_MIN - BORDER, LNG_MIN - BORDER],
+        [LAT_MAX + BORDER, LNG_MAX + BORDER]
+    ));
+
     drawnItems = new L.FeatureGroup();
     map.addLayer(drawnItems);
     hiddenLayers = new L.FeatureGroup();
@@ -137,7 +142,7 @@
             maintainColor: true,
             opacity: 0.4
         }
-    }
+    };
     var drawControl = new L.Control.Draw({
         draw: {
             polygon: false,
@@ -193,34 +198,20 @@
         });
     });
 
-    map.on('draw:editstart', function(e) {
+    map.on('draw:editstart', function() {
         hideChildLayers();
     });
 
-    map.on('draw:editstop', function(e) {
+    map.on('draw:editstop', function() {
         showChildLayers();
     });
 
-    map.on('draw:deletestart', function(e) {
+    map.on('draw:deletestart', function() {
         hideChildLayers();
     });
 
-    map.on('draw:deletestop', function(e) {
+    map.on('draw:deletestop', function() {
         showChildLayers();
     });
-
-    map.setMaxBounds(new L.LatLngBounds(
-        [LAT_MIN - BORDER, LNG_MIN - BORDER],
-        [LAT_MAX + BORDER, LNG_MAX + BORDER]
-    ));
-
-    // debug other events
-    var otherEvents = ['draw:deletestart', 'draw:deleteend', 'draw:editstop', 'draw:drawvertex',
-            'draw:editvertex', 'draw:editstart', 'draw:drawstop', 'draw:drawstart']
-    for (var i = 0; i < otherEvents.length; i++) {
-        map.on(otherEvents[i], function(e) {
-            console.log(e);
-        });
-    }
 
 })();
