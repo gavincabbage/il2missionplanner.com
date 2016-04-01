@@ -56,6 +56,8 @@ function deploy_beta {
 
 function main {
 
+    build
+
     # Do not deploy any PRs or code from other repos
     if [[ "${TRAVIS_REPO_SLUG}" != "${REPO}" ]] || \
        [[ "${TRAVIS_PULL_REQUEST}" != "false" ]] || \
@@ -64,8 +66,6 @@ function main {
     then
         abort "0" "No deploy necessary - exiting happily"
     fi
-
-    build
 
     # Deploy depending on branch
     if [[ "${TRAVIS_BRANCH}" == "${PROD_BRANCH}" ]]
