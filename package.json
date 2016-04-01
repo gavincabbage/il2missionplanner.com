@@ -4,7 +4,8 @@
   "description": "Il-2: Battle of Stalingrad Mission Planner",
   "main": "index.html",
   "scripts": {
-    "test": "echo \"No tests implemented yet\" && exit 0"
+    "test": "echo \"No tests implemented yet\" && exit 0",
+    "lint": "jshint static/js/**.js"
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,7 @@
   },
   "homepage": "https://github.com/gavincabbage/bos-mission-planner#readme",
   "devDependencies": {
-    "bower": "^1.7.7"
+    "bower": "^1.7.7",
+    "jshint": "^2.9.1"
   }
 }

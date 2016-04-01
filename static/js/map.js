@@ -1,32 +1,164 @@
 (function() {
 
     const
-        SCALE_FACTOR = 7.14,
-        LAT_MIN = 0
+        SCALE_FACTOR = 1.40056,
+        LAT_MIN = 0,
         LAT_MAX = 164,
         LNG_MIN = 0,
         LNG_MAX = 252,
         BORDER = 5,
         CENTER = [LAT_MAX / 2, LNG_MAX / 2],
         RED = '#ff0000'
+        //DEFAULT_SPEED = 300
     ;
 
-    var map = L.map('map', {
+    var map, drawnItems, hiddenLayers;
+
+    // patch a leaflet bug, see https://github.com/bbecquet/Leaflet.PolylineDecorator/issues/17
+    L.PolylineDecorator.include(L.Mixin.Events);
+
+    function calculateDistance(a, b) {
+		var dx = b.lng - a.lng;
+        var dy = b.lat - a.lat;
+        var raw = SCALE_FACTOR * Math.sqrt(dx * dx + dy * dy);
+        return raw.toFixed(1);
+	}
+
+    function mathDegreesToGeographic(degrees) {
+        if (degrees < 0) {
+            degrees += 360;
+        }
+        return (450 - degrees) % 360;
+    }
+
+    function calculateHeading(start, end) {
+        var radians = Math.atan2(end.lat - start.lat, end.lng - start.lng);
+        var degrees = radians * 180 / Math.PI;
+        degrees = mathDegreesToGeographic(degrees);
+        return degrees.toFixed(0);
+    }
+
+    function newFlightDecorator(route) {
+        return L.polylineDecorator(route, {
+            patterns: [
+                {
+                    offset: 6,
+                    repeat: 300,
+                    symbol: L.Symbol.arrowHead({
+                        pathOptions: {
+                            opacity: 0,
+                            fillOpacity: 1,
+                            color: RED
+                        }
+                    })
+                }
+            ]
+        });
+    }
+
+    function calculateMidpoint(a, b) {
+        var lat = (a.lat + b.lat) / 2;
+        var lng = (a.lng + b.lng) / 2;
+        return L.latLng(lat, lng);
+    }
+
+    function applyFlightPlan(route) {
+        var id = route._leaflet_id;
+        var coords = route.getLatLngs();
+        var decorator = newFlightDecorator(route);
+        decorator.parentId = id;
+        decorator.addTo(map);
+        for (var i = 0; i < coords.length-1; i++) {
+            var distance = calculateDistance(coords[i], coords[i+1]).toString();
+            var heading = calculateHeading(coords[i], coords[i+1]).toString();
+            var midpoint = calculateMidpoint(coords[i], coords[i+1]);
+            var markerContent = distance + 'km|' + heading + '&deg;';
+            var marker =  L.marker(midpoint, {
+                clickable: false,
+                icon: L.divIcon({
+                    className: 'flight-vertext',
+                    html: markerContent,
+                    iconSize: [250, 0]
+                })
+            });
+            marker.parentId = id;
+            marker.addTo(map);
+        }
+        var endMarker = L.circleMarker(coords[coords.length-1], {
+            clickable: false,
+            radius: 3,
+            color: RED,
+            fillColor: RED,
+            opacity: 1,
+            fillOpacity: 1
+        });
+        endMarker.parentId = id;
+        endMarker.addTo(map);
+    }
+
+    function deleteAssociatedLayers(parentLayers) {
+        var toDelete = [];
+        parentLayers.eachLayer(function(layer) {
+            toDelete.push(layer._leaflet_id);
+        });
+
+        map.eachLayer(function(layer) {
+            if (toDelete.indexOf(layer.parentId) !== -1) {
+                map.removeLayer(layer);
+            }
+        });
+        hiddenLayers.eachLayer(function(layer) {
+            if (toDelete.indexOf(layer.parentId) !== -1) {
+                hiddenLayers.removeLayer(layer);
+            }
+        });
+    }
+
+    function transferChildLayer(from, to) {
+        from.eachLayer(function(layer) {
+            if (typeof layer.parentId !== 'undefined') {
+                from.removeLayer(layer);
+                to.addLayer(layer);
+            }
+        });
+    }
+
+    function showChildLayers() {
+        transferChildLayer(hiddenLayers, map);
+    }
+
+    function hideChildLayers() {
+        transferChildLayer(map, hiddenLayers);
+    }
+
+    map = L.map('map', {
         crs: L.CRS.Simple,
         attributionControl: false
-    }).setView([0, 0], 2);
+    }).setView(CENTER, 3);
 
     L.tileLayer('img/map/{z}/{x}/{y}.png', {
-        minZoom: 1,
+        minZoom: 2,
         maxZoom: 6,
         noWrap: true,
         tms: true,
         continuousWorld: true
     }).addTo(map);
 
-    var drawnItems = new L.FeatureGroup();
-    map.addLayer(drawnItems);
+    map.setMaxBounds(new L.LatLngBounds(
+        [LAT_MIN - BORDER, LNG_MIN - BORDER],
+        [LAT_MAX + BORDER, LNG_MAX + BORDER]
+    ));
 
+    drawnItems = new L.FeatureGroup();
+    map.addLayer(drawnItems);
+    hiddenLayers = new L.FeatureGroup();
+
+    var editOptions = {
+        selectedPathOptions: {
+            maintainColor: true,
+            opacity: 0.5
+        }
+    };
     var drawControl = new L.Control.Draw({
         draw: {
             polygon: false,
@@ -36,89 +168,66 @@
                 showLength: false,
                 shapeOptions: {
                     color: RED,
-                    weight: 2
+                    weight: 2,
+                    opacity: 1
                 }
             }
         },
         edit: {
-            featureGroup: drawnItems
+            featureGroup: drawnItems,
+            edit: L.Browser.touch ? false : editOptions
         }
     });
     map.addControl(drawControl);
 
+    var titleControl = new L.Control.TitleControl({});
+    map.addControl(titleControl);
+
+    var clearControl = new L.Control.ClearButton({}, function() {
+        drawnItems.clearLayers();
+        hideChildLayers();
+        hiddenLayers.clearLayers();
+    });
+    map.addControl(clearControl);
+
     map.on('draw:created', function(e) {
-
-        // TODO This does not work with edit
-        // if (e.layerType === 'polyline') {
-        //     L.polylineDecorator(e.layer, {
-        //         patterns: [
-        //             {
-        //                 offset: 100,
-        //                 repeat: 300,
-        //                 symbol: L.Symbol.arrowHead({
-        //                     pathOptions: {
-        //                         opacity: 0,
-        //                         fillOpacity: 1,
-        //                         color: RED
-        //                     }
-        //                 })
-        //             }
-        //         ]
-        //     }).addTo(map);
-        // }
-
+        console.log(e);
         map.addLayer(e.layer);
         drawnItems.addLayer(e.layer);
+        if (e.layerType === 'polyline') {
+            applyFlightPlan(e.layer);
+        }
     });
 
-    map.on('moveend', function() {
-     console.log(map.getBounds());
+    map.on('draw:deleted', function(e) {
+        console.log(e);
+        deleteAssociatedLayers(e.layers);
     });
 
-    var layerCount = 0;
-    map.on('draw:drawvertex', function(e) {
-        console.log(e.layers.getLayers());
-        // TODO Keeping for the text marker code below, will do soon
-        // e.layers.eachLayer(function(layer) {
-        //     layer.bindLabel('hello').addTo(map);
-        // });
-        // e.layers.eachLayer(function(layer) {
-        //     console.log(layer);
-        // });
-        // var layers = e.layers.getLayers();
-        // console.log(layers.pop());
-        // var cur = layers.pop();
-        // var curLatLng = cur.getLatLng();
-        // var prev = layers[layers.length-2];
-        // var prevLatLng = prev.getLatLng();
-        //
-        // L.marker(curLatLng, {
-        //     icon: L.divIcon({
-        //         className: 'heading-icon',
-        //         html: curLatLng.distanceTo(prevLatLng).toString(),
-        //         iconAnchor: curLatLng,
-        //         iconSize: [100, 0]
-        //     })
-        // }).addTo(map).addTo(drawnItems);
-
+    map.on('draw:edited', function(e) {
+        console.log(e);
+        deleteAssociatedLayers(e.layers);
+        e.layers.eachLayer(function(layer) {
+            if (layer.getLatLngs) {
+                applyFlightPlan(layer);
+            }
+        });
     });
 
-    L.marker([0,0]).addTo(map);
-    L.marker([0,1]).addTo(map);
-    L.marker([1,0]).addTo(map);
-    L.marker([1,1]).addTo(map);
-    L.marker([2,2]).addTo(map);
-    L.marker([0,10]).addTo(map);
-    L.marker([0,25]).addTo(map);
-    L.marker([0,252]).addTo(map);
-    L.marker([164,0]).addTo(map);
+    map.on('draw:editstart', function() {
+        hideChildLayers();
+    });
 
-    L.marker([7.219,5.016]).addTo(map);
-    L.marker([14.359,12.156]).addTo(map);
+    map.on('draw:editstop', function() {
+        showChildLayers();
+    });
 
-    map.setMaxBounds(new L.LatLngBounds(
-        [LAT_MIN - BORDER, LNG_MIN - BORDER],
-        [LAT_MAX + BORDER, LNG_MAX + BORDER]
-    ));
+    map.on('draw:deletestart', function() {
+        hideChildLayers();
+    });
+
+    map.on('draw:deletestop', function() {
+        showChildLayers();
+    });
 
 })();
