@@ -1,14 +1,14 @@
-# Il-2: Battle of Stalingrad Mission Planner
+# Il-2 Mission Planner
 
 [![Build Status](https://travis-ci.org/gavincabbage/bos-mission-planner.svg?branch=master)](https://travis-ci.org/gavincabbage/bos-mission-planner)
 
-Welcome to the `bos-mission-planner` repository. This repository houses the code behind the Il-2: Battle of Stalingrad Mission Planner tool, a simple client-side javascript application based primarily on [Leaflet](http://leafletjs.com/).
+Welcome to the `il2missionplanner.com` repository. This repository houses the code behind the Il-2 Mission Planner tool, a simple client-side javascript application based primarily on [Leaflet](http://leafletjs.com/).
 
-Check out the [latest stable release at bosmissionplanner.com](http://bosmissionplanner.com), or the [beta region](http://beta.bosmissionplanner.com) to see work in progress.
+Check out the [latest stable release at il2missionplanner.com](http://il2missionplanner.com), or the [beta region](http://beta.il2missionplanner.com) to see work in progress.
 
 ## Issues and Enhancements
 
-If you'd like to report a bug or request an enhancement, please [open an issue](https://github.com/gavincabbage/bos-mission-planner/issues).
+If you'd like to report a bug or request an enhancement, please [open an issue](https://github.com/gavincabbage/il2missionplanner.com/issues).
 
 ## Contributing
 
@@ -16,7 +16,7 @@ Interested in contributing to this tool? Feel free to fork the project and open 
 
 ## Development Setup
 
-Clone the repository. In the repository directory, run `npm install` followed by `bower install` to fetch dependencies. Then navigate to the index file in a web browser (e.g. `file:///path/to/index.html`) to access the site. Currently most of the app is in `map.js` and `controls.js`. There aren't any unit tests yet because I'm lazy and learning how to use Leaflet, but eventually my anxiety will get the better of me and I'll write some tests.
+Clone the repository. In the repository directory, run `npm install` followed by `bower install` to fetch dependencies. Then navigate to the index file in a web browser (e.g. `file:///path/to/index.html`) to access the site. Currently most of the app is in `map.js` and `controls.js`.
 
 ## Contact
 

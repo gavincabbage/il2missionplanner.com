@@ -13,10 +13,19 @@ div.title-control {
     font-size: 12pt;
 }
 
-div.flight-vertext {
+div.flight-leg {
     font-family: 'Courier', Courier, monospace;
     font-weight: 400;
     text-align: center;
+    color: #0000aa;
+}
+
+div.flight-title {
+    font-family: 'Courier', Courier, monospace;
+    font-weight: 700;
+    font-size: 1.3em;
+    text-align: center;
+    color: #0000aa;
 }
 
 @media(max-width: 400px) {
