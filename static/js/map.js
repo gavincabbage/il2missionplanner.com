@@ -82,6 +82,7 @@
     }
 
     function applyFlightPlanCallback(route) {
+        console.log(route);
         var id = route._leaflet_id;
         var coords = route.getLatLngs();
         var decorator = newFlightDecorator(route);
@@ -114,23 +115,37 @@
         });
         endMarker.parentId = id;
         endMarker.addTo(map);
+        var nameCoords = L.latLng(coords[0].lat, coords[0].lng);
+        var nameMarker = L.marker(nameCoords, {
+            clickable: false,
+            icon: L.divIcon({
+                className: 'flight-title',
+                html: route.name,
+                iconSize: [250,0]
+            })
+        });
+        nameMarker.parentId = id;
+        nameMarker.addTo(map);
     }
 
     function applyFlightPlan(route) {
-        // fire modal to get speed for the newly created flight
-        // we'll try to set the things on the route layer itself for persistence on edit, who knows
         if (typeof route.speed === 'undefined') {
             route.speed = DEFAULT_SPEED;
         }
+        if (typeof route.name === 'undefined') {
+            route.name = '';
+        }
         map.fire('modal', {
             speed: route.speed,
-            template: '<form><input id="speedInput" value="{speed}"></input></form>',
+            name: route.name,
+            template: content.flightModalTemplate,
             zIndex: 10000,
             onShow: function(e) {
                 e.modal.route = route;
             },
             onHide: function(e) {
-                e.modal.route.speed = document.getElementById('speedInput').value;
+                e.modal.route.name = document.getElementById('flight-name').value;
+                e.modal.route.speed = document.getElementById('flight-speed').value;
                 applyFlightPlanCallback(e.modal.route);
             }
         });
@@ -169,6 +184,15 @@
 
     function hideChildLayers() {
         transferChildLayer(map, hiddenLayers);
+    }
+
+    function checkClearButtonDisabled() {
+        var element = document.getElementById('clear-button');
+        if (drawnItems.getLayers().length === 0) {
+            element.classList.add('leaflet-disabled');
+        } else {
+            element.classList.remove('leaflet-disabled');
+        }
     }
 
     map = L.map('map', {
@@ -223,12 +247,31 @@
     var titleControl = new L.Control.TitleControl({});
     map.addControl(titleControl);
 
-    var clearControl = new L.Control.ClearButton({}, function() {
-        drawnItems.clearLayers();
-        hideChildLayers();
-        hiddenLayers.clearLayers();
+    var clearButton = new L.Control.CustomButton({}, 'clear-button', 'fa-trash', function() {
+        if (drawnItems.getLayers().length !== 0) {
+            map.openModal({
+                template: content.confirmClearTemplate,
+                okCls: 'modal-ok',
+                okText: 'Yes',
+                cancelCls: 'modal-cancel',
+                cancelText: 'No',
+                onShow: function(e) {
+                    L.DomEvent
+                        .on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
+                            drawnItems.clearLayers();
+                            hideChildLayers();
+                            hiddenLayers.clearLayers();
+                            e.modal.hide();
+                            checkClearButtonDisabled();
+                        })
+                        .on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
+                            e.modal.hide();
+                        });
+                }
+            });
+        }
     });
-    map.addControl(clearControl);
+    map.addControl(clearButton);
 
     map.on('draw:created', function(e) {
         map.addLayer(e.layer);
@@ -236,10 +279,12 @@
         if (e.layerType === 'polyline') {
             applyFlightPlan(e.layer);
         }
+        checkClearButtonDisabled();
     });
 
     map.on('draw:deleted', function(e) {
         deleteAssociatedLayers(e.layers);
+        checkClearButtonDisabled();
     });
 
     map.on('draw:edited', function(e) {
