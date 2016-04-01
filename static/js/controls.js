@@ -6,30 +6,36 @@
             position: 'topright'
         },
 
-        onAdd: function() {
+        onAdd: function(e) {
+            L.DomEvent.stop(e);
             var container = L.DomUtil.create('div', 'title-control');
+            L.DomEvent.disableClickPropagation(container);
             container.innerHTML = 'Il-2: Battle of Stalingrad Mission Planner';
             return container;
         }
     });
 
-    L.Control.ClearButton = L.Control.extend({
+    L.Control.CustomButton = L.Control.extend({
 
-        clearFn: null,
+        clickFn: null,
+        iconClass: null,
         options: {
             position: 'bottomleft'
         },
 
-        initialize: function(options, fn) {
-            L.Control.prototype.initialize(options);
-            clearFn = fn;
+        initialize: function(options, cls, fn) {
+            L.Control.prototype.initialize.call(this, options);
+            iconClass = cls;
+            clickFn = fn;
         },
 
-        onAdd: function() {
+        onAdd: function(e) {
+            L.DomEvent.stop(e);
             var container = L.DomUtil.create('div', 'leaflet-bar');
-            var link = L.DomUtil.create('a', 'fa fa-trash', container);
+            L.DomEvent.disableClickPropagation(container);
+            var link = L.DomUtil.create('a', 'fa '+iconClass, container);
             link.addEventListener('click', function() {
-                clearFn();
+                clickFn();
             });
             return container;
         }

@@ -20,6 +20,14 @@ div.flight-leg {
     color: '#0000ff';
 }
 
+div.flight-title {
+    font-family: 'Courier', Courier, monospace;
+    font-weight: 700;
+    font-size: 1.4em;
+    text-align: center;
+    color: '#0000ff';
+}
+
 @media(max-width: 400px) {
     div.title-control {
         max-width: 260px;
