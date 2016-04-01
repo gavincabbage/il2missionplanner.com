@@ -21,8 +21,7 @@
     function calculateDistance(a, b) {
 		var dx = b.lng - a.lng;
         var dy = b.lat - a.lat;
-        var raw = SCALE_FACTOR * Math.sqrt(dx * dx + dy * dy);
-        return raw.toFixed(1);
+        return SCALE_FACTOR * Math.sqrt(dx * dx + dy * dy);
 	}
 
     function mathDegreesToGeographic(degrees) {
@@ -36,7 +35,7 @@
         var radians = Math.atan2(end.lat - start.lat, end.lng - start.lng);
         var degrees = radians * 180 / Math.PI;
         degrees = mathDegreesToGeographic(degrees);
-        return degrees.toFixed(0);
+        return degrees;
     }
 
     function newFlightDecorator(route) {
@@ -63,24 +62,41 @@
         return L.latLng(lat, lng);
     }
 
-    function applyFlightPlanCallback(modal) {
-        var route = modal.route;
+    function pad(num, size) {
+        var s = num.toFixed(0);
+        while (s.length < size) {
+            s = "0" + s;
+        }
+        return s;
+    }
+
+    function calculateTime(speed, distance) {
+        var kmPerSecond = speed / 3600;
+        return distance / kmPerSecond;
+    }
+
+    function formatTime(totalSeconds) {
+        var minutes = totalSeconds / 60;
+        var seconds = totalSeconds % 60;
+        return minutes.toFixed(0) + ':' + pad(seconds, 2);
+    }
+
+    function applyFlightPlanCallback(route) {
         var id = route._leaflet_id;
         var coords = route.getLatLngs();
-        console.log('in callback');
-        console.log(modal);
         var decorator = newFlightDecorator(route);
         decorator.parentId = id;
         decorator.addTo(map);
         for (var i = 0; i < coords.length-1; i++) {
-            var distance = calculateDistance(coords[i], coords[i+1]).toString();
-            var heading = calculateHeading(coords[i], coords[i+1]).toString();
+            var distance = calculateDistance(coords[i], coords[i+1]);
+            var heading = calculateHeading(coords[i], coords[i+1]);
             var midpoint = calculateMidpoint(coords[i], coords[i+1]);
-            var markerContent = distance + 'km|' + heading + '&deg;';
+            var time = formatTime(calculateTime(route.speed, distance));
+            var markerContent = '[' + distance.toFixed(1) + 'km|' + heading.toFixed(0) + '&deg;|' + time + ']';
             var marker =  L.marker(midpoint, {
                 clickable: false,
                 icon: L.divIcon({
-                    className: 'flight-vertext',
+                    className: 'flight-leg',
                     html: markerContent,
                     iconSize: [250, 0]
                 })
@@ -103,19 +119,19 @@
     function applyFlightPlan(route) {
         // fire modal to get speed for the newly created flight
         // we'll try to set the things on the route layer itself for persistence on edit, who knows
+        if (typeof route.speed === 'undefined') {
+            route.speed = DEFAULT_SPEED;
+        }
         map.fire('modal', {
-            content: '<form><input id="testInput" value=""></input></form>',
+            speed: route.speed,
+            template: '<form><input id="speedInput" value="{speed}"></input></form>',
             zIndex: 10000,
             onShow: function(e) {
                 e.modal.route = route;
             },
             onHide: function(e) {
-                var modal = e.modal;
-                console.log(e);
-                modal.testValue = document.getElementById('testInput').value;
-                console.log('modalAfterTest');
-                console.log(modal);
-                applyFlightPlanCallback(modal);
+                e.modal.route.speed = document.getElementById('speedInput').value;
+                applyFlightPlanCallback(e.modal.route);
             }
         });
     }
@@ -215,7 +231,6 @@
     map.addControl(clearControl);
 
     map.on('draw:created', function(e) {
-        console.log(e);
         map.addLayer(e.layer);
         drawnItems.addLayer(e.layer);
         if (e.layerType === 'polyline') {
@@ -224,16 +239,14 @@
     });
 
     map.on('draw:deleted', function(e) {
-        console.log(e);
         deleteAssociatedLayers(e.layers);
     });
 
     map.on('draw:edited', function(e) {
-        console.log(e);
         deleteAssociatedLayers(e.layers);
         e.layers.eachLayer(function(layer) {
-            if (layer.getLatLngs) {
-                applyFlightPlan(layer);
+            if (typeof layer.getLatLngs !== 'undefined') {
+                applyFlightPlanCallback(layer);
             }
         });
     });
@@ -252,18 +265,6 @@
 
     map.on('draw:deletestop', function() {
         showChildLayers();
-    });
-
-    map.fire('modal', {
-        template: content.html.flightModalTemplate,
-        defaultSpeed: DEFAULT_SPEED,
-        defaultAltitude: DEFAULT_ALTITUDE,
-        formId: "flight-modal-form",
-        zIndex: 10000,
-        onHide: function(e) {
-            console.log('close modal');
-            console.log(e);
-        }
     });
 
 })(content);
