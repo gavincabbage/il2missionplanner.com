@@ -26,7 +26,7 @@ function abort { # usage: abort <code> <message>
     exit "${1}"
 }
 
-function test {
+function build {
     log "Starting build"
     bower install
     npm run lint
