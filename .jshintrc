@@ -7,10 +7,11 @@
     "latedef": true,
     "shadow": true,
     "undef": true,
-    "unused": true,
     "globals": {
         "L": true,
         "console": true,
-        "clearFn": true
+        "clearFn": true,
+        "document": true,
+        "content": true
     }
 }
