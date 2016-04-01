@@ -5,7 +5,10 @@
   "main": "index.html",
   "scripts": {
     "test": "echo \"No tests implemented yet\" && exit 0",
-    "lint": "jshint static/js/**.js"
+    "lint": "jshint static/js/**.js",
+    "uglify": "uglify static/js/**.js > dist/js/app.min.js",
+    "build": "npm run lint && npm run uglify",
+    "clean": "rm -rf dist"
   },
   "repository": {
     "type": "git",

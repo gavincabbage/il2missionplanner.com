@@ -2,3 +2,5 @@
 static/libs/bower_components/
 node_modules/
 clipboard.js
+dist/
+npm-debug.log

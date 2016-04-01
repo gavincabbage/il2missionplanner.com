@@ -29,7 +29,7 @@ function abort { # usage: abort <code> <message>
 function build {
     log "Starting build"
     bower install
-    npm run-script lint
+    npm run lint
     log "Build successful"
 }
 
