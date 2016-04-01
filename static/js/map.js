@@ -1,4 +1,4 @@
-(function() {
+(function(content) {
 
     const
         SCALE_FACTOR = 1.40056,
@@ -8,8 +8,9 @@
         LNG_MAX = 252,
         BORDER = 5,
         CENTER = [LAT_MAX / 2, LNG_MAX / 2],
-        RED = '#ff0000'
-        //DEFAULT_SPEED = 300
+        RED = '#ff0000',
+        DEFAULT_SPEED = 300,
+        DEFAULT_ALTITUDE = 1000
     ;
 
     var map, drawnItems, hiddenLayers;
@@ -230,4 +231,16 @@
         showChildLayers();
     });
 
-})();
+    map.fire('modal', {
+        template: content.html.flightModalTemplate,
+        defaultSpeed: DEFAULT_SPEED,
+        defaultAltitude: DEFAULT_ALTITUDE,
+        formId: "flight-modal-form",
+        zIndex: 10000,
+        onHide: function(e) {
+            console.log('close modal');
+            console.log(e);
+        }
+    });
+
+})(content);
