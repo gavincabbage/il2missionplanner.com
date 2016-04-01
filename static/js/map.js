@@ -56,6 +56,12 @@
         });
     }
 
+    function calculateMidpoint(a, b) {
+        var lat = (a.lat + b.lat) / 2;
+        var lng = (a.lng + b.lng) / 2;
+        return L.latLng(lat, lng);
+    }
+
     function applyFlightPlan(route) {
         var id = route._leaflet_id;
         var coords = route.getLatLngs();
@@ -65,19 +71,29 @@
         for (var i = 0; i < coords.length-1; i++) {
             var distance = calculateDistance(coords[i], coords[i+1]).toString();
             var heading = calculateHeading(coords[i], coords[i+1]).toString();
-            var markerContent = distance + 'km. | ' + heading + '&deg;';
-            var marker =  L.marker(coords[i], {
+            var midpoint = calculateMidpoint(coords[i], coords[i+1]);
+            var markerContent = distance + 'km|' + heading + '&deg;';
+            var marker =  L.marker(midpoint, {
                 clickable: false,
                 icon: L.divIcon({
                     className: 'flight-vertext',
                     html: markerContent,
-                    iconAnchor: coords[i],
                     iconSize: [250, 0]
                 })
             });
             marker.parentId = id;
             marker.addTo(map);
         }
+        var endMarker = L.circleMarker(coords[coords.length-1], {
+            clickable: false,
+            radius: 3,
+            color: RED,
+            fillColor: RED,
+            opacity: 1,
+            fillOpacity: 1
+        });
+        endMarker.parentId = id;
+        endMarker.addTo(map);
     }
 
     function deleteAssociatedLayers(parentLayers) {
@@ -140,7 +156,7 @@
     var editOptions = {
         selectedPathOptions: {
             maintainColor: true,
-            opacity: 0.4
+            opacity: 0.5
         }
     };
     var drawControl = new L.Control.Draw({
@@ -152,8 +168,8 @@
                 showLength: false,
                 shapeOptions: {
                     color: RED,
-                    weight: 3,
-                    opacity: 0.8
+                    weight: 2,
+                    opacity: 1
                 }
             }
         },
