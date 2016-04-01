@@ -188,6 +188,15 @@
         transferChildLayer(map, hiddenLayers);
     }
 
+    function checkClearButtonDisabled() {
+        var element = document.getElementById('clear-button');
+        if (drawnItems.getLayers().length === 0) {
+            element.classList.add('leaflet-disabled');
+        } else {
+            element.classList.remove('leaflet-disabled');
+        }
+    }
+
     map = L.map('map', {
         crs: L.CRS.Simple,
         attributionControl: false
@@ -240,26 +249,29 @@
     var titleControl = new L.Control.TitleControl({});
     map.addControl(titleControl);
 
-    var clearButton = new L.Control.CustomButton({}, 'fa-trash', function() {
-        map.openModal({
-            template: content.confirmClearTemplate,
-            okCls: 'modal-ok',
-            okText: 'Yes',
-            cancelCls: 'modal-cancel',
-            cancelText: 'No',
-            onShow: function(e) {
-                L.DomEvent
-                    .on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
-                        drawnItems.clearLayers();
-                        hideChildLayers();
-                        hiddenLayers.clearLayers();
-                        e.modal.hide();
-                    })
-                    .on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
-                        e.modal.hide();
-                    });
-            }
-        });
+    var clearButton = new L.Control.CustomButton({}, 'clear-button', 'fa-trash', function() {
+        if (drawnItems.getLayers().length !== 0) {
+            map.openModal({
+                template: content.confirmClearTemplate,
+                okCls: 'modal-ok',
+                okText: 'Yes',
+                cancelCls: 'modal-cancel',
+                cancelText: 'No',
+                onShow: function(e) {
+                    L.DomEvent
+                        .on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
+                            drawnItems.clearLayers();
+                            hideChildLayers();
+                            hiddenLayers.clearLayers();
+                            e.modal.hide();
+                            checkClearButtonDisabled();
+                        })
+                        .on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
+                            e.modal.hide();
+                        });
+                }
+            });
+        }
     });
     map.addControl(clearButton);
 
@@ -269,10 +281,12 @@
         if (e.layerType === 'polyline') {
             applyFlightPlan(e.layer);
         }
+        checkClearButtonDisabled();
     });
 
     map.on('draw:deleted', function(e) {
         deleteAssociatedLayers(e.layers);
+        checkClearButtonDisabled();
     });
 
     map.on('draw:edited', function(e) {

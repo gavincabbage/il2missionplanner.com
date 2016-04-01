@@ -13,6 +13,7 @@
         "clickFn": true,
         "iconClass": true,
         "document": true,
-        "content": true
+        "content": true,
+        "iconId": true
     }
 }
