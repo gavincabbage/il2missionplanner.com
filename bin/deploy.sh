@@ -1,6 +1,6 @@
 #!/bin/bash
 
-REPO="gavincabbage/bos-mission-planner"
+REPO="gavincabbage/il2missionplanner.com"
 BETA_BRANCH="develop"
 PROD_BRANCH="master"
 SRC="static/"
@@ -42,7 +42,7 @@ function deploy_prod {
 function deploy_beta {
     log "Starting beta deployment"
     cd ..
-    cp -R "bos-mission-planner/${SRC}" "${DIST}"
+    cp -R "il2missionplanner.com/${SRC}" "${DIST}"
     cd "${DIST}"
     log "Initializing git repo"
     git init
