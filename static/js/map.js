@@ -129,8 +129,6 @@
     }
 
     function applyFlightPlan(route) {
-        // fire modal to get speed for the newly created flight
-        // we'll try to set the things on the route layer itself for persistence on edit, who knows
         if (typeof route.speed === 'undefined') {
             route.speed = DEFAULT_SPEED;
         }
