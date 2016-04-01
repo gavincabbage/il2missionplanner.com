@@ -63,9 +63,12 @@
         return L.latLng(lat, lng);
     }
 
-    function applyFlightPlan(route) {
+    function applyFlightPlanCallback(modal) {
+        var route = modal.route;
         var id = route._leaflet_id;
         var coords = route.getLatLngs();
+        console.log('in callback');
+        console.log(modal);
         var decorator = newFlightDecorator(route);
         decorator.parentId = id;
         decorator.addTo(map);
@@ -95,6 +98,26 @@
         });
         endMarker.parentId = id;
         endMarker.addTo(map);
+    }
+
+    function applyFlightPlan(route) {
+        // fire modal to get speed for the newly created flight
+        // we'll try to set the things on the route layer itself for persistence on edit, who knows
+        map.fire('modal', {
+            content: '<form><input id="testInput" value=""></input></form>',
+            zIndex: 10000,
+            onShow: function(e) {
+                e.modal.route = route;
+            },
+            onHide: function(e) {
+                var modal = e.modal;
+                console.log(e);
+                modal.testValue = document.getElementById('testInput').value;
+                console.log('modalAfterTest');
+                console.log(modal);
+                applyFlightPlanCallback(modal);
+            }
+        });
     }
 
     function deleteAssociatedLayers(parentLayers) {

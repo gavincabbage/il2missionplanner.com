@@ -1,10 +1,8 @@
 var content = (function() {
 
     var content = {
-        html: {
-            flightModalTemplate: '<h1>Configure Flight</h1><form id="{formId}" onsubmit="submitModal()"><label for="speed">Speed (km/h)</label><input type="number" name="speed" min="1" max="999" value="{defaultSpeed}"><label for="speed">Altitude (km):</label><input type="number" name="altitude" min="1" max="9999" value="{defaultAltitude}"><input type="submit" value="Submit"></form>'
-        }
-    }
+        flightModalTemplate: 'test'
+    };
 
     //  Just copied this wholesale from Leaflet.draw and edited some
     L.drawLocal = {
