@@ -1,4 +1,8 @@
-(function() {
+var content = (function() {
+
+    var content = {
+        flightModalTemplate: 'test'
+    };
 
     //  Just copied this wholesale from Leaflet.draw and edited some
     L.drawLocal = {
@@ -97,5 +101,7 @@
     		}
     	}
     };
+
+    return content;
 
 })();
