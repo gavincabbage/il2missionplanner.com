@@ -64,7 +64,9 @@
 
     function pad(num, size) {
         var s = num.toFixed(0);
-        while (s.length < size) s = "0" + s;
+        while (s.length < size) {
+            s = "0" + s;
+        }
         return s;
     }
 
