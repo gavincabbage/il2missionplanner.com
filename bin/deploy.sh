@@ -63,7 +63,7 @@ function main {
     if [[ "${TRAVIS_REPO_SLUG}" != "${REPO}" ]] || \
        [[ "${TRAVIS_PULL_REQUEST}" != "false" ]] || \
        ([[ "${TRAVIS_BRANCH}" != "${PROD_BRANCH}" ]] && \
-        [[ "${TRAVIS_BRANCH}" != "${BETA_BRANCH}"]] && \
+        [[ "${TRAVIS_BRANCH}" != "${BETA_BRANCH}" ]] && \
         [[ "${TRAVIS_BRANCH}" != "${DEV_BRANCH}" ]])
     then
         abort "0" "No deploy necessary - exiting happily"
