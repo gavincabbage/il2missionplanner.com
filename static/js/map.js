@@ -10,7 +10,8 @@
         CENTER = [LAT_MAX / 2, LNG_MAX / 2],
         RED = '#ff0000',
         DEFAULT_SPEED = 300,
-        DEFAULT_ALTITUDE = 1000
+        DEFAULT_ALTITUDE = 1000,
+        FLIGHT_OPACITY = 0.8
     ;
 
     var map, drawnItems, hiddenLayers;
@@ -47,7 +48,7 @@
                     symbol: L.Symbol.arrowHead({
                         pathOptions: {
                             opacity: 0,
-                            fillOpacity: 1,
+                            fillOpacity: FLIGHT_OPACITY,
                             color: RED
                         }
                     })
@@ -110,8 +111,8 @@
             radius: 3,
             color: RED,
             fillColor: RED,
-            opacity: 1,
-            fillOpacity: 1
+            opacity: FLIGHT_OPACITY,
+            fillOpacity: FLIGHT_OPACITY
         });
         endMarker.parentId = id;
         endMarker.addTo(map);
@@ -220,7 +221,7 @@
     var editOptions = {
         selectedPathOptions: {
             maintainColor: true,
-            opacity: 0.5
+            opacity: 0.4
         }
     };
     var drawControl = new L.Control.Draw({
@@ -233,7 +234,7 @@
                 shapeOptions: {
                     color: RED,
                     weight: 2,
-                    opacity: 1
+                    opacity: FLIGHT_OPACITY
                 }
             }
         },
