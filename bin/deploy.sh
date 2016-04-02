@@ -1,9 +1,9 @@
 #!/bin/bash
 
 REPO="gavincabbage/il2missionplanner.com"
-DEV_BRANCH="master"
+DEV_BRANCH="develop"
 BETA_BRANCH="beta"
-PROD_BRANCH="prod"
+PROD_BRANCH="master"
 SRC="static/"
 DIST="dist/"
 GIT_NAME="Gavin Cabbage"
