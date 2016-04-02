@@ -10,7 +10,7 @@ deploy:
       access_key_id: AKIAIVOD3WGLQHXFCTTQ
       secret_access_key:
         secure: ZWodfMkB+A7HV3VyuHeGfSneo/liHAFDwtQpesSULoMXIWrsX+PRQcQC5rMv5GU0/ianfCYrP3cSfR6bhWKPvQ1X34UNiIuTTsAb/sKA+kQPAClOIxPZEUGEVcOGRnBjfXja2d/gdCySgAosMMaUK8h7boOOmAeS9zP8gc3g+NcZlWPvQS/3uBUFcRia+EZ3j5zaxHDHTYAl5m9Pq2kfONMtS+Q9ukO2LU2WFx5hB2y2kYwKhlk3VBRoneAf9P0U6RWfDvO3xCpQwDBep9tLPsrc3YUskxfzjosaSBARfpImxvwdUh/CV9wdOBsW4ECYVn0NTjRqQsNB6eAyRvjSszZ3/WYB59GmNJt2iW/KQqGPIex+SbIOYGAbvj8B+QqBafLhc5jjvnFC79okpPfrc3eScs4asnUicLSM8l9Yryf63dFk/y0C/xiIh4h39EwZRy8mNHlV+qloUheR8WCxKU8rKZ8ag06akWtX7Wk8zaIK68aAhm6suZMnuehb9K9VDEfVkzC4BExabvAM1hKEXxVWcEYUOPkw6fCvjVru9lpHwovDjzEhTHJpY9znJkms6NlifdCjKJtpyejKVLjnX3CDIsBXGmHpNXowRiocHFalbI2RzEDY1g3ylKZLhoFvV/PwogDNzt260/5cUhcbUKJ4syrkKu7br4riBusoZvc=
-      bucket: bosmissionplanner.com
+      bucket: beta.il2missionplanner.com
       acl: public_read
       local_dir: dist
       skip_cleanup: true
@@ -21,6 +21,7 @@ deploy:
       access_key_id: AKIAIVOD3WGLQHXFCTTQ
       secret_access_key:
         secure: ZWodfMkB+A7HV3VyuHeGfSneo/liHAFDwtQpesSULoMXIWrsX+PRQcQC5rMv5GU0/ianfCYrP3cSfR6bhWKPvQ1X34UNiIuTTsAb/sKA+kQPAClOIxPZEUGEVcOGRnBjfXja2d/gdCySgAosMMaUK8h7boOOmAeS9zP8gc3g+NcZlWPvQS/3uBUFcRia+EZ3j5zaxHDHTYAl5m9Pq2kfONMtS+Q9ukO2LU2WFx5hB2y2kYwKhlk3VBRoneAf9P0U6RWfDvO3xCpQwDBep9tLPsrc3YUskxfzjosaSBARfpImxvwdUh/CV9wdOBsW4ECYVn0NTjRqQsNB6eAyRvjSszZ3/WYB59GmNJt2iW/KQqGPIex+SbIOYGAbvj8B+QqBafLhc5jjvnFC79okpPfrc3eScs4asnUicLSM8l9Yryf63dFk/y0C/xiIh4h39EwZRy8mNHlV+qloUheR8WCxKU8rKZ8ag06akWtX7Wk8zaIK68aAhm6suZMnuehb9K9VDEfVkzC4BExabvAM1hKEXxVWcEYUOPkw6fCvjVru9lpHwovDjzEhTHJpY9znJkms6NlifdCjKJtpyejKVLjnX3CDIsBXGmHpNXowRiocHFalbI2RzEDY1g3ylKZLhoFvV/PwogDNzt260/5cUhcbUKJ4syrkKu7br4riBusoZvc=
+      bucket: il2missionplanner.com
       acl: public_read
       local_dir: dist
       skip_cleanup: true
