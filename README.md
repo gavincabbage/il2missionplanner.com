@@ -1,6 +1,6 @@
 # Il-2 Mission Planner
 
-[![Build Status](https://travis-ci.org/gavincabbage/bos-mission-planner.svg?branch=master)](https://travis-ci.org/gavincabbage/bos-mission-planner)
+[![Build Status](https://travis-ci.org/gavincabbage/il2missionplanner.com.svg?branch=master)](https://travis-ci.org/gavincabbage/il2missionplanner.com)
 
 Welcome to the `il2missionplanner.com` repository. This repository houses the code behind the Il-2 Mission Planner tool, a simple client-side javascript application based primarily on [Leaflet](http://leafletjs.com/).
 
