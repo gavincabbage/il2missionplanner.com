@@ -1,8 +1,9 @@
 #!/bin/bash
 
 REPO="gavincabbage/il2missionplanner.com"
-BETA_BRANCH="develop"
-PROD_BRANCH="master"
+DEV_BRANCH="master"
+BETA_BRANCH="beta"
+PROD_BRANCH="prod"
 SRC="static/"
 DIST="dist/"
 GIT_NAME="Gavin Cabbage"
@@ -33,14 +34,14 @@ function build {
     log "Build successful"
 }
 
-function deploy_prod {
+function deploy_s3 {
     log "Starting prod deployment"
     cp -R "${SRC}" "${DIST}"
     log "Ready for automatic deployment to S3"
 }
 
-function deploy_beta {
-    log "Starting beta deployment"
+function deploy_dev {
+    log "Starting dev deployment"
     cd ..
     cp -R "il2missionplanner.com/${SRC}" "${DIST}"
     cd "${DIST}"
@@ -62,20 +63,22 @@ function main {
     if [[ "${TRAVIS_REPO_SLUG}" != "${REPO}" ]] || \
        [[ "${TRAVIS_PULL_REQUEST}" != "false" ]] || \
        ([[ "${TRAVIS_BRANCH}" != "${PROD_BRANCH}" ]] && \
-        [[ "${TRAVIS_BRANCH}" != "${BETA_BRANCH}" ]])
+        [[ "${TRAVIS_BRANCH}" != "${BETA_BRANCH}"]] && \
+        [[ "${TRAVIS_BRANCH}" != "${DEV_BRANCH}" ]])
     then
         abort "0" "No deploy necessary - exiting happily"
     fi
 
     # Deploy depending on branch
-    if [[ "${TRAVIS_BRANCH}" == "${PROD_BRANCH}" ]]
+    if [[ "${TRAVIS_BRANCH}" == "${PROD_BRANCH}" ]] || \
+       [[ "${TRAVIS_BRANCH}" == "${BETA_BRANCH}" ]]
     then
         log "Deploying branch:${PROD_BRANCH} to production"
-        deploy_prod
-    elif [[ "${TRAVIS_BRANCH}" == "${BETA_BRANCH}" ]]
+        deploy_s3
+    elif [[ "${TRAVIS_BRANCH}" == "${DEV_BRANCH}" ]]
     then
         log "Deploying branch:${BETA_BRANCH} to beta"
-        deploy_beta
+        deploy_dev
     fi
 
     abort "0" "Finished deployment successfully!"

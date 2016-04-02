@@ -6,14 +6,24 @@ env:
   - GH_REF: github.com/gavincabbage/il2missionplanner.com.git
   - secure: tCcYozTXIT0fsIvDMYz3SqFLVOGsbrHnqOsHgVgPTrfe+5WT+ycXsR8nNinLvL9Wqb1n2KMlxxO1io6tENj8R5OJ99WVvwd9XazRl8s+/qATadrVF7UAghusaZMYZgAxkYSLNMiJEkxOa8/zPSG8jxQIGQcwBGIvKi9xEX5mrJ6JzjaRF4msm4E6iBnBookMV9gCwGU5Ls1ilLM9fwtoS5weS5eAWXteYWGu7tqkaUH8NZdjwgIb6IFpGRsQFnubsl/hq/ZBF/inKZPvnTdUHCRUizU0Umt4CdFv9fXa8JMY2v0BZhE6crU9msFTZbJXWtMiOD1CD9ectSL1WFeVKmSxW+loZNPYUlCgQNznMcdCV9B1R0IxbvOExvZaPh6QJJyHTqnVTSC2euuPSmkNFilVdGCbLrePCm188gQNa2rS9UnVWk2SW7SRy0yyWOm6Z3kI4wg6T+TiPhynFV6uCe9nXJq24+NPquHz1ry1g0VbP6DaCjAjmu5Qq2fryKXj9yIh06VtIzSa0peHU9+jRvcdbxkuFS7Og6UkLf0jhuDkmX7Ex5ncocX6oqqvKaOMCs1cad9TDI/GgWsVBDjNfjfxUIG6RBGl04KeNbIZ5Ovjg+qTuqVHcQg0LN9DYfGsH4rDixcEzESMCsSIy/9iflCyVwNS+MrYTjJ2Rv30sRw=
 deploy:
-  provider: s3
-  access_key_id: AKIAIRSHRY7ZGIPXHDKA
-  secret_access_key:
-    secure: R45uoSyLh1DDQOfPDLt4HcfVsqSGxpENw+sRevTS/A37y6koVntNIES198s0m2JdsFxqmDh9S+ilFjfIc4dalPj6z0xPclAJhnvYrDmTcFgCmtjPh+CDuk3wNXuINneyXxCQYHrXFxylwlocSFRxfmENrOjq2EbxWhj3cb1/RvVcwenGgkTtx9kn2tSuLlloubAYYTNfylAFQbBh3yomYZpTD7HXvnAa1KEKql7IrbgQnvL8BuULZ2aARmoUUd3coNw5alHEw4WHwd5iIDlgj6NzGXn6Xhmw/3ujuN/xOzo7HirVVDz/2Rkt79UPLw3Fcm1Osxz9AEyxAb5RczIMKQnZli2uMe2z12RbvJWSmYNKmzl4P4YRXidKmKGhGAnTpBMmGyabBMcZS1u6skdCSpCWtsog8AI6rRcmywJrvXoezqpIppBxmlbqOUC29aVd2UQdKr0rVbHaxfyTO6oHUH4ZwvRnGKW0a3DU950xLM0w661Cip25v2UxM98/SQi371zNmd0uoN8z21f1MixDgi0j/36Ag/zI/npHh0Hru+/9PUfXh+9Fqy4RuLYCGz+1rg6mRJ8awC4FrnInZwFXZYo/LYdralHo3N8hBFIeFqaCIZBS3r3pPvScvMFSfhp/O2sxmG5ul1xIEtX2+ppe/6uCMEkHt0YDMuuROlsvZm0=
-  bucket: bosmissionplanner.com
-  acl: public_read
-  local_dir: dist
-  skip_cleanup: true
-  on:
-    branch: master
-    repo: gavincabbage/il2missionplanner.com
+  - provider: s3
+      access_key_id: AKIAIVOD3WGLQHXFCTTQ
+      secret_access_key:
+        secure: ZWodfMkB+A7HV3VyuHeGfSneo/liHAFDwtQpesSULoMXIWrsX+PRQcQC5rMv5GU0/ianfCYrP3cSfR6bhWKPvQ1X34UNiIuTTsAb/sKA+kQPAClOIxPZEUGEVcOGRnBjfXja2d/gdCySgAosMMaUK8h7boOOmAeS9zP8gc3g+NcZlWPvQS/3uBUFcRia+EZ3j5zaxHDHTYAl5m9Pq2kfONMtS+Q9ukO2LU2WFx5hB2y2kYwKhlk3VBRoneAf9P0U6RWfDvO3xCpQwDBep9tLPsrc3YUskxfzjosaSBARfpImxvwdUh/CV9wdOBsW4ECYVn0NTjRqQsNB6eAyRvjSszZ3/WYB59GmNJt2iW/KQqGPIex+SbIOYGAbvj8B+QqBafLhc5jjvnFC79okpPfrc3eScs4asnUicLSM8l9Yryf63dFk/y0C/xiIh4h39EwZRy8mNHlV+qloUheR8WCxKU8rKZ8ag06akWtX7Wk8zaIK68aAhm6suZMnuehb9K9VDEfVkzC4BExabvAM1hKEXxVWcEYUOPkw6fCvjVru9lpHwovDjzEhTHJpY9znJkms6NlifdCjKJtpyejKVLjnX3CDIsBXGmHpNXowRiocHFalbI2RzEDY1g3ylKZLhoFvV/PwogDNzt260/5cUhcbUKJ4syrkKu7br4riBusoZvc=
+      bucket: bosmissionplanner.com
+      acl: public_read
+      local_dir: dist
+      skip_cleanup: true
+      on:
+        branch: beta
+        repo: gavincabbage/il2missionplanner.com
+  - provider: s3
+      access_key_id: AKIAIVOD3WGLQHXFCTTQ
+      secret_access_key:
+        secure: ZWodfMkB+A7HV3VyuHeGfSneo/liHAFDwtQpesSULoMXIWrsX+PRQcQC5rMv5GU0/ianfCYrP3cSfR6bhWKPvQ1X34UNiIuTTsAb/sKA+kQPAClOIxPZEUGEVcOGRnBjfXja2d/gdCySgAosMMaUK8h7boOOmAeS9zP8gc3g+NcZlWPvQS/3uBUFcRia+EZ3j5zaxHDHTYAl5m9Pq2kfONMtS+Q9ukO2LU2WFx5hB2y2kYwKhlk3VBRoneAf9P0U6RWfDvO3xCpQwDBep9tLPsrc3YUskxfzjosaSBARfpImxvwdUh/CV9wdOBsW4ECYVn0NTjRqQsNB6eAyRvjSszZ3/WYB59GmNJt2iW/KQqGPIex+SbIOYGAbvj8B+QqBafLhc5jjvnFC79okpPfrc3eScs4asnUicLSM8l9Yryf63dFk/y0C/xiIh4h39EwZRy8mNHlV+qloUheR8WCxKU8rKZ8ag06akWtX7Wk8zaIK68aAhm6suZMnuehb9K9VDEfVkzC4BExabvAM1hKEXxVWcEYUOPkw6fCvjVru9lpHwovDjzEhTHJpY9znJkms6NlifdCjKJtpyejKVLjnX3CDIsBXGmHpNXowRiocHFalbI2RzEDY1g3ylKZLhoFvV/PwogDNzt260/5cUhcbUKJ4syrkKu7br4riBusoZvc=
+      acl: public_read
+      local_dir: dist
+      skip_cleanup: true
+      on:
+        branch: prod
+        repo: gavincabbage/il2missionplanner.com
