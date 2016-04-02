@@ -200,7 +200,7 @@
         attributionControl: false
     }).setView(CENTER, 3);
 
-    L.tileLayer('img/map/{z}/{x}/{y}.png', {
+    L.tileLayer(content.tileServiceUrl, {
         minZoom: 2,
         maxZoom: 6,
         noWrap: true,

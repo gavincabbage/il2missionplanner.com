@@ -1,6 +1,7 @@
 var content = (function() {
 
     var content = {
+        tileServiceUrl: 'http://tiles.il2missionplanner.com/img/{z}/{x}/{y}.png',
         flightModalTemplate: [
             '<div id="flight-modal">',
                 '<form>',
