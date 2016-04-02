@@ -26,5 +26,5 @@ deploy:
     local_dir: dist
     skip_cleanup: true
     on:
-      branch: prod
+      branch: master
       repo: gavincabbage/il2missionplanner.com
