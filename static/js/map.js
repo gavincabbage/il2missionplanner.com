@@ -118,7 +118,8 @@
         endMarker.addTo(map);
         var nameCoords = L.latLng(coords[0].lat, coords[0].lng);
         var nameMarker = L.marker(nameCoords, {
-            clickable: false,
+            //clickable: false,
+            draggable: false,
             icon: L.divIcon({
                 className: 'flight-title',
                 html: route.name,
@@ -126,6 +127,10 @@
             })
         });
         nameMarker.parentId = id;
+        nameMarker.on('click', function() {
+            deleteAssociatedLayers(L.layerGroup([route]));
+            applyFlightPlan(route);
+        });
         nameMarker.addTo(map);
     }
 
