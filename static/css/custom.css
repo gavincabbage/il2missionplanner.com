@@ -17,7 +17,7 @@ div.flight-leg {
     font-family: 'Courier', Courier, monospace;
     font-weight: 400;
     text-align: center;
-    color: #0000aa;
+    color: #0033cc;
 }
 
 div.flight-title {
@@ -25,7 +25,11 @@ div.flight-title {
     font-weight: 700;
     font-size: 1.3em;
     text-align: center;
-    color: #0000aa;
+    color: #0033cc;
+}
+
+div.flight-title:hover {
+    color: #0066ff;
 }
 
 @media(max-width: 400px) {

@@ -10,35 +10,36 @@
         CENTER = [LAT_MAX / 2, LNG_MAX / 2],
         RED = '#ff0000',
         DEFAULT_SPEED = 300,
-        DEFAULT_ALTITUDE = 1000
+        DEFAULT_ALTITUDE = 1000,
+        FLIGHT_OPACITY = 0.8
     ;
 
-    var map, drawnItems, hiddenLayers;
+    var map, drawnItems, hiddenLayers, applyFlightPlan, deleteAssociatedLayers;
 
     // patch a leaflet bug, see https://github.com/bbecquet/Leaflet.PolylineDecorator/issues/17
     L.PolylineDecorator.include(L.Mixin.Events);
 
-    function calculateDistance(a, b) {
+    var calculateDistance = function(a, b) {
 		var dx = b.lng - a.lng;
         var dy = b.lat - a.lat;
         return SCALE_FACTOR * Math.sqrt(dx * dx + dy * dy);
-	}
+	};
 
-    function mathDegreesToGeographic(degrees) {
+    var mathDegreesToGeographic = function(degrees) {
         if (degrees < 0) {
             degrees += 360;
         }
         return (450 - degrees) % 360;
-    }
+    };
 
-    function calculateHeading(start, end) {
+    var calculateHeading = function(start, end) {
         var radians = Math.atan2(end.lat - start.lat, end.lng - start.lng);
         var degrees = radians * 180 / Math.PI;
         degrees = mathDegreesToGeographic(degrees);
         return degrees;
-    }
+    };
 
-    function newFlightDecorator(route) {
+    var newFlightDecorator = function(route) {
         return L.polylineDecorator(route, {
             patterns: [
                 {
@@ -47,42 +48,41 @@
                     symbol: L.Symbol.arrowHead({
                         pathOptions: {
                             opacity: 0,
-                            fillOpacity: 1,
+                            fillOpacity: FLIGHT_OPACITY,
                             color: RED
                         }
                     })
                 }
             ]
         });
-    }
+    };
 
-    function calculateMidpoint(a, b) {
+    var calculateMidpoint = function(a, b) {
         var lat = (a.lat + b.lat) / 2;
         var lng = (a.lng + b.lng) / 2;
         return L.latLng(lat, lng);
-    }
+    };
 
-    function pad(num, size) {
+    var pad = function(num, size) {
         var s = num.toFixed(0);
         while (s.length < size) {
             s = "0" + s;
         }
         return s;
-    }
+    };
 
-    function calculateTime(speed, distance) {
+    var calculateTime = function(speed, distance) {
         var kmPerSecond = speed / 3600;
         return distance / kmPerSecond;
-    }
+    };
 
-    function formatTime(totalSeconds) {
+    var formatTime = function(totalSeconds) {
         var minutes = totalSeconds / 60;
         var seconds = totalSeconds % 60;
         return minutes.toFixed(0) + ':' + pad(seconds, 2);
-    }
+    };
 
-    function applyFlightPlanCallback(route) {
-        console.log(route);
+    var applyFlightPlanCallback = function(route) {
         var id = route._leaflet_id;
         var coords = route.getLatLngs();
         var decorator = newFlightDecorator(route);
@@ -110,14 +110,15 @@
             radius: 3,
             color: RED,
             fillColor: RED,
-            opacity: 1,
-            fillOpacity: 1
+            opacity: FLIGHT_OPACITY,
+            fillOpacity: FLIGHT_OPACITY
         });
         endMarker.parentId = id;
         endMarker.addTo(map);
         var nameCoords = L.latLng(coords[0].lat, coords[0].lng);
         var nameMarker = L.marker(nameCoords, {
-            clickable: false,
+            //clickable: false,
+            draggable: false,
             icon: L.divIcon({
                 className: 'flight-title',
                 html: route.name,
@@ -125,10 +126,14 @@
             })
         });
         nameMarker.parentId = id;
+        nameMarker.on('click', function() {
+            deleteAssociatedLayers(L.layerGroup([route]));
+            applyFlightPlan(route);
+        });
         nameMarker.addTo(map);
-    }
+    };
 
-    function applyFlightPlan(route) {
+    applyFlightPlan = function(route) {
         if (typeof route.speed === 'undefined') {
             route.speed = DEFAULT_SPEED;
         }
@@ -149,9 +154,9 @@
                 applyFlightPlanCallback(e.modal.route);
             }
         });
-    }
+    };
 
-    function deleteAssociatedLayers(parentLayers) {
+    deleteAssociatedLayers = function(parentLayers) {
         var toDelete = [];
         parentLayers.eachLayer(function(layer) {
             toDelete.push(layer._leaflet_id);
@@ -167,33 +172,33 @@
                 hiddenLayers.removeLayer(layer);
             }
         });
-    }
+    };
 
-    function transferChildLayer(from, to) {
+    var transferChildLayer = function(from, to) {
         from.eachLayer(function(layer) {
             if (typeof layer.parentId !== 'undefined') {
                 from.removeLayer(layer);
                 to.addLayer(layer);
             }
         });
-    }
+    };
 
-    function showChildLayers() {
+    var showChildLayers = function() {
         transferChildLayer(hiddenLayers, map);
-    }
+    };
 
-    function hideChildLayers() {
+    var hideChildLayers = function() {
         transferChildLayer(map, hiddenLayers);
-    }
+    };
 
-    function checkClearButtonDisabled() {
+    var checkClearButtonDisabled = function() {
         var element = document.getElementById('clear-button');
         if (drawnItems.getLayers().length === 0) {
             element.classList.add('leaflet-disabled');
         } else {
             element.classList.remove('leaflet-disabled');
         }
-    }
+    };
 
     map = L.map('map', {
         crs: L.CRS.Simple,
@@ -220,7 +225,7 @@
     var editOptions = {
         selectedPathOptions: {
             maintainColor: true,
-            opacity: 0.5
+            opacity: 0.4
         }
     };
     var drawControl = new L.Control.Draw({
@@ -233,7 +238,7 @@
                 shapeOptions: {
                     color: RED,
                     weight: 2,
-                    opacity: 1
+                    opacity: FLIGHT_OPACITY
                 }
             }
         },
