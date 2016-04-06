@@ -83,7 +83,6 @@
     }
 
     function applyFlightPlanCallback(route) {
-        console.log(route);
         var id = route._leaflet_id;
         var coords = route.getLatLngs();
         var decorator = newFlightDecorator(route);
