@@ -14,7 +14,7 @@
         FLIGHT_OPACITY = 0.8
     ;
 
-    var map, drawnItems, hiddenLayers, applyFlightPlan, deleteAssociatedLayers;
+    var map, drawnItems, hiddenLayers, applyFlightPlan, applyTargetInfo, deleteAssociatedLayers;
 
     // patch a leaflet bug, see https://github.com/bbecquet/Leaflet.PolylineDecorator/issues/17
     L.PolylineDecorator.include(L.Mixin.Events);
@@ -117,10 +117,9 @@
         endMarker.addTo(map);
         var nameCoords = L.latLng(coords[0].lat, coords[0].lng);
         var nameMarker = L.marker(nameCoords, {
-            //clickable: false,
             draggable: false,
             icon: L.divIcon({
-                className: 'flight-title',
+                className: 'map-title flight-title',
                 html: route.name,
                 iconSize: [250,0]
             })
@@ -157,6 +156,57 @@
                 e.modal.route.name = document.getElementById('flight-name').value;
                 e.modal.route.speed = document.getElementById('flight-speed').value;
                 applyFlightPlanCallback(e.modal.route);
+            }
+        });
+    };
+
+    var applyTargetInfoCallback = function(target) {
+        var id = target._leaflet_id;
+        var coords = target.getLatLng();
+        var nameCoords = L.latLng(coords.lat, coords.lng);
+        var nameMarker = L.marker(nameCoords, {
+            draggable: false,
+            icon: L.divIcon({
+                className: 'map-title target-title',
+                html: target.name,
+                iconSize: [250,0]
+            })
+        });
+        nameMarker.parentId = id;
+        nameMarker.on('click', function() {
+            deleteAssociatedLayers(L.layerGroup([target]));
+            applyTargetInfo(target);
+        });
+        nameMarker.addTo(map);
+        if (target.notes !== '') {
+            target.bindLabel(target.notes).addTo(map);
+        }
+    };
+
+    applyTargetInfo = function(target) {
+        if (typeof target.name === 'undefined') {
+            target.name = '';
+        }
+        if (typeof target.notes === 'undefined') {
+            target.notes = '';
+        }
+        map.openModal({
+            okCls: 'modal-ok',
+            okText: 'Done',
+            name: target.name,
+            notes: target.notes,
+            template: content.targetModalTemplate,
+            zIndex: 10000,
+            onShow: function(e) {
+                e.modal.target = target;
+                L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
+                    e.modal.hide();
+                });
+            },
+            onHide: function(e) {
+                e.modal.target.name = document.getElementById('target-name').value;
+                e.modal.target.notes = document.getElementById('target-notes').value;
+                applyTargetInfoCallback(e.modal.target);
             }
         });
     };
@@ -320,6 +370,8 @@
         drawnItems.addLayer(e.layer);
         if (e.layerType === 'polyline') {
             applyFlightPlan(e.layer);
+        } else if (e.layerType === 'marker') {
+            applyTargetInfo(e.layer);
         }
         checkClearButtonDisabled();
     });
@@ -334,6 +386,8 @@
         e.layers.eachLayer(function(layer) {
             if (typeof layer.getLatLngs !== 'undefined') {
                 applyFlightPlanCallback(layer);
+            } else if (typeof layer.getLatLng !== 'undefined') {
+                applyTargetInfoCallback(layer);
             }
         });
     });
