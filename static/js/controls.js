@@ -1,4 +1,4 @@
-(function() {
+(function(content) {
 
     L.Control.TitleControl = L.Control.extend({
 
@@ -10,7 +10,7 @@
             L.DomEvent.stop(e);
             var container = L.DomUtil.create('div', 'title-control');
             L.DomEvent.disableClickPropagation(container);
-            container.innerHTML = 'Il-2: Battle of Stalingrad Mission Planner';
+            container.innerHTML = content.titleText;
             return container;
         }
     });
@@ -44,4 +44,4 @@
         }
     });
 
-})();
+})(content);
