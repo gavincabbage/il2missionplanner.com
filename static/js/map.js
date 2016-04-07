@@ -140,13 +140,18 @@
         if (typeof route.name === 'undefined') {
             route.name = '';
         }
-        map.fire('modal', {
+        map.openModal({
+            okCls: 'modal-ok',
+            okText: 'Done',
             speed: route.speed,
             name: route.name,
             template: content.flightModalTemplate,
             zIndex: 10000,
             onShow: function(e) {
                 e.modal.route = route;
+                L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
+                    e.modal.hide();
+                });
             },
             onHide: function(e) {
                 e.modal.route.name = document.getElementById('flight-name').value;
