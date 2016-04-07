@@ -178,7 +178,7 @@
             applyTargetInfo(target);
         });
         nameMarker.addTo(map);
-        if (target.notes != '') {
+        if (target.notes !== '') {
             target.bindLabel(target.notes).addTo(map);
         }
     };
