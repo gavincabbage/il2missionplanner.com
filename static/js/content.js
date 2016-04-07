@@ -3,6 +3,8 @@ var content = (function() {
     var content = {
         tileServiceUrl: 'http://tiles.il2missionplanner.com/img/{z}/{x}/{y}.png',
         titleText: 'Il-2 Mission Planner',
+        helpTooltip: 'How to use this tool',
+        clearTooltip: 'Clear the map',
         flightModalTemplate: `
             <div id="flight-modal">
                 <h2>Configure flight</h2>
@@ -24,6 +26,10 @@ var content = (function() {
                 <p>Are you sure? This action cannot be undone.</p>
                 <button class="{okCls}">{okText}</button>
                 <button class="{cancelCls}">{cancelText}</button>
+            </div>`,
+        helpTemplate: `
+            <div id="help-modal">
+                <h2>How to</h2>
             </div>`
     };
 
