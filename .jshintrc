@@ -7,6 +7,7 @@
     "latedef": true,
     "shadow": true,
     "undef": true,
+    "multistr": true,
     "globals": {
         "L": true,
         "console": true,
@@ -14,6 +15,7 @@
         "iconClass": true,
         "document": true,
         "content": true,
-        "iconId": true
+        "iconId": true,
+        "tooltipText": true
     }
 }

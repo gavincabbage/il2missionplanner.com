@@ -20,7 +20,7 @@ div.flight-leg {
     color: #0033cc;
 }
 
-div.flight-title {
+div.map-title {
     font-family: 'Courier', Courier, monospace;
     font-weight: 700;
     font-size: 1.3em;
@@ -28,23 +28,35 @@ div.flight-title {
     color: #0033cc;
 }
 
-div.flight-title:hover {
+div.map-title:hover {
     color: #0066ff;
 }
 
-.flight-item {
+div.flight-title {
+    font-size: 1.3em;
+}
+
+div.target-title {
+    font-size: 1.1em;
+}
+
+.modal-item {
     width: 100%;
     padding-bottom: 10px;
 }
 
-.flight-item-label {
+.modal-item-label {
     display: inline-block;
     width: 20%;
     padding-right: 5%;
     text-align: right;
 }
 
-.flight-item-input {
+.modal-item-input {
+
+}
+
+.modal-item-text {
 
 }
 

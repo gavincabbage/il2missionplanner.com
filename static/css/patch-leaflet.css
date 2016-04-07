@@ -16,7 +16,7 @@
 }
 
 .leaflet-draw-draw-marker:before {
-    content: "\f041";
+    content: "\f05b"; /* fa-crosshairs */
     font-family: FontAwesome;
 }
 

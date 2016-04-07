@@ -3,28 +3,49 @@ var content = (function() {
     var content = {
         tileServiceUrl: 'http://tiles.il2missionplanner.com/img/{z}/{x}/{y}.png',
         titleText: 'Il-2 Mission Planner',
-        flightModalTemplate: `
-            <div id="flight-modal">
-                <h2>Configure flight</h2>
-                <form>
-                    <div class="flight-item">
-                        <label class="flight-item-label" for="nameInput">Flight name</label>
-                        <input id="flight-name" class="flight-item-input" value="{name}" placeholder="name"></input>
-                    </div>
-                    <div class="flight-item">
-                        <label class="flight-item-label" for="speedInput">Average speed</label>
-                        <input id="flight-speed" class="flight-item-input" value="{speed}"></input>
-                    </div>
-                    <button class="{okCls}" type="button">{okText}</button>
-                </form>
-            </div>`,
-        confirmClearTemplate: `
-            <div id="confirm-clear-modal">
-                <h2>Clear the map</h2>
-                <p>Are you sure? This action cannot be undone.</p>
-                <button class="{okCls}">{okText}</button>
-                <button class="{cancelCls}">{cancelText}</button>
-            </div>`
+        helpTooltip: 'How to use this tool',
+        clearTooltip: 'Clear the map',
+        flightModalTemplate:
+            '<div id="flight-modal"> \
+                <h2>Configure flight</h2> \
+                <form> \
+                    <div class="modal-item"> \
+                        <label class="modal-item-label" for="flight-name">Flight name</label> \
+                        <input id="flight-name" class="modal-item-input" value="{name}" placeholder="name"></input> \
+                    </div> \
+                    <div class="modal-item"> \
+                        <label class="modal-item-label" for="flight-speed">Average speed</label> \
+                        <input id="flight-speed" class="modal-item-input" value="{speed}"></input> \
+                    </div> \
+                    <button class="{okCls}" type="button">{okText}</button> \
+                </form> \
+            </div>',
+        confirmClearTemplate:
+            '<div id="confirm-clear-modal"> \
+                <h2>Clear the map</h2> \
+                <p>Are you sure? This action cannot be undone.</p> \
+                <button class="{okCls}">{okText}</button> \
+                <button class="{cancelCls}">{cancelText}</button> \
+            </div>',
+        helpTemplate:
+            '<div id="help-modal"> \
+                <h2>How to</h2> \
+            </div>',
+        targetModalTemplate:
+            '<div id="target-modal"> \
+                <h2>Configure target</h2> \
+                <form> \
+                    <div class="modal-item"> \
+                        <label class="modal-item-label" for="target-name">Target name</label> \
+                        <input id="target-name" class="modal-item-input" value="{name}" placeholder="name"></input> \
+                    </div> \
+                    <div class="modal-item"> \
+                        <label class="modal-item-label" for="target-notes">Notes</label> \
+                        <textarea id="target-notes" class="modal-item-text" value="{notes}"></textarea> \
+                    </div> \
+                    <button class="{okCls}" type="button">{okText}</button> \
+                </form> \
+            </div>'
     };
 
     //  Just copied this wholesale from Leaflet.draw and edited some
