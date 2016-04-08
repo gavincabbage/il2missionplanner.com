@@ -44,7 +44,7 @@ var content = (function() {
                         <label class="modal-item-label" for="target-notes">Notes</label> \
                         <textarea id="target-notes" class="modal-item-text" value="{notes}"></textarea> \
                     </div> \
-                    <button class="{okCls}">{okText}</button> \
+                    <button class="{okCls}" type="button">{okText}</button> \
                 </form> \
             </div>'
     };
