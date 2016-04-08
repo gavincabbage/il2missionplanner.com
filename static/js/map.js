@@ -300,7 +300,7 @@
                 icon: L.icon({
                     iconUrl: 'img/explosion.png',
                     iconSize: [30, 30],
-                    iconAnchor: [15, 15]
+                    iconAnchor: [15, 25]
                 })
             }
         },
