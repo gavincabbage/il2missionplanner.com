@@ -69,7 +69,7 @@ var content = (function() {
     				polygon: 'Draw a polygon',
     				rectangle: 'Draw a rectangle',
     				circle: 'Draw a circle',
-    				marker: 'Mark a location'
+    				marker: 'Mark a target'
     			}
     		},
     		handlers: {
@@ -81,7 +81,7 @@ var content = (function() {
     			},
     			marker: {
     				tooltip: {
-    					start: 'Click map to mark a location'
+    					start: 'Click to mark a target'
     				}
     			},
     			polygon: {
