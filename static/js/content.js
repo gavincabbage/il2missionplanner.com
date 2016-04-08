@@ -8,7 +8,7 @@ var content = (function() {
         flightModalTemplate:
             '<div id="flight-modal"> \
                 <h2>Configure flight</h2> \
-                <form> \
+                <form onsubmit="return false;"> \
                     <div class="modal-item"> \
                         <label class="modal-item-label" for="flight-name">Flight name</label> \
                         <input id="flight-name" class="modal-item-input" value="{name}" placeholder="name"></input> \
@@ -35,7 +35,7 @@ var content = (function() {
         targetModalTemplate:
             '<div id="target-modal"> \
                 <h2>Configure target</h2> \
-                <form> \
+                <form onsubmit="return false;"> \
                     <div class="modal-item"> \
                         <label class="modal-item-label" for="target-name">Target name</label> \
                         <input id="target-name" class="modal-item-input" value="{name}" placeholder="name"></input> \
