@@ -30,6 +30,7 @@ var content = (function() {
         helpTemplate:
             '<div id="help-modal"> \
                 <h2>How to</h2> \
+                <img class="modal-image" src="img/howto.png"></img> \
             </div>',
         targetModalTemplate:
             '<div id="target-modal"> \

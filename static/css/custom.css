@@ -64,19 +64,17 @@ div.target-title {
     vertical-align: top;
 }
 
+img.modal-image {
+    max-height: 100%;
+    max-width: 100% !important;
+}
+
 @media(max-width: 1600px) {
 
     div.flight-leg {
         font-size: 1.0em;
     }
 
-    div.flight-title {
-        font-size: 1.3em;
-    }
-
-    div.target-title {
-        font-size: 1.1em;
-    }
 }
 
 @media(max-width: 400px) {
