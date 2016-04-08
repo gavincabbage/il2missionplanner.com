@@ -30,6 +30,7 @@ var content = (function() {
         helpTemplate:
             '<div id="help-modal"> \
                 <h2>How to</h2> \
+                <img class="modal-image" src="img/howto.png"></img> \
             </div>',
         targetModalTemplate:
             '<div id="target-modal"> \
@@ -43,7 +44,7 @@ var content = (function() {
                         <label class="modal-item-label" for="target-notes">Notes</label> \
                         <textarea id="target-notes" class="modal-item-text" value="{notes}"></textarea> \
                     </div> \
-                    <button class="{okCls}" type="button">{okText}</button> \
+                    <button class="{okCls}">{okText}</button> \
                 </form> \
             </div>'
     };
@@ -69,7 +70,7 @@ var content = (function() {
     				polygon: 'Draw a polygon',
     				rectangle: 'Draw a rectangle',
     				circle: 'Draw a circle',
-    				marker: 'Mark a location'
+    				marker: 'Mark a target'
     			}
     		},
     		handlers: {
@@ -81,7 +82,7 @@ var content = (function() {
     			},
     			marker: {
     				tooltip: {
-    					start: 'Click map to mark a location'
+    					start: 'Click to mark a target'
     				}
     			},
     			polygon: {
