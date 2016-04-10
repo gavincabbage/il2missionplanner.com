@@ -4,3 +4,5 @@ node_modules/
 clipboard.js
 dist/
 npm-debug.log
+coverage/
+dist/
