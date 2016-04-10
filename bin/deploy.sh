@@ -27,22 +27,8 @@ function abort { # usage: abort <code> <message>
     exit "${1}"
 }
 
-# function build {
-#     log "Starting build"
-#     bower install
-#     npm run dist
-#     log "Build successful"
-# }
-
-# function deploy_s3 {
-#     log "Starting prod deployment"
-#     cp -R "${SRC}" "${DIST}"
-#     log "Ready for automatic deployment to S3"
-# }
-
 function deploy_dev {
     log "Starting dev deployment"
-    #cp -R "il2missionplanner.com/${SRC}" "${DIST}"
     cd "${DIST}"
     log "Initializing git repo"
     git init
@@ -56,7 +42,6 @@ function deploy_dev {
 
 function main {
 
-    #build
     bower install
     npm run lint && npm test
 
@@ -72,13 +57,8 @@ function main {
 
     npm run dist
 
-    # Deploy depending on branch
-    if [[ "${TRAVIS_BRANCH}" == "${PROD_BRANCH}" ]] || \
-       [[ "${TRAVIS_BRANCH}" == "${BETA_BRANCH}" ]]
-    then
-        log "Deploying branch:${PROD_BRANCH} to production"
-        #deploy_s3
-    elif [[ "${TRAVIS_BRANCH}" == "${DEV_BRANCH}" ]]
+    # Deploy dev branch - beta and prod deployments are handled by travis
+    if [[ "${TRAVIS_BRANCH}" == "${DEV_BRANCH}" ]]
     then
         log "Deploying branch:${BETA_BRANCH} to beta"
         deploy_dev
