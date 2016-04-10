@@ -1,15 +1,8 @@
 {
   "name": "il2missionplanner.com",
   "version": "1.0.0",
-  "description": "Il-2: Battle of Stalingrad Mission Planner",
+  "description": "Il-2 Mission Planner",
   "main": "index.html",
-  "scripts": {
-    "test": "echo \"No tests implemented yet\" && exit 0",
-    "lint": "jshint static/js/**.js",
-    "uglify": "uglify static/js/**.js > dist/js/app.min.js",
-    "build": "npm run lint && npm run uglify",
-    "clean": "rm -rf dist"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gavincabbage/il2missionplanner.com.git"
@@ -22,6 +15,33 @@
   "homepage": "https://github.com/gavincabbage/il2missionplanner.com#readme",
   "devDependencies": {
     "bower": "^1.7.7",
-    "jshint": "^2.9.1"
+    "browserify": "^13.0.0",
+    "chai": "^3.5.0",
+    "clean-css": "^3.4.12",
+    "istanbul": "^0.4.3",
+    "jshint": "^2.9.1",
+    "mocha": "^2.4.5",
+    "watch-run": "^1.2.4"
+  },
+  "scripts": {
+    "coverage": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha src/js/**/*.test.js",
+    "test": "mocha src/js/**/*.test.js",
+    "lint": "jshint src/js/**.js",
+    "clean": "rm -rf dist",
+    "browserify": "browserify src/js/map.js -o dist/index.js",
+    "browserify:dev": "browserify src/js/map.js -o dist/index.js -d",
+    "copy:libs": "cp -R src/libs dist/libs",
+    "copy:img": "cp -R src/img dist/img",
+    "copy:html": "cp src/index.html dist/index.html",
+    "copy": "mkdir -p dist && npm run copy:libs && npm run copy:img && npm run copy:html",
+    "dist:js:dev": "npm run lint && npm test && npm run browserify:dev",
+    "dist:js": "npm run lint && npm test && npm run browserify",
+    "dist:dev": "npm run copy && npm run dist:js:dev && npm run dist:css",
+    "dist": "npm run copy && npm run dist:js && npm run dist:css",
+    "watch:css": "watch-run -p 'src/css/**/*.css' npm run dist:css",
+    "watch:html": "watch-run -p 'src/index.html' npm run copy:html",
+    "watch:js": "watch-run -p 'src/js/**/*.js' npm run dist:js:dev",
+    "develop": "npm run dist:dev && concurrently \"npm run watch:css\" \"npm run watch:html\" \"npm run watch:js\"",
+    "dist:css": "cleancss -o dist/index.css src/css/index.css"
   }
 }

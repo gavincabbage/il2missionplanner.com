@@ -16,6 +16,8 @@
         "document": true,
         "content": true,
         "iconId": true,
-        "tooltipText": true
+        "tooltipText": true,
+        "require": true,
+        "module": true
     }
 }

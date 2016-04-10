@@ -1,4 +1,8 @@
-(function(content) {
+(function() {
+
+    var content = require('./content.js');
+    require('./math.js');
+    require('./controls.js');
 
     const
         SCALE_FACTOR = 1.40056,
@@ -79,7 +83,7 @@
     var formatTime = function(totalSeconds) {
         var minutes = totalSeconds / 60;
         var seconds = totalSeconds % 60;
-        return minutes.toFixed(0) + ':' + pad(seconds, 2);
+        return Math.floor(minutes).toFixed(0) + ':' + pad(seconds, 2);
     };
 
     var applyFlightPlanCallback = function(route) {
@@ -410,4 +414,4 @@
 
     checkClearButtonDisabled();
 
-})(content);
+})();
