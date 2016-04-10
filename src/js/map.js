@@ -1,4 +1,8 @@
-(function(content) {
+(function() {
+
+    var content = require('./content.js');
+    require('./math.js');
+    require('./controls.js');
 
     const
         SCALE_FACTOR = 1.40056,
@@ -410,4 +414,4 @@
 
     checkClearButtonDisabled();
 
-})(content);
+})();

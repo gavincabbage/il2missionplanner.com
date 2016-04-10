@@ -1,4 +1,6 @@
-(function(content) {
+(function() {
+
+    var content = require('./content.js');
 
     L.Control.TitleControl = L.Control.extend({
 
@@ -37,4 +39,4 @@
         }
     });
 
-})(content);
+})();

@@ -4,7 +4,7 @@ REPO="gavincabbage/il2missionplanner.com"
 DEV_BRANCH="develop"
 BETA_BRANCH="beta"
 PROD_BRANCH="master"
-SRC="static/"
+SRC="src/"
 DIST="dist/"
 GIT_NAME="Gavin Cabbage"
 GIT_EMAIL="gavincabbage@gmail.com"
@@ -27,23 +27,22 @@ function abort { # usage: abort <code> <message>
     exit "${1}"
 }
 
-function build {
-    log "Starting build"
-    bower install
-    npm run lint
-    log "Build successful"
-}
+# function build {
+#     log "Starting build"
+#     bower install
+#     npm run dist
+#     log "Build successful"
+# }
 
-function deploy_s3 {
-    log "Starting prod deployment"
-    cp -R "${SRC}" "${DIST}"
-    log "Ready for automatic deployment to S3"
-}
+# function deploy_s3 {
+#     log "Starting prod deployment"
+#     cp -R "${SRC}" "${DIST}"
+#     log "Ready for automatic deployment to S3"
+# }
 
 function deploy_dev {
     log "Starting dev deployment"
-    cd ..
-    cp -R "il2missionplanner.com/${SRC}" "${DIST}"
+    #cp -R "il2missionplanner.com/${SRC}" "${DIST}"
     cd "${DIST}"
     log "Initializing git repo"
     git init
@@ -57,7 +56,9 @@ function deploy_dev {
 
 function main {
 
-    build
+    #build
+    bower install
+    npm run lint && npm test
 
     # Do not deploy any PRs or code from other repos
     if [[ "${TRAVIS_REPO_SLUG}" != "${REPO}" ]] || \
@@ -69,12 +70,14 @@ function main {
         abort "0" "No deploy necessary - exiting happily"
     fi
 
+    npm run dist
+
     # Deploy depending on branch
     if [[ "${TRAVIS_BRANCH}" == "${PROD_BRANCH}" ]] || \
        [[ "${TRAVIS_BRANCH}" == "${BETA_BRANCH}" ]]
     then
         log "Deploying branch:${PROD_BRANCH} to production"
-        deploy_s3
+        #deploy_s3
     elif [[ "${TRAVIS_BRANCH}" == "${DEV_BRANCH}" ]]
     then
         log "Deploying branch:${BETA_BRANCH} to beta"
