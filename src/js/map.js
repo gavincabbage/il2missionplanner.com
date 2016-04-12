@@ -4,6 +4,11 @@
     var m = require('./math.js');
     require('./controls.js');
 
+    // map object needs
+    // - tile provider url
+    // - scale factor
+    // - lat and lng min and maxes
+
     const
         LAT_MIN = 0,
         LAT_MAX = 164,
@@ -17,7 +22,7 @@
         FLIGHT_OPACITY = 0.8
     ;
 
-    var map, drawnItems, hiddenLayers, applyFlightPlan, applyTargetInfo, deleteAssociatedLayers;
+    var mapTiles, map, drawnItems, hiddenLayers, applyFlightPlan, applyTargetInfo, deleteAssociatedLayers;
 
     // patch a leaflet bug, see https://github.com/bbecquet/Leaflet.PolylineDecorator/issues/17
     L.PolylineDecorator.include(L.Mixin.Events);
@@ -229,13 +234,14 @@
         attributionControl: false
     }).setView(CENTER, 3);
 
-    L.tileLayer(content.tileServiceUrl, {
+    var mapTiles = L.tileLayer(content.tileServiceUrl, {
         minZoom: 2,
         maxZoom: 6,
         noWrap: true,
         tms: true,
         continuousWorld: true
-    }).addTo(map);
+    });
+    mapTiles.addTo(map);
 
     map.setMaxBounds(new L.LatLngBounds(
         [LAT_MIN - BORDER, LNG_MIN - BORDER],
@@ -378,5 +384,28 @@
     });
 
     checkClearButtonDisabled();
+
+    console.log(window.location.href);
+    console.log(window.location.search);
+    console.log(window.location.pathname);
+    console.log(window.location.hash);
+    window.location.hash = '#other';
+
+    L.marker([0,0], {}).addTo(map);
+    L.marker([1,1], {}).addTo(map);
+    L.marker([0,1], {}).addTo(map);
+    L.marker([1,0], {}).addTo(map);
+    L.marker([2,2], {}).addTo(map);
+    L.marker([0,40], {}).addTo(map);
+    L.marker([0,90], {}).addTo(map);
+    L.marker([0,91], {}).addTo(map);
+    L.marker([0,92], {}).addTo(map);
+    L.marker([0,100], {}).addTo(map);
+    L.marker([0,180], {}).addTo(map);
+    L.marker([0,190], {}).addTo(map);
+    L.marker([0,200], {}).addTo(map);
+    L.marker([0,192], {}).addTo(map);
+    L.marker([192,192], {}).addTo(map);
+    L.marker([192,0], {}).addTo(map); // so moscow is 192 by 192
 
 })();

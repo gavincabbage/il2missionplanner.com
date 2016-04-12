@@ -18,6 +18,7 @@
         "iconId": true,
         "tooltipText": true,
         "require": true,
-        "module": true
+        "module": true,
+        "window": true
     }
 }

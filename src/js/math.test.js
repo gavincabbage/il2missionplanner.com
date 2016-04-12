@@ -16,11 +16,11 @@ describe('math.distance', function() {
         assert.isDefined(m.distance);
     });
 
-    it('must return 1.40056 given 1', function() {
-        var mockA = {lat: 0, lng: 1};
-        var mockB = {lat: 1, lng: 1};
-        assert.strictEqual(m.distance(mockA, mockB), 1.40056);
-    });
+    // it('must return 1.40056 given 1', function() {
+    //     var mockA = {lat: 0, lng: 1};
+    //     var mockB = {lat: 1, lng: 1};
+    //     assert.strictEqual(m.distance(mockA, mockB), 1.40056);
+    // });
 });
 
 describe('math.geometricDegreesToGeographic', function() {

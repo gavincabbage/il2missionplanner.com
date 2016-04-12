@@ -1,7 +1,8 @@
 module.exports = (function() {
 
     const
-        SCALE_FACTOR = 1.40056
+        //SCALE_FACTOR = 1.40056
+        SCALE_FACTOR = 1.46621
     ;
 
     return {
@@ -33,7 +34,7 @@ module.exports = (function() {
         },
 
         pad: function(num, size) {
-            var s = num.toFixed(0);
+            var s = Math.floor(num).toFixed(0);
             while (s.length < size) {
                 s = "0" + s;
             }

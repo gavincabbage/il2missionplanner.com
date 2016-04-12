@@ -99,7 +99,7 @@ module.exports = (function() {
     };
 
     return {
-        tileServiceUrl: 'http://tiles.il2missionplanner.com/img/{z}/{x}/{y}.png',
+        tileServiceUrl: 'http://tiles.il2missionplanner.com/img/moscow/{z}/{x}/{y}.png',
         titleText: 'Il-2 Mission Planner',
         helpTooltip: 'How to use this tool',
         clearTooltip: 'Clear the map',
