@@ -41,7 +41,7 @@
     "watch:css": "watch-run -p 'src/css/**/*.css' npm run dist:css",
     "watch:html": "watch-run -p 'src/index.html' npm run copy:html",
     "watch:js": "watch-run -p 'src/js/**/*.js' npm run dist:js:dev",
-    "develop": "npm run dist:dev && concurrently \"npm run watch:css\" \"npm run watch:html\" \"npm run watch:js\"",
+    "develop": "npm run clean && npm run dist:dev && concurrently \"npm run watch:css\" \"npm run watch:html\" \"npm run watch:js\"",
     "dist:css": "cleancss -o dist/index.css src/css/index.css"
   }
 }
