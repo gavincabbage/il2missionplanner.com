@@ -116,6 +116,15 @@ module.exports = (function() {
             lngMin: 0,
             lngMax: 192,
             tileUrl: 'http://tiles.il2missionplanner.com/img/moscow/{z}/{x}/{y}.png'
+        },
+        luki: {
+            name: 'luki',
+            scale: 1.40056,
+            latMin: 0,
+            latMax: 164,
+            lngMin: 0,
+            lngMax: 252,
+            tileUrl: 'http://tiles.il2missionplanner.com/img/stalingrad/{z}/{x}/{y}.png'
         }
     };
 
@@ -125,6 +134,7 @@ module.exports = (function() {
         titleText: 'Il-2 Mission Planner',
         helpTooltip: 'How to use this tool',
         clearTooltip: 'Clear the map',
+        mapSelectTooltip: 'Select a game map',
         flightModalTemplate:
             '<div id="flight-modal"> \
                 <h2>Configure flight</h2> \
@@ -166,7 +176,19 @@ module.exports = (function() {
                     </div> \
                     <button class="{okCls}" type="button">{okText}</button> \
                 </form> \
-            </div>'
+            </div>',
+        mapSelectTemplate:
+            '<div id="help-modal"> \
+                <h2>Change map</h2> \
+                <form> \
+                    <select id="map-select"> \
+                        <option value="stalingrad">Stalingrad</option> \
+                        <option value="moscow">Moscow</option> \
+                        <option value="luki">Velikie Luki</option> \
+                    </select> \
+                    <button class="{okCls}" type="button">{okText}</button> \
+                </form> \
+            </div>',
     };
 
 })();
