@@ -9,20 +9,17 @@
     // - scale factor
     // - lat and lng min and maxes
 
+    // on load, define stuff in local vars from config or some
+
     const
-        LAT_MIN = 0,
-        LAT_MAX = 164,
-        LNG_MIN = 0,
-        LNG_MAX = 252,
         BORDER = 5,
-        CENTER = [LAT_MAX / 2, LNG_MAX / 2],
         RED = '#ff0000',
         DEFAULT_SPEED = 300,
         DEFAULT_ALTITUDE = 1000,
         FLIGHT_OPACITY = 0.8
     ;
 
-    var mapTiles, map, drawnItems, hiddenLayers, applyFlightPlan, applyTargetInfo, deleteAssociatedLayers;
+    var map, mapTiles, mapConfig, drawnItems, hiddenLayers, applyFlightPlan, applyTargetInfo, deleteAssociatedLayers;
 
     // patch a leaflet bug, see https://github.com/bbecquet/Leaflet.PolylineDecorator/issues/17
     L.PolylineDecorator.include(L.Mixin.Events);
@@ -63,7 +60,7 @@
         decorator.parentId = id;
         decorator.addTo(map);
         for (var i = 0; i < coords.length-1; i++) {
-            var distance = m.distance(coords[i], coords[i+1]);
+            var distance = mapConfig.scale * m.distance(coords[i], coords[i+1]);
             var heading = m.heading(coords[i], coords[i+1]);
             var midpoint = m.midpoint(coords[i], coords[i+1]);
             var time = formatTime(calculateTime(route.speed, distance));
@@ -229,12 +226,24 @@
         }
     };
 
+    if (window.location.hash === '#moscow') {
+        console.log('map: moscow');
+        mapConfig = content.maps.moscow;
+    } else {
+        console.log('map: stalingrad');
+        mapConfig = content.maps.stalingrad;
+        window.location.hash = '#stalingrad';
+    }
+
+    console.log(mapConfig);
+
+    var center = [mapConfig.latMax / 2, mapConfig.lngMax / 2],
     map = L.map('map', {
         crs: L.CRS.Simple,
         attributionControl: false
-    }).setView(CENTER, 3);
+    }).setView(center, 3);
 
-    var mapTiles = L.tileLayer(content.tileServiceUrl, {
+    mapTiles = L.tileLayer(mapConfig.tileUrl, {
         minZoom: 2,
         maxZoom: 6,
         noWrap: true,
@@ -244,8 +253,8 @@
     mapTiles.addTo(map);
 
     map.setMaxBounds(new L.LatLngBounds(
-        [LAT_MIN - BORDER, LNG_MIN - BORDER],
-        [LAT_MAX + BORDER, LNG_MAX + BORDER]
+        [mapConfig.latMin - BORDER, mapConfig.lngMin - BORDER],
+        [mapConfig.latMax + BORDER, mapConfig.lngMax + BORDER]
     ));
 
     drawnItems = new L.FeatureGroup();
@@ -384,28 +393,5 @@
     });
 
     checkClearButtonDisabled();
-
-    console.log(window.location.href);
-    console.log(window.location.search);
-    console.log(window.location.pathname);
-    console.log(window.location.hash);
-    window.location.hash = '#other';
-
-    L.marker([0,0], {}).addTo(map);
-    L.marker([1,1], {}).addTo(map);
-    L.marker([0,1], {}).addTo(map);
-    L.marker([1,0], {}).addTo(map);
-    L.marker([2,2], {}).addTo(map);
-    L.marker([0,40], {}).addTo(map);
-    L.marker([0,90], {}).addTo(map);
-    L.marker([0,91], {}).addTo(map);
-    L.marker([0,92], {}).addTo(map);
-    L.marker([0,100], {}).addTo(map);
-    L.marker([0,180], {}).addTo(map);
-    L.marker([0,190], {}).addTo(map);
-    L.marker([0,200], {}).addTo(map);
-    L.marker([0,192], {}).addTo(map);
-    L.marker([192,192], {}).addTo(map);
-    L.marker([192,0], {}).addTo(map); // so moscow is 192 by 192
 
 })();

@@ -98,7 +98,29 @@ module.exports = (function() {
     	}
     };
 
+    var mapConfigs = {
+        stalingrad: {
+            name: 'stalingrad',
+            scale: 1.40056,
+            latMin: 0,
+            latMax: 164,
+            lngMin: 0,
+            lngMax: 252,
+            tileUrl: 'http://tiles.il2missionplanner.com/img/stalingrad/{z}/{x}/{y}.png'
+        },
+        moscow: {
+            name: 'moscow',
+            scale: 1.46621,
+            latMin: 0,
+            latMax: 192,
+            lngMin: 0,
+            lngMax: 192,
+            tileUrl: 'http://tiles.il2missionplanner.com/img/moscow/{z}/{x}/{y}.png'
+        }
+    };
+
     return {
+        maps: mapConfigs,
         tileServiceUrl: 'http://tiles.il2missionplanner.com/img/moscow/{z}/{x}/{y}.png',
         titleText: 'Il-2 Mission Planner',
         helpTooltip: 'How to use this tool',
