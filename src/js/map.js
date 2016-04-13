@@ -1,47 +1,22 @@
 (function() {
 
     var content = require('./content.js');
-    require('./math.js');
+    var m = require('./math.js');
     require('./controls.js');
 
     const
-        SCALE_FACTOR = 1.40056,
-        LAT_MIN = 0,
-        LAT_MAX = 164,
-        LNG_MIN = 0,
-        LNG_MAX = 252,
         BORDER = 5,
-        CENTER = [LAT_MAX / 2, LNG_MAX / 2],
         RED = '#ff0000',
         DEFAULT_SPEED = 300,
         DEFAULT_ALTITUDE = 1000,
         FLIGHT_OPACITY = 0.8
     ;
 
-    var map, drawnItems, hiddenLayers, applyFlightPlan, applyTargetInfo, deleteAssociatedLayers;
+    var map, mapTiles, mapConfig, drawnItems, hiddenLayers, applyFlightPlan, applyTargetInfo, deleteAssociatedLayers;
+    var selectedMapIndex = 0;
 
     // patch a leaflet bug, see https://github.com/bbecquet/Leaflet.PolylineDecorator/issues/17
     L.PolylineDecorator.include(L.Mixin.Events);
-
-    var calculateDistance = function(a, b) {
-		var dx = b.lng - a.lng;
-        var dy = b.lat - a.lat;
-        return SCALE_FACTOR * Math.sqrt(dx * dx + dy * dy);
-	};
-
-    var mathDegreesToGeographic = function(degrees) {
-        if (degrees < 0) {
-            degrees += 360;
-        }
-        return (450 - degrees) % 360;
-    };
-
-    var calculateHeading = function(start, end) {
-        var radians = Math.atan2(end.lat - start.lat, end.lng - start.lng);
-        var degrees = radians * 180 / Math.PI;
-        degrees = mathDegreesToGeographic(degrees);
-        return degrees;
-    };
 
     var newFlightDecorator = function(route) {
         return L.polylineDecorator(route, {
@@ -61,20 +36,6 @@
         });
     };
 
-    var calculateMidpoint = function(a, b) {
-        var lat = (a.lat + b.lat) / 2;
-        var lng = (a.lng + b.lng) / 2;
-        return L.latLng(lat, lng);
-    };
-
-    var pad = function(num, size) {
-        var s = num.toFixed(0);
-        while (s.length < size) {
-            s = "0" + s;
-        }
-        return s;
-    };
-
     var calculateTime = function(speed, distance) {
         var kmPerSecond = speed / 3600;
         return distance / kmPerSecond;
@@ -83,7 +44,7 @@
     var formatTime = function(totalSeconds) {
         var minutes = totalSeconds / 60;
         var seconds = totalSeconds % 60;
-        return Math.floor(minutes).toFixed(0) + ':' + pad(seconds, 2);
+        return Math.floor(minutes).toFixed(0) + ':' + m.pad(seconds, 2);
     };
 
     var applyFlightPlanCallback = function(route) {
@@ -93,9 +54,9 @@
         decorator.parentId = id;
         decorator.addTo(map);
         for (var i = 0; i < coords.length-1; i++) {
-            var distance = calculateDistance(coords[i], coords[i+1]);
-            var heading = calculateHeading(coords[i], coords[i+1]);
-            var midpoint = calculateMidpoint(coords[i], coords[i+1]);
+            var distance = mapConfig.scale * m.distance(coords[i], coords[i+1]);
+            var heading = m.heading(coords[i], coords[i+1]);
+            var midpoint = m.midpoint(coords[i], coords[i+1]);
             var time = formatTime(calculateTime(route.speed, distance));
             var markerContent = '[' + distance.toFixed(1) + 'km|' + heading.toFixed(0) + '&deg;|' + time + ']';
             var marker =  L.marker(midpoint, {
@@ -259,27 +220,77 @@
         }
     };
 
+    if (window.location.hash === '#moscow') {
+        console.log('map: moscow');
+        mapConfig = content.maps.moscow;
+    } else {
+        console.log('map: stalingrad');
+        mapConfig = content.maps.stalingrad;
+        window.location.hash = '#stalingrad';
+    }
+
+    console.log(mapConfig);
+
+    var center = [mapConfig.latMax / 2, mapConfig.lngMax / 2],
     map = L.map('map', {
         crs: L.CRS.Simple,
         attributionControl: false
-    }).setView(CENTER, 3);
+    }).setView(center, 3);
 
-    L.tileLayer(content.tileServiceUrl, {
+    mapTiles = L.tileLayer(mapConfig.tileUrl, {
         minZoom: 2,
         maxZoom: 6,
         noWrap: true,
         tms: true,
         continuousWorld: true
-    }).addTo(map);
+    });
+    mapTiles.addTo(map);
 
     map.setMaxBounds(new L.LatLngBounds(
-        [LAT_MIN - BORDER, LNG_MIN - BORDER],
-        [LAT_MAX + BORDER, LNG_MAX + BORDER]
+        [mapConfig.latMin - BORDER, mapConfig.lngMin - BORDER],
+        [mapConfig.latMax + BORDER, mapConfig.lngMax + BORDER]
     ));
 
     drawnItems = new L.FeatureGroup();
     map.addLayer(drawnItems);
     hiddenLayers = new L.FeatureGroup();
+
+    var mapSelectButton = new L.Control.CustomButton({
+        position: 'topleft',
+        id: 'map-select-button',
+        icon: 'fa-map',
+        tooltip: content.mapSelectTooltip,
+        clickFn: function() {
+            map.openModal({
+                template: content.mapSelectTemplate,
+                okCls: 'modal-ok',
+                okText: 'Okay',
+                onShow: function(e) {
+                    var selectElement = document.getElementById('map-select');
+                    selectElement.selectedIndex = selectedMapIndex;
+                    L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
+                        deleteAssociatedLayers(drawnItems);
+                        drawnItems.clearLayers();
+                        hiddenLayers.clearLayers();
+                        selectedMapIndex = selectElement.selectedIndex;
+                        var selectedMap = selectElement.options[selectedMapIndex].value;
+                        window.location.hash = '#' + selectedMap;
+                        mapConfig = content.maps[selectedMap];
+                        mapTiles = L.tileLayer(mapConfig.tileUrl, {
+                            minZoom: 2,
+                            maxZoom: 6,
+                            noWrap: true,
+                            tms: true,
+                            continuousWorld: true
+                        });
+                        mapTiles.addTo(map);
+                        e.modal.hide();
+                    });
+                }
+            });
+        }
+    });
+    map.addControl(mapSelectButton);
 
     var editOptions = {
         selectedPathOptions: {
