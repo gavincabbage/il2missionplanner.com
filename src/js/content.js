@@ -100,7 +100,9 @@ module.exports = (function() {
 
     var mapConfigs = {
         stalingrad: {
+            fullName: 'Stalingrad',
             name: 'stalingrad',
+            hash: '#stalingrad',
             scale: 1.40056,
             latMin: 0,
             latMax: 164,
@@ -109,7 +111,9 @@ module.exports = (function() {
             tileUrl: 'http://tiles.il2missionplanner.com/stalingrad/{z}/{x}/{y}.png'
         },
         moscow: {
+            fullName: 'Moscow',
             name: 'moscow',
+            hash: '#moscow',
             scale: 1.46621,
             latMin: 0,
             latMax: 192,
@@ -118,13 +122,15 @@ module.exports = (function() {
             tileUrl: 'http://tiles.il2missionplanner.com/moscow/{z}/{x}/{y}.png'
         },
         luki: {
+            fullName: 'Velikie Luki',
             name: 'luki',
+            hash: '#luki',
             scale: 1.40056,
             latMin: 0,
             latMax: 164,
             lngMin: 0,
             lngMax: 252,
-            tileUrl: 'http://tiles.il2missionplanner.com/stalingrad/{z}/{x}/{y}.png'
+            tileUrl: 'http://tiles.il2missionplanner.com/luki/{z}/{x}/{y}.png'
         }
     };
 
@@ -185,7 +191,7 @@ module.exports = (function() {
                     <select id="map-select"> \
                         <option value="stalingrad">Stalingrad</option> \
                         <option value="moscow">Moscow</option> \
-                        <!-- <option value="luki">Velikie Luki</option> --> \
+                        <option value="luki">Velikie Luki</option> \
                     </select> \
                     <button class="{okCls}" type="button">{okText}</button> \
                 </form> \
