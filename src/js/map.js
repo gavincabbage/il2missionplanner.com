@@ -1,7 +1,8 @@
 (function() {
 
     var content = require('./content.js');
-    var m = require('./math.js');
+    var calc = require('./calc.js');
+    var util = require('./util.js');
     require('./controls.js');
 
     const
@@ -13,7 +14,9 @@
     ;
 
     var map, mapTiles, mapConfig, drawnItems, hiddenLayers, applyFlightPlan, applyTargetInfo, deleteAssociatedLayers;
-    var selectedMapIndex = 0;
+    var selectedMapIndex = 0; // TODO calculate default index by hash on load
+
+    L.drawLocal = content.augmentedLeafletDrawLocal;
 
     // patch a leaflet bug, see https://github.com/bbecquet/Leaflet.PolylineDecorator/issues/17
     L.PolylineDecorator.include(L.Mixin.Events);
@@ -36,17 +39,6 @@
         });
     };
 
-    var calculateTime = function(speed, distance) {
-        var kmPerSecond = speed / 3600;
-        return distance / kmPerSecond;
-    };
-
-    var formatTime = function(totalSeconds) {
-        var minutes = totalSeconds / 60;
-        var seconds = totalSeconds % 60;
-        return Math.floor(minutes).toFixed(0) + ':' + m.pad(seconds, 2);
-    };
-
     var applyFlightPlanCallback = function(route) {
         var id = route._leaflet_id;
         var coords = route.getLatLngs();
@@ -54,10 +46,10 @@
         decorator.parentId = id;
         decorator.addTo(map);
         for (var i = 0; i < coords.length-1; i++) {
-            var distance = mapConfig.scale * m.distance(coords[i], coords[i+1]);
-            var heading = m.heading(coords[i], coords[i+1]);
-            var midpoint = m.midpoint(coords[i], coords[i+1]);
-            var time = formatTime(calculateTime(route.speed, distance));
+            var distance = mapConfig.scale * calc.distance(coords[i], coords[i+1]);
+            var heading = calc.heading(coords[i], coords[i+1]);
+            var midpoint = calc.midpoint(coords[i], coords[i+1]);
+            var time = util.formatTime(calc.time(route.speed, distance));
             var markerContent = '[' + distance.toFixed(1) + 'km|' + heading.toFixed(0) + '&deg;|' + time + ']';
             var marker =  L.marker(midpoint, {
                 clickable: false,
@@ -221,15 +213,11 @@
     };
 
     if (window.location.hash === '#moscow') {
-        console.log('map: moscow');
         mapConfig = content.maps.moscow;
     } else {
-        console.log('map: stalingrad');
         mapConfig = content.maps.stalingrad;
         window.location.hash = '#stalingrad';
     }
-
-    console.log(mapConfig);
 
     var center = [mapConfig.latMax / 2, mapConfig.lngMax / 2],
     map = L.map('map', {

@@ -1,7 +1,7 @@
 module.exports = (function() {
 
-    //  Just copied this wholesale from Leaflet.draw and edited some
-    L.drawLocal = {
+    // Edited original leaflet object
+    var augmentedLeafletDrawLocal = {
         draw: {
     		toolbar: {
     			actions: {
@@ -106,7 +106,7 @@ module.exports = (function() {
             latMax: 164,
             lngMin: 0,
             lngMax: 252,
-            tileUrl: 'http://tiles.il2missionplanner.com/img/stalingrad/{z}/{x}/{y}.png'
+            tileUrl: 'http://tiles.il2missionplanner.com/stalingrad/{z}/{x}/{y}.png'
         },
         moscow: {
             name: 'moscow',
@@ -115,7 +115,7 @@ module.exports = (function() {
             latMax: 192,
             lngMin: 0,
             lngMax: 192,
-            tileUrl: 'http://tiles.il2missionplanner.com/img/moscow/{z}/{x}/{y}.png'
+            tileUrl: 'http://tiles.il2missionplanner.com/moscow/{z}/{x}/{y}.png'
         },
         luki: {
             name: 'luki',
@@ -124,11 +124,12 @@ module.exports = (function() {
             latMax: 164,
             lngMin: 0,
             lngMax: 252,
-            tileUrl: 'http://tiles.il2missionplanner.com/img/stalingrad/{z}/{x}/{y}.png'
+            tileUrl: 'http://tiles.il2missionplanner.com/stalingrad/{z}/{x}/{y}.png'
         }
     };
 
     return {
+        augmentedLeafletDrawLocal: augmentedLeafletDrawLocal,
         maps: mapConfigs,
         tileServiceUrl: 'http://tiles.il2missionplanner.com/img/moscow/{z}/{x}/{y}.png',
         titleText: 'Il-2 Mission Planner',
