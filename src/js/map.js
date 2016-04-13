@@ -421,4 +421,18 @@
 
     checkClearButtonDisabled();
 
+    L.marker([0,0]).addTo(map);
+    L.marker([0,1]).addTo(map);
+    L.marker([1,0]).addTo(map);
+    L.marker([1,1]).addTo(map);
+    L.marker([2,2]).addTo(map);
+    L.marker([0,10]).addTo(map);
+    L.marker([0,100]).addTo(map);
+
+    L.marker([100,0]).addTo(map);
+
+    L.marker([0,224]).addTo(map);
+
+    L.marker([160,0]).addTo(map);
+
 })();

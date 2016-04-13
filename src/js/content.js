@@ -125,11 +125,11 @@ module.exports = (function() {
             fullName: 'Velikie Luki',
             name: 'luki',
             hash: '#luki',
-            scale: 1.40056,
+            scale: 0.65306,
             latMin: 0,
-            latMax: 164,
+            latMax: 160,
             lngMin: 0,
-            lngMax: 252,
+            lngMax: 224,
             tileUrl: 'http://tiles.il2missionplanner.com/luki/{z}/{x}/{y}.png'
         }
     };
@@ -141,7 +141,7 @@ module.exports = (function() {
         titleText: 'Il-2 Mission Planner',
         helpTooltip: 'How to use this tool',
         clearTooltip: 'Clear the map',
-        mapSelectTooltip: 'Select a game map',
+        mapSelectTooltip: 'Select game map',
         flightModalTemplate:
             '<div id="flight-modal"> \
                 <h2>Configure flight</h2> \
