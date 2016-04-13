@@ -4,13 +4,6 @@
     var m = require('./math.js');
     require('./controls.js');
 
-    // map object needs
-    // - tile provider url
-    // - scale factor
-    // - lat and lng min and maxes
-
-    // on load, define stuff in local vars from config or some
-
     const
         BORDER = 5,
         RED = '#ff0000',
@@ -262,6 +255,43 @@
     map.addLayer(drawnItems);
     hiddenLayers = new L.FeatureGroup();
 
+    var mapSelectButton = new L.Control.CustomButton({
+        position: 'topleft',
+        id: 'map-select-button',
+        icon: 'fa-map',
+        tooltip: content.mapSelectTooltip,
+        clickFn: function() {
+            map.openModal({
+                template: content.mapSelectTemplate,
+                okCls: 'modal-ok',
+                okText: 'Okay',
+                onShow: function(e) {
+                    var selectElement = document.getElementById('map-select');
+                    selectElement.selectedIndex = selectedMapIndex;
+                    L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
+                        deleteAssociatedLayers(drawnItems);
+                        drawnItems.clearLayers();
+                        hiddenLayers.clearLayers();
+                        selectedMapIndex = selectElement.selectedIndex;
+                        var selectedMap = selectElement.options[selectedMapIndex].value;
+                        window.location.hash = '#' + selectedMap;
+                        mapConfig = content.maps[selectedMap];
+                        mapTiles = L.tileLayer(mapConfig.tileUrl, {
+                            minZoom: 2,
+                            maxZoom: 6,
+                            noWrap: true,
+                            tms: true,
+                            continuousWorld: true
+                        });
+                        mapTiles.addTo(map);
+                        e.modal.hide();
+                    });
+                }
+            });
+        }
+    });
+    map.addControl(mapSelectButton);
+
     var editOptions = {
         selectedPathOptions: {
             maintainColor: true,
@@ -349,44 +379,6 @@
         }
     });
     map.addControl(helpButton);
-
-    var mapSelectButton = new L.Control.CustomButton({
-        position: 'topleft',
-        id: 'map-select-button',
-        icon: 'fa-map',
-        tooltip: content.mapSelectTooltip,
-        clickFn: function() {
-            map.openModal({
-                template: content.mapSelectTemplate,
-                okCls: 'modal-ok',
-                okText: 'Okay',
-                onShow: function(e) {
-                    var selectElement = document.getElementById('map-select');
-                    selectElement.selectedIndex = selectedMapIndex;
-                    L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
-                        deleteAssociatedLayers(drawnItems);
-                        drawnItems.clearLayers();
-                        hiddenLayers.clearLayers();
-                        //map.removeLayer(mapTiles);
-                        selectedMapIndex = selectElement.selectedIndex;
-                        var selectedMap = selectElement.options[selectedMapIndex].value;
-                        window.location.hash = '#' + selectedMap;
-                        mapConfig = content.maps[selectedMap];
-                        mapTiles = L.tileLayer(mapConfig.tileUrl, {
-                            minZoom: 2,
-                            maxZoom: 6,
-                            noWrap: true,
-                            tms: true,
-                            continuousWorld: true
-                        });
-                        mapTiles.addTo(map);
-                        e.modal.hide();
-                    });
-                }
-            });
-        }
-    });
-    map.addControl(mapSelectButton);
 
     map.on('draw:created', function(e) {
         map.addLayer(e.layer);
