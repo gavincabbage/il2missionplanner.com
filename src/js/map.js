@@ -269,22 +269,28 @@
                     var selectElement = document.getElementById('map-select');
                     selectElement.selectedIndex = selectedMapIndex;
                     L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
-                        deleteAssociatedLayers(drawnItems);
-                        drawnItems.clearLayers();
-                        hiddenLayers.clearLayers();
                         selectedMapIndex = selectElement.selectedIndex;
                         var selectedMap = selectElement.options[selectedMapIndex].value;
                         window.location.hash = '#' + selectedMap;
-                        mapConfig = content.maps[selectedMap];
-                        mapTiles = L.tileLayer(mapConfig.tileUrl, {
-                            minZoom: 2,
-                            maxZoom: 6,
-                            noWrap: true,
-                            tms: true,
-                            continuousWorld: true
-                        });
-                        mapTiles.addTo(map);
-                        e.modal.hide();
+                        window.location.reload();
+                        // TODO fix tile purging issue with code below
+                        // deleteAssociatedLayers(drawnItems);
+                        // drawnItems.clearLayers();
+                        // hiddenLayers.clearLayers();
+                        // selectedMapIndex = selectElement.selectedIndex;
+                        // var selectedMap = selectElement.options[selectedMapIndex].value;
+                        // window.location.hash = '#' + selectedMap;
+                        // mapConfig = content.maps[selectedMap];
+                        // mapTiles = L.tileLayer(mapConfig.tileUrl, {
+                        //     minZoom: 2,
+                        //     maxZoom: 6,
+                        //     noWrap: true,
+                        //     tms: true,
+                        //     continuousWorld: true
+                        // });
+                        // mapTiles.redraw();
+                        // mapTiles.addTo(map);
+                        // e.modal.hide();
                     });
                 }
             });
