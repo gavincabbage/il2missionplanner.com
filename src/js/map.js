@@ -214,6 +214,8 @@
 
     if (window.location.hash === '#moscow') {
         mapConfig = content.maps.moscow;
+    } else if (window.location.hash === '#luki') {
+        mapConfig = content.maps.luki;
     } else {
         mapConfig = content.maps.stalingrad;
         window.location.hash = '#stalingrad';
