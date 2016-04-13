@@ -3,6 +3,10 @@ var assert = chai.assert;
 
 var m = require('./math.js');
 
+function strLatLng(latLng) {
+    return '('+latLng.lat+','+latLng.lng+')';
+}
+
 describe('math', function() {
 
     it('must be defined', function() {
@@ -16,22 +20,28 @@ describe('math.distance', function() {
         assert.isDefined(m.distance);
     });
 
-    it('must return 1 given (0,1) and (1,1)', function() {
-        var mockA = {lat: 0, lng: 1};
-        var mockB = {lat: 1, lng: 1};
-        assert.strictEqual(m.distance(mockA, mockB), 1);
-    });
+    var tests = [
+        {
+            a: {lat: 0, lng: 1},
+            b: {lat: 1, lng: 1},
+            expectedDistance: 1
+        },
+        {
+            a: {lat: 0, lng: 0},
+            b: {lat: 0, lng:-1},
+            expectedDistance: 1
+        },
+        {
+            a: {lat: 0, lng: 0},
+            b: {lat: 1, lng: 1},
+            expectedDistance: Math.sqrt(2)
+        }
+    ];
 
-    it('must return 1 given (0,0) and (0,-1)', function() {
-        var mockA = {lat: 0, lng: 1};
-        var mockB = {lat: 1, lng: 1};
-        assert.strictEqual(m.distance(mockA, mockB), 1);
-    });
-
-    it('must return sqrt(2) given (0,0) and (1,1)', function() {
-        var mockA = {lat: 0, lng: 0};
-        var mockB = {lat: 1, lng: 1};
-        assert.strictEqual(m.distance(mockA, mockB), Math.sqrt(2));
+    tests.forEach(function(test) {
+        it('must return '+test.expectedDistance+' given '+strLatLng(test.a)+' and '+strLatLng(test.b), function() {
+            assert.strictEqual(m.distance(test.a, test.b), test.expectedDistance);
+        });
     });
 });
 
@@ -41,24 +51,18 @@ describe('math.geometricDegreesToGeographic', function() {
         assert.isDefined(m.geometricDegreesToGeographic);
     });
 
-    it('must return 90 given 0', function() {
-        assert.strictEqual(m.geometricDegreesToGeographic(0), 90);
-    });
+    var tests = [
+        {expected: 90, given: 0},
+        {expected: 0, given: 90},
+        {expected: 270, given: 180},
+        {expected: 180, given: 270},
+        {expected: 90, given: 360},
+    ];
 
-    it('must return 0 given 90', function() {
-        assert.strictEqual(m.geometricDegreesToGeographic(90), 0);
-    });
-
-    it('must return 270 given 180', function() {
-        assert.strictEqual(m.geometricDegreesToGeographic(180), 270);
-    });
-
-    it('must return 180 given 270', function() {
-        assert.strictEqual(m.geometricDegreesToGeographic(270), 180);
-    });
-
-    it('must return 90 given 360', function() {
-        assert.strictEqual(m.geometricDegreesToGeographic(360), 90);
+    tests.forEach(function(test) {
+        it('must return '+test.expected+' given '+test.given, function() {
+            assert.strictEqual(m.geometricDegreesToGeographic(test.given), test.expected);
+        });
     });
 });
 
@@ -68,22 +72,28 @@ describe('math.heading', function() {
         assert.isDefined(m.heading);
     });
 
-    it('must return 180 given (1,1) and (0,1)', function() {
-        var mockA = {lat: 1, lng: 1};
-        var mockB = {lat: 0, lng: 1};
-        assert.strictEqual(m.heading(mockA, mockB), 180);
-    });
+    tests = [
+        {
+            a: {lat: 1, lng: 1},
+            b: {lat: 0, lng: 1},
+            expectedHeading: 180
+        },
+        {
+            a: {lat: 0, lng: 1},
+            b: {lat: 1, lng: 1},
+            expectedHeading: 0
+        },
+        {
+            a: {lat: 1, lng: 2},
+            b: {lat: 1, lng: 0},
+            expectedHeading: 270
+        }
+    ]
 
-    it('must return 0 given (0,1) and (1,1)', function() {
-        var mockA = {lat: 0, lng: 1};
-        var mockB = {lat: 1, lng: 1};
-        assert.strictEqual(m.heading(mockA, mockB), 0);
-    });
-
-    it('must return 270 given (1,1) and (1,0)', function() {
-        var mockA = {lat: 1, lng: 1};
-        var mockB = {lat: 1, lng: 0};
-        assert.strictEqual(m.heading(mockA, mockB), 270);
+    tests.forEach(function(test) {
+        it('must return '+test.expectedHeading+' given '+strLatLng(test.a)+' and '+strLatLng(test.b), function() {
+            assert.strictEqual(m.heading(test.a, test.b), test.expectedHeading);
+        });
     });
 });
 
@@ -93,15 +103,15 @@ describe('math.pad', function() {
         assert.isDefined(m.pad);
     });
 
-    it('must return \'090\' given 90 and 3', function() {
-        assert.strictEqual(m.pad(90, 3), '090');
-    });
+    var tests = [
+        {num: 90, digits: 3, expected: '090'},
+        {num: 270, digits: 3, expected: '270'},
+        {num: 1, digits: 3, expected: '001'}
+    ];
 
-    it('must return \'270\' given 270 and 3', function() {
-        assert.strictEqual(m.pad(270, 3), '270');
-    });
-
-    it('must return \'001\' given 1 and 3', function() {
-        assert.strictEqual(m.pad(1, 3), '001');
+    tests.forEach(function(test) {
+        it('must return '+test.expected+' given '+test.num+' and '+test.digits, function() {
+            assert.strictEqual(m.pad(test.num, test.digits), test.expected);
+        });
     });
 });
