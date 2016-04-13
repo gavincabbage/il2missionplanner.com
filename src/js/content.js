@@ -184,7 +184,7 @@ module.exports = (function() {
                     <select id="map-select"> \
                         <option value="stalingrad">Stalingrad</option> \
                         <option value="moscow">Moscow</option> \
-                        <option value="luki">Velikie Luki</option> \
+                        <!-- <option value="luki">Velikie Luki</option> --> \
                     </select> \
                     <button class="{okCls}" type="button">{okText}</button> \
                 </form> \
