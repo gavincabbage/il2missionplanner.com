@@ -1,7 +1,10 @@
 module.exports = (function() {
 
+    'use strict';
+
     const
-        SECONDS_IN_HOUR = 3600
+        SECONDS_IN_HOUR = 3600,
+        BORDER = 5
     ;
 
     return {
@@ -43,8 +46,13 @@ module.exports = (function() {
         time: function(speed, distance) {
             var kmPerSecond = speed / SECONDS_IN_HOUR;
             return distance / kmPerSecond;
+        },
+
+        maxBounds: function(mapConfig) {
+            return [
+                [mapConfig.latMin - BORDER, mapConfig.lngMin - BORDER],
+                [mapConfig.latMax + BORDER, mapConfig.lngMax + BORDER]
+            ];
         }
-
     };
-
 })();

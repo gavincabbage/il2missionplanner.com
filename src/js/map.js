@@ -1,27 +1,28 @@
 (function() {
 
-    var content = require('./content.js');
-    var calc = require('./calc.js');
-    var util = require('./util.js');
+    'use strict';
+
+    let content = require('./content.js');
+    let calc = require('./calc.js');
+    let util = require('./util.js');
     require('./controls.js');
 
     const
-        BORDER = 5,
         RED = '#ff0000',
         DEFAULT_SPEED = 300,
-        DEFAULT_ALTITUDE = 1000,
         FLIGHT_OPACITY = 0.8
     ;
 
-    var map, mapTiles, mapConfig, drawnItems, hiddenLayers, applyFlightPlan, applyTargetInfo, deleteAssociatedLayers;
+    var map, mapTiles, mapConfig, drawnItems, hiddenLayers;
     var selectedMapIndex = 0; // TODO calculate default index by hash on load
 
-    L.drawLocal = content.augmentedLeafletDrawLocal;
-
-    // patch a leaflet bug, see https://github.com/bbecquet/Leaflet.PolylineDecorator/issues/17
+    // Patch a leaflet bug, see https://github.com/bbecquet/Leaflet.PolylineDecorator/issues/17
     L.PolylineDecorator.include(L.Mixin.Events);
 
-    var newFlightDecorator = function(route) {
+    // Patch leaflet content with custom language
+    L.drawLocal = content.augmentedLeafletDrawLocal;
+
+    function newFlightDecorator(route) {
         return L.polylineDecorator(route, {
             patterns: [
                 {
@@ -37,9 +38,9 @@
                 }
             ]
         });
-    };
+    }
 
-    var applyFlightPlanCallback = function(route) {
+    function applyFlightPlanCallback(route) {
         var id = route._leaflet_id;
         var coords = route.getLatLngs();
         var decorator = newFlightDecorator(route);
@@ -87,9 +88,9 @@
             applyFlightPlan(route);
         });
         nameMarker.addTo(map);
-    };
+    }
 
-    applyFlightPlan = function(route) {
+    function applyFlightPlan(route) {
         if (typeof route.speed === 'undefined') {
             route.speed = DEFAULT_SPEED;
         }
@@ -115,9 +116,9 @@
                 applyFlightPlanCallback(e.modal.route);
             }
         });
-    };
+    }
 
-    var applyTargetInfoCallback = function(target) {
+    function applyTargetInfoCallback(target) {
         var id = target._leaflet_id;
         var coords = target.getLatLng();
         var nameCoords = L.latLng(coords.lat, coords.lng);
@@ -138,9 +139,9 @@
         if (target.notes !== '') {
             target.bindLabel(target.notes).addTo(map);
         }
-    };
+    }
 
-    applyTargetInfo = function(target) {
+    function applyTargetInfo(target) {
         if (typeof target.name === 'undefined') {
             target.name = '';
         }
@@ -166,9 +167,9 @@
                 applyTargetInfoCallback(e.modal.target);
             }
         });
-    };
+    }
 
-    deleteAssociatedLayers = function(parentLayers) {
+    function deleteAssociatedLayers(parentLayers) {
         var toDelete = [];
         parentLayers.eachLayer(function(layer) {
             toDelete.push(layer._leaflet_id);
@@ -184,33 +185,33 @@
                 hiddenLayers.removeLayer(layer);
             }
         });
-    };
+    }
 
-    var transferChildLayer = function(from, to) {
+    function transferChildLayers(from, to) {
         from.eachLayer(function(layer) {
             if (typeof layer.parentId !== 'undefined') {
                 from.removeLayer(layer);
                 to.addLayer(layer);
             }
         });
-    };
+    }
 
-    var showChildLayers = function() {
-        transferChildLayer(hiddenLayers, map);
-    };
+    function showChildLayers() {
+        transferChildLayers(hiddenLayers, map);
+    }
 
-    var hideChildLayers = function() {
-        transferChildLayer(map, hiddenLayers);
-    };
+    function hideChildLayers() {
+        transferChildLayers(map, hiddenLayers);
+    }
 
-    var checkClearButtonDisabled = function() {
+    function checkClearButtonDisabled() {
         var element = document.getElementById('clear-button');
         if (drawnItems.getLayers().length === 0) {
             element.classList.add('leaflet-disabled');
         } else {
             element.classList.remove('leaflet-disabled');
         }
-    };
+    }
 
     if (window.location.hash === '#moscow') {
         mapConfig = content.maps.moscow;
@@ -236,10 +237,7 @@
     });
     mapTiles.addTo(map);
 
-    map.setMaxBounds(new L.LatLngBounds(
-        [mapConfig.latMin - BORDER, mapConfig.lngMin - BORDER],
-        [mapConfig.latMax + BORDER, mapConfig.lngMax + BORDER]
-    ));
+    map.setMaxBounds(calc.maxBounds(mapConfig));
 
     drawnItems = new L.FeatureGroup();
     map.addLayer(drawnItems);
@@ -262,25 +260,20 @@
                         selectedMapIndex = selectElement.selectedIndex;
                         var selectedMap = selectElement.options[selectedMapIndex].value;
                         window.location.hash = '#' + selectedMap;
-                        window.location.reload();
-                        // TODO fix tile purging issue with code below
-                        // deleteAssociatedLayers(drawnItems);
-                        // drawnItems.clearLayers();
-                        // hiddenLayers.clearLayers();
-                        // selectedMapIndex = selectElement.selectedIndex;
-                        // var selectedMap = selectElement.options[selectedMapIndex].value;
-                        // window.location.hash = '#' + selectedMap;
-                        // mapConfig = content.maps[selectedMap];
-                        // mapTiles = L.tileLayer(mapConfig.tileUrl, {
-                        //     minZoom: 2,
-                        //     maxZoom: 6,
-                        //     noWrap: true,
-                        //     tms: true,
-                        //     continuousWorld: true
-                        // });
-                        // mapTiles.redraw();
-                        // mapTiles.addTo(map);
-                        // e.modal.hide();
+                        deleteAssociatedLayers(drawnItems);
+                        drawnItems.clearLayers();
+                        hiddenLayers.clearLayers();
+                        selectedMapIndex = selectElement.selectedIndex;
+                        var selectedMap = selectElement.options[selectedMapIndex].value;
+                        window.location.hash = '#' + selectedMap;
+                        mapConfig = content.maps[selectedMap];
+                        mapTiles.setUrl(mapConfig.tileUrl);
+                        map.setMaxBounds(calc.maxBounds(mapConfig));
+                        center = [mapConfig.latMax / 2, mapConfig.lngMax / 2];
+                        map.setView(center, 3);
+                        mapTiles.redraw();
+                        mapTiles.addTo(map);
+                        e.modal.hide();
                     });
                 }
             });

@@ -4,7 +4,6 @@
     "eqeqeq": true,
     "freeze": true,
     "funcscope": true,
-    "latedef": true,
     "shadow": true,
     "undef": true,
     "multistr": true,

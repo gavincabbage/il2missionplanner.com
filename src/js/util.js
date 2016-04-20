@@ -1,5 +1,7 @@
 module.exports = (function() {
 
+    'use strict';
+
     var calc = require('./calc.js');
 
     return {
@@ -9,7 +11,5 @@ module.exports = (function() {
             var seconds = timeInSeconds % 60;
             return Math.floor(minutes).toFixed(0) + ':' + calc.pad(seconds, 2);
         }
-
     };
-
 })();

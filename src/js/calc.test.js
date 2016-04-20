@@ -173,4 +173,39 @@ describe('calc', function() {
             });
         });
     });
+
+    describe('calc.maxBounds', function() {
+
+        it('must be defined', function() {
+            assert.isDefined(calc.maxBounds);
+        });
+
+        var tests = [
+            {
+                given: {
+                    latMin: 0,
+                    latMax: 10,
+                    lngMin: 0,
+                    lngMax: 10
+                },
+                expected: [[-5, -5], [15, 15]]
+            },
+            {
+                given: {
+                    latMin: 0,
+                    latMax: 100,
+                    lngMin: 0,
+                    lngMax: 100
+                },
+                expected: [[-5, -5], [105, 105]]
+            }
+        ];
+
+        tests.forEach(function(test) {
+            it('must return '+test.expected+' given '+strLatLng([test.given.latMin, test.given.lngMin])+
+                    ' and '+strLatLng([test.given.latMin, test.given.lngMin]), function() {
+                assert.deepEqual(calc.maxBounds(test.given), test.expected);
+            });
+        });
+    });
 });
