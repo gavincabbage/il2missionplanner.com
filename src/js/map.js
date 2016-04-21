@@ -1,8 +1,8 @@
 (function() {
 
-    let content = require('./content.js');
-    let calc = require('./calc.js');
-    let util = require('./util.js');
+    var content = require('./content.js');
+    var calc = require('./calc.js');
+    var util = require('./util.js');
     require('./controls.js');
 
     const
