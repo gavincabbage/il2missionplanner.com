@@ -1,7 +1,5 @@
 (function() {
 
-    'use strict';
-
     let content = require('./content.js');
     let calc = require('./calc.js');
     let util = require('./util.js');

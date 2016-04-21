@@ -1,7 +1,5 @@
 module.exports = (function() {
 
-    'use strict';
-
     var calc = require('./calc.js');
 
     return {

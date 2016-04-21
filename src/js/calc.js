@@ -1,7 +1,5 @@
 module.exports = (function() {
 
-    'use strict';
-
     const
         SECONDS_IN_HOUR = 3600,
         BORDER = 5
