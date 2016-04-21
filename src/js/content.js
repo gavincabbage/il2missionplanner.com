@@ -1,7 +1,5 @@
 module.exports = (function() {
 
-    'use strict';
-
     // Edited original leaflet object
     var augmentedLeafletDrawLocal = {
         draw: {
