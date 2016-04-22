@@ -12,7 +12,7 @@
     ;
 
     var map, mapTiles, mapConfig, drawnItems, hiddenLayers;
-    var selectedMapIndex = 0; // TODO calculate default index by hash on load
+    var selectedMapIndex = util.getSelectedMapIndex(window.location.hash, content.maps);
 
     // Patch a leaflet bug, see https://github.com/bbecquet/Leaflet.PolylineDecorator/issues/17
     L.PolylineDecorator.include(L.Mixin.Events);
@@ -38,20 +38,69 @@
         });
     }
 
+    function applyCustomFlightLeg(marker) {
+
+
+        map.openModal({
+            okCls: 'modal-ok',
+            okText: 'Done',
+            speed: marker.options.speed,
+            template: content.flightLegModalTemplate,
+            zIndex: 10000,
+            onShow: function(e) {
+                L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
+                    e.modal.hide();
+                });
+            },
+            onHide: function(e) {
+                marker.options.speed = parseInt(document.getElementById('flight-leg-speed').value);
+                applyCustomFlightLegCallback(marker);
+            }
+        });
+    }
+
+    function applyCustomFlightLegCallback(marker) {
+
+        console.log('apply custom flight leg');
+        var d = marker.options.distance.toFixed(1);
+        var h = marker.options.heading.toFixed(0);
+        var s = marker.options.speed;
+        marker.options.time = util.formatTime(calc.time(s, marker.options.distance));
+        var newContent = '[' + d + 'km|' + h + '&deg;|' + s + 'kph|' + marker.options.time + ']';
+        console.log(marker);
+        marker.setIcon(L.divIcon({
+            className: 'flight-leg',
+            html: newContent,
+            iconSize: [250, 0]
+        }));
+    }
+
     function applyFlightPlanCallback(route) {
         var id = route._leaflet_id;
         var coords = route.getLatLngs();
         var decorator = newFlightDecorator(route);
         decorator.parentId = id;
         decorator.addTo(map);
+        console.log(coords);
+        console.log(coords.length);
+        var speedArray = util.defaultSpeedArray(route.speed, coords.length-1);
+        console.log(speedArray);
+        function markerClickHandlerFactory(clickedMarker) {
+            return function() {
+                applyCustomFlightLeg(clickedMarker);
+            };
+        }
         for (var i = 0; i < coords.length-1; i++) {
             var distance = mapConfig.scale * calc.distance(coords[i], coords[i+1]);
             var heading = calc.heading(coords[i], coords[i+1]);
             var midpoint = calc.midpoint(coords[i], coords[i+1]);
             var time = util.formatTime(calc.time(route.speed, distance));
-            var markerContent = '[' + distance.toFixed(1) + 'km|' + heading.toFixed(0) + '&deg;|' + time + ']';
+            var markerContent = '[' + distance.toFixed(1) + 'km|' + heading.toFixed(0) + '&deg;|' + route.speed + 'kph|' + time + ']';
             var marker =  L.marker(midpoint, {
-                clickable: false,
+                distance: distance,
+                heading: heading,
+                time: time,
+                speed: route.speed,
                 icon: L.divIcon({
                     className: 'flight-leg',
                     html: markerContent,
@@ -59,6 +108,7 @@
                 })
             });
             marker.parentId = id;
+            marker.on('click', markerClickHandlerFactory(marker));
             marker.addTo(map);
         }
         var endMarker = L.circleMarker(coords[coords.length-1], {
@@ -93,7 +143,7 @@
             route.speed = DEFAULT_SPEED;
         }
         if (typeof route.name === 'undefined') {
-            route.name = '';
+            route.name = 'New Flight';
         }
         map.openModal({
             okCls: 'modal-ok',
@@ -110,7 +160,7 @@
             },
             onHide: function(e) {
                 e.modal.route.name = document.getElementById('flight-name').value;
-                e.modal.route.speed = document.getElementById('flight-speed').value;
+                e.modal.route.speed = parseInt(document.getElementById('flight-speed').value);
                 applyFlightPlanCallback(e.modal.route);
             }
         });
@@ -141,7 +191,7 @@
 
     function applyTargetInfo(target) {
         if (typeof target.name === 'undefined') {
-            target.name = '';
+            target.name = 'New Target';
         }
         if (typeof target.notes === 'undefined') {
             target.notes = '';
@@ -257,14 +307,11 @@
                     L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
                         selectedMapIndex = selectElement.selectedIndex;
                         var selectedMap = selectElement.options[selectedMapIndex].value;
-                        window.location.hash = '#' + selectedMap;
+                        mapConfig = content.maps[selectedMap];
+                        window.location.hash = mapConfig.hash;
                         deleteAssociatedLayers(drawnItems);
                         drawnItems.clearLayers();
                         hiddenLayers.clearLayers();
-                        selectedMapIndex = selectElement.selectedIndex;
-                        var selectedMap = selectElement.options[selectedMapIndex].value;
-                        window.location.hash = '#' + selectedMap;
-                        mapConfig = content.maps[selectedMap];
                         mapTiles.setUrl(mapConfig.tileUrl);
                         map.setMaxBounds(calc.maxBounds(mapConfig));
                         center = [mapConfig.latMax / 2, mapConfig.lngMax / 2];

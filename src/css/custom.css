@@ -21,6 +21,10 @@ div.flight-leg {
     color: #0033cc;
 }
 
+div.flight-leg:hover {
+    color: #0066ff;
+}
+
 div.map-title {
     font-family: 'Courier', Courier, monospace;
     font-weight: 700;
