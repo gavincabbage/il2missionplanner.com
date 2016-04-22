@@ -69,7 +69,7 @@
         var newContent = '[' + d + 'km|' + h + '&deg;|' + s + 'kph|' + marker.options.time + ']';
         console.log(marker);
         marker.setIcon(L.divIcon({
-            className: 'flight-leg',
+            className: 'flight-leg map-text',
             html: newContent,
             iconSize: [250, 0]
         }));
@@ -102,9 +102,9 @@
                 time: time,
                 speed: route.speed,
                 icon: L.divIcon({
-                    className: 'flight-leg',
+                    className: 'flight-leg map-text',
                     html: markerContent,
-                    iconSize: [250, 0]
+                    iconSize: [200, 0]
                 })
             });
             marker.parentId = id;
@@ -125,7 +125,7 @@
         var nameMarker = L.marker(nameCoords, {
             draggable: false,
             icon: L.divIcon({
-                className: 'map-title flight-title',
+                className: 'map-title flight-title map-text',
                 html: route.name,
                 iconSize: [250,0]
             })
@@ -173,7 +173,7 @@
         var nameMarker = L.marker(nameCoords, {
             draggable: false,
             icon: L.divIcon({
-                className: 'map-title target-title',
+                className: 'map-title target-title map-text',
                 html: target.name,
                 iconSize: [250,0]
             })

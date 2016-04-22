@@ -17,12 +17,19 @@ div.flight-leg {
     font-family: 'Courier', Courier, monospace;
     font-weight: 700;
     font-size: 1.2em;
-    text-align: center;
-    color: #0033cc;
 }
 
-div.flight-leg:hover {
-    color: #0066ff;
+div.map-text {
+    text-align: center;
+    height: unset !important;
+    width: unset !important;
+    color: #ffffff;
+    background: rgba(54, 25, 25, .5);
+    padding: 0 5px;
+}
+
+div.map-text:hover {
+    color: #0099ff;
 }
 
 div.map-title {
@@ -30,11 +37,6 @@ div.map-title {
     font-weight: 700;
     font-size: 1.3em;
     text-align: center;
-    color: #0033cc;
-}
-
-div.map-title:hover {
-    color: #0066ff;
 }
 
 div.flight-title {
@@ -42,6 +44,7 @@ div.flight-title {
 }
 
 div.target-title {
+    margin: unset !important;
     font-size: 1.3em;
 }
 
