@@ -3,6 +3,7 @@
     var content = require('./content.js');
     var calc = require('./calc.js');
     var util = require('./util.js');
+    var test = require('./text.js')(L);
     require('./controls.js');
 
     const
@@ -39,8 +40,6 @@
     }
 
     function applyCustomFlightLeg(marker) {
-
-
         map.openModal({
             okCls: 'modal-ok',
             okText: 'Done',
@@ -59,20 +58,19 @@
         });
     }
 
-    function applyCustomFlightLegCallback(marker) {
+    function textIconFactory(text, classes) {
+        return L.divIcon({
+            className: classes,
+            html: text,
+            iconSize: [200, 0]
+        });
+    }
 
-        console.log('apply custom flight leg');
-        var d = marker.options.distance.toFixed(1);
-        var h = marker.options.heading.toFixed(0);
-        var s = marker.options.speed;
-        marker.options.time = util.formatTime(calc.time(s, marker.options.distance));
-        var newContent = '[' + d + 'km|' + h + '&deg;|' + s + 'kph|' + marker.options.time + ']';
-        console.log(marker);
-        marker.setIcon(L.divIcon({
-            className: 'flight-leg map-text',
-            html: newContent,
-            iconSize: [250, 0]
-        }));
+    function applyCustomFlightLegCallback(marker) {
+        marker.options.time = util.formatTime(calc.time(marker.options.speed, marker.options.distance));
+        var newContent = util.formatFlightLegMarker(
+                marker.options.distance, marker.options.heading, marker.options.speed, marker.options.time);
+        marker.setIcon(textIconFactory(newContent, 'flight-leg map-text'));
     }
 
     function applyFlightPlanCallback(route) {
@@ -81,10 +79,7 @@
         var decorator = newFlightDecorator(route);
         decorator.parentId = id;
         decorator.addTo(map);
-        console.log(coords);
-        console.log(coords.length);
         var speedArray = util.defaultSpeedArray(route.speed, coords.length-1);
-        console.log(speedArray);
         function markerClickHandlerFactory(clickedMarker) {
             return function() {
                 applyCustomFlightLeg(clickedMarker);
@@ -95,17 +90,13 @@
             var heading = calc.heading(coords[i], coords[i+1]);
             var midpoint = calc.midpoint(coords[i], coords[i+1]);
             var time = util.formatTime(calc.time(route.speed, distance));
-            var markerContent = '[' + distance.toFixed(1) + 'km|' + heading.toFixed(0) + '&deg;|' + route.speed + 'kph|' + time + ']';
+            var markerContent = util.formatFlightLegMarker(distance, heading, route.speed, time);
             var marker =  L.marker(midpoint, {
                 distance: distance,
                 heading: heading,
                 time: time,
                 speed: route.speed,
-                icon: L.divIcon({
-                    className: 'flight-leg map-text',
-                    html: markerContent,
-                    iconSize: [200, 0]
-                })
+                icon: textIconFactory(markerContent, 'flight-leg map-text')
             });
             marker.parentId = id;
             marker.on('click', markerClickHandlerFactory(marker));
@@ -124,11 +115,7 @@
         var nameCoords = L.latLng(coords[0].lat, coords[0].lng);
         var nameMarker = L.marker(nameCoords, {
             draggable: false,
-            icon: L.divIcon({
-                className: 'map-title flight-title map-text',
-                html: route.name,
-                iconSize: [250,0]
-            })
+            icon: textIconFactory(route.name, 'map-title flight-title map-text')
         });
         nameMarker.parentId = id;
         nameMarker.on('click', function() {
@@ -172,11 +159,7 @@
         var nameCoords = L.latLng(coords.lat, coords.lng);
         var nameMarker = L.marker(nameCoords, {
             draggable: false,
-            icon: L.divIcon({
-                className: 'map-title target-title map-text',
-                html: target.name,
-                iconSize: [250,0]
-            })
+            icon: textIconFactory(target.name, 'map-title target-title map-text')
         });
         nameMarker.parentId = id;
         nameMarker.on('click', function() {
@@ -290,6 +273,19 @@
     drawnItems = new L.FeatureGroup();
     map.addLayer(drawnItems);
     hiddenLayers = new L.FeatureGroup();
+
+    var exportButton = new L.Control.CustomButton({
+        position: 'bottomleft',
+        id: 'export-button',
+        icon: 'fa-camera',
+        tooltip: 'export',
+        clickFn: function() {
+            drawnItems.eachLayer(function(layer) {
+                console.log(layer);
+            });
+        }
+    });
+    map.addControl(exportButton);
 
     var mapSelectButton = new L.Control.CustomButton({
         position: 'topleft',
@@ -457,6 +453,10 @@
         showChildLayers();
     });
 
-    checkClearButtonDisabled();
+    function main() {
+        checkClearButtonDisabled();
+    }
+
+    main();
 
 })();

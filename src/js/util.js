@@ -25,6 +25,12 @@ module.exports = (function() {
                 speedArray.push(speed);
             }
             return speedArray;
+        },
+
+        formatFlightLegMarker: function(distance, heading, speed, time) {
+            distance = typeof distance === 'number' ? distance.toFixed(1) : distance;
+            heading = typeof heading === 'number' ? heading.toFixed(0) : heading;
+            return '[' + distance + 'km|' + heading + '&deg;|' + speed + 'kph|' + time + ']';
         }
     };
 })();
