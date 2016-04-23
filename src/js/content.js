@@ -103,6 +103,7 @@ module.exports = (function() {
             fullName: 'Stalingrad',
             name: 'stalingrad',
             hash: '#stalingrad',
+            selectIndex: 0,
             scale: 1.40056,
             latMin: 0,
             latMax: 164,
@@ -114,6 +115,7 @@ module.exports = (function() {
             fullName: 'Moscow',
             name: 'moscow',
             hash: '#moscow',
+            selectIndex: 1,
             scale: 1.46621,
             latMin: 0,
             latMax: 192,
@@ -125,6 +127,7 @@ module.exports = (function() {
             fullName: 'Velikie Luki',
             name: 'luki',
             hash: '#luki',
+            selectIndex: 2,
             scale: 0.65306,
             latMin: 0,
             latMax: 160,
@@ -153,6 +156,17 @@ module.exports = (function() {
                     <div class="modal-item"> \
                         <label class="modal-item-label" for="flight-speed">Average speed</label> \
                         <input id="flight-speed" class="modal-item-input" value="{speed}"></input> \
+                    </div> \
+                    <button class="{okCls}" type="button">{okText}</button> \
+                </form> \
+            </div>',
+        flightLegModalTemplate:
+            '<div id="flight-leg-modal"> \
+                <h2>Configure flight leg</h2> \
+                <form onsubmit="return false;"> \
+                    <div class="modal-item"> \
+                        <label class="modal-item-label" for="flight-speed">Speed</label> \
+                        <input id="flight-leg-speed" class="modal-item-input" value="{speed}"></input> \
                     </div> \
                     <button class="{okCls}" type="button">{okText}</button> \
                 </form> \
