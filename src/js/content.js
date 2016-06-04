@@ -110,6 +110,7 @@ module.exports = (function() {
             lngMin: 0,
             lngMax: 252,
             tileUrl: 'http://tiles.il2missionplanner.com/stalingrad/{z}/{x}/{y}.png'
+            //tileUrl: 'file:///Users/fkc930/Development/personal/tiles.il2missionplanner.com/dist/stalingrad/{z}/{x}/{y}.png'
         },
         moscow: {
             fullName: 'Moscow',
@@ -122,6 +123,7 @@ module.exports = (function() {
             lngMin: 0,
             lngMax: 192,
             tileUrl: 'http://tiles.il2missionplanner.com/moscow/{z}/{x}/{y}.png'
+            //tileUrl: 'file:///Users/fkc930/Development/personal/tiles.il2missionplanner.com/dist/moscow/{z}/{x}/{y}.png'
         },
         luki: {
             fullName: 'Velikie Luki',
@@ -134,6 +136,7 @@ module.exports = (function() {
             lngMin: 0,
             lngMax: 224,
             tileUrl: 'http://tiles.il2missionplanner.com/luki/{z}/{x}/{y}.png'
+            //tileUrl: 'file:///Users/fkc930/Development/personal/tiles.il2missionplanner.com/dist/luki/{z}/{x}/{y}.png'
         }
     };
 
@@ -145,6 +148,8 @@ module.exports = (function() {
         helpTooltip: 'How to use this tool',
         clearTooltip: 'Clear the map',
         mapSelectTooltip: 'Select game map',
+        exportTooltip: 'Export mission plan',
+        importTooltip: 'Import mission plan',
         flightModalTemplate:
             '<div id="flight-modal"> \
                 <h2>Configure flight</h2> \
@@ -209,6 +214,13 @@ module.exports = (function() {
                     </select> \
                     <button class="{okCls}" type="button">{okText}</button> \
                 </form> \
+            </div>',
+        importTemplate:
+            '<div id="import-modal"> \
+                <h2>Import Mission Plan</h2> \
+                <input id="import-file" type="file" name="importFile"></input>\
+                <button class="{okCls}">{okText}</button> \
+                <button class="{cancelCls}">{cancelText}</button> \
             </div>',
     };
 })();

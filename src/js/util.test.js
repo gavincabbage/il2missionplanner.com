@@ -40,10 +40,10 @@ describe('util', function() {
         });
     });
 
-    describe('util.getSelectedMapIndex', function() {
+    describe('util.getSelectedMapConfig', function() {
 
         it('must be defined', function() {
-            assert.isDefined(util.getSelectedMapIndex);
+            assert.isDefined(util.getSelectedMapConfig);
         });
 
         var mockMaps = {
@@ -60,21 +60,21 @@ describe('util', function() {
         var tests = [
             {
                 given: '#test',
-                expected: 0
+                expected: 'test'
             },
             {
                 given: '#other',
-                expected: 1
+                expected: 'other'
             },
             {
                 given: '#none',
-                expected: 0
+                expected: 'test'
             }
         ]
 
         tests.forEach(function(test) {
             it('must return '+test.expected+' given '+test.given, function() {
-                assert.strictEqual(util.getSelectedMapIndex(test.given, mockMaps), test.expected);
+                assert.strictEqual(util.getSelectedMapConfig(test.given, mockMaps), mockMaps[test.expected]);
             });
         });
     });
@@ -125,6 +125,62 @@ describe('util', function() {
 
         it('must return '+expected+' given '+given.distance+', '+given.heading+', '+given.speed+' and '+given.time, function() {
             assert.strictEqual(util.formatFlightLegMarker(given.distance, given.heading, given.speed, given.time), expected);
+        });
+    });
+
+    describe('util.isLine', function() {
+
+        it('must be defined', function() {
+            assert.isDefined(util.isLine);
+        });
+
+        var tests = [
+            {
+                given: {
+                    getLatLngs: function(){}
+                },
+                expected: true
+            },
+            {
+                given: {
+                    getLatLng: function(){}
+                },
+                expected: false
+            }
+        ]
+
+        tests.forEach(function(test) {
+            it('must return '+test.expected+' given '+JSON.stringify(test.given), function() {
+                assert.strictEqual(util.isLine(test.given), test.expected);
+            });
+        });
+    });
+
+    describe('util.isMarker', function() {
+
+        it('must be defined', function() {
+            assert.isDefined(util.isMarker);
+        });
+
+        var tests = [
+            {
+                given: {
+                    getLatLngs: function(){}
+                },
+                expected: false
+            },
+            {
+                given: {
+                    getLatLng: function(){}
+                },
+                expected: true
+            }
+        ]
+
+        tests.forEach(function(test) {
+            it('must return '+test.expected+' given '+JSON.stringify(test.given), function() {
+                assert.strictEqual(util.isMarker(test.given), test.expected);
+            });
         });
     });
 });

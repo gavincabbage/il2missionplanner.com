@@ -51,6 +51,10 @@ module.exports = (function() {
                 [mapConfig.latMin - BORDER, mapConfig.lngMin - BORDER],
                 [mapConfig.latMax + BORDER, mapConfig.lngMax + BORDER]
             ];
+        },
+
+        center: function(mapConfig) {
+            return [mapConfig.latMax / 2, mapConfig.lngMax / 2];
         }
     };
 })();

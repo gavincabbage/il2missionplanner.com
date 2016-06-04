@@ -202,9 +202,31 @@ describe('calc', function() {
         ];
 
         tests.forEach(function(test) {
-            it('must return '+test.expected+' given '+strLatLng([test.given.latMin, test.given.lngMin])+
-                    ' and '+strLatLng([test.given.latMin, test.given.lngMin]), function() {
+            it('must return '+JSON.stringify(test.expected)+' given '+JSON.stringify(test.given), function() {
                 assert.deepEqual(calc.maxBounds(test.given), test.expected);
+            });
+        });
+    });
+
+    describe('calc.center', function() {
+
+        it('must be defined', function() {
+            assert.isDefined(calc.center);
+        });
+
+        var tests = [
+            {
+                given: {
+                    latMax: 10,
+                    lngMax: 10
+                },
+                expected: [5, 5]
+            }
+        ];
+
+        tests.forEach(function(test) {
+            it('must return '+JSON.stringify(test.expected)+' given '+JSON.stringify(test.given), function() {
+                assert.deepEqual(calc.center(test.given), test.expected);
             });
         });
     });

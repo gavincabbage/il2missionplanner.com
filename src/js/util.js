@@ -2,6 +2,10 @@ module.exports = (function() {
 
     var calc = require('./calc.js');
 
+    function getFirstAttribute(obj) {
+        return obj[Object.keys(obj)[0]];
+    }
+
     return {
 
         formatTime: function(timeInSeconds) {
@@ -10,13 +14,13 @@ module.exports = (function() {
             return Math.floor(minutes).toFixed(0) + ':' + calc.pad(seconds, 2);
         },
 
-        getSelectedMapIndex: function(hash, maps) {
+        getSelectedMapConfig: function(hash, maps) {
             for (var map in maps) {
                 if (maps[map].hash === hash) {
-                    return maps[map].selectIndex;
+                    return maps[map];
                 }
             }
-            return 0;
+            return getFirstAttribute(maps);
         },
 
         defaultSpeedArray: function(speed, count) {
@@ -30,7 +34,15 @@ module.exports = (function() {
         formatFlightLegMarker: function(distance, heading, speed, time) {
             distance = typeof distance === 'number' ? distance.toFixed(1) : distance;
             heading = typeof heading === 'number' ? heading.toFixed(0) : heading;
-            return '[' + distance + 'km|' + heading + '&deg;|' + speed + 'kph|' + time + ']';
+            return '[' + distance + 'km|' + calc.pad(heading, 3) + '&deg;|' + speed + 'kph|' + time + ']';
+        },
+
+        isLine: function(layer) {
+            return typeof layer.getLatLngs !== 'undefined';
+        },
+
+        isMarker: function(layer) {
+            return typeof layer.getLatLng !== 'undefined';
         }
     };
 })();
