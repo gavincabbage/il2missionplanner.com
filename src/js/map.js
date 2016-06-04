@@ -3,25 +3,26 @@
     var content = require('./content.js');
     var calc = require('./calc.js');
     var util = require('./util.js');
+    var test = require('./text.js')(L);
     require('./controls.js');
 
     const
-        BORDER = 5,
         RED = '#ff0000',
         DEFAULT_SPEED = 300,
-        DEFAULT_ALTITUDE = 1000,
         FLIGHT_OPACITY = 0.8
     ;
 
-    var map, mapTiles, mapConfig, drawnItems, hiddenLayers, applyFlightPlan, applyTargetInfo, deleteAssociatedLayers;
-    var selectedMapIndex = 0; // TODO calculate default index by hash on load
+    var map, mapTiles, mapConfig, drawnItems, hiddenLayers;
+    var mapConfig = util.getSelectedMapConfig(window.location.hash, content.maps);
+    var selectedMapIndex = mapConfig.selectIndex;
 
-    L.drawLocal = content.augmentedLeafletDrawLocal;
-
-    // patch a leaflet bug, see https://github.com/bbecquet/Leaflet.PolylineDecorator/issues/17
+    // Patch a leaflet bug, see https://github.com/bbecquet/Leaflet.PolylineDecorator/issues/17
     L.PolylineDecorator.include(L.Mixin.Events);
 
-    var newFlightDecorator = function(route) {
+    // Patch leaflet content with custom language
+    L.drawLocal = content.augmentedLeafletDrawLocal;
+
+    function newFlightDecorator(route) {
         return L.polylineDecorator(route, {
             patterns: [
                 {
@@ -37,29 +38,69 @@
                 }
             ]
         });
-    };
+    }
 
-    var applyFlightPlanCallback = function(route) {
+    function applyCustomFlightLeg(marker) {
+        map.openModal({
+            okCls: 'modal-ok',
+            okText: 'Done',
+            speed: marker.options.speed,
+            template: content.flightLegModalTemplate,
+            zIndex: 10000,
+            onShow: function(e) {
+                L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
+                    e.modal.hide();
+                });
+            },
+            onHide: function(e) {
+                marker.options.speed = parseInt(document.getElementById('flight-leg-speed').value);
+                applyCustomFlightLegCallback(marker);
+            }
+        });
+    }
+
+    function textIconFactory(text, classes) {
+        return L.divIcon({
+            className: classes,
+            html: text,
+            iconSize: [200, 0]
+        });
+    }
+
+    function applyCustomFlightLegCallback(marker) {
+        marker.options.time = util.formatTime(calc.time(marker.options.speed, marker.options.distance));
+        var newContent = util.formatFlightLegMarker(
+                marker.options.distance, marker.options.heading, marker.options.speed, marker.options.time);
+        marker.setIcon(textIconFactory(newContent, 'flight-leg map-text'));
+    }
+
+    function applyFlightPlanCallback(route) {
         var id = route._leaflet_id;
         var coords = route.getLatLngs();
         var decorator = newFlightDecorator(route);
         decorator.parentId = id;
         decorator.addTo(map);
+        var speedArray = util.defaultSpeedArray(route.speed, coords.length-1);
+        function markerClickHandlerFactory(clickedMarker) {
+            return function() {
+                applyCustomFlightLeg(clickedMarker);
+            };
+        }
         for (var i = 0; i < coords.length-1; i++) {
             var distance = mapConfig.scale * calc.distance(coords[i], coords[i+1]);
             var heading = calc.heading(coords[i], coords[i+1]);
             var midpoint = calc.midpoint(coords[i], coords[i+1]);
             var time = util.formatTime(calc.time(route.speed, distance));
-            var markerContent = '[' + distance.toFixed(1) + 'km|' + heading.toFixed(0) + '&deg;|' + time + ']';
+            var markerContent = util.formatFlightLegMarker(distance, heading, route.speed, time);
             var marker =  L.marker(midpoint, {
-                clickable: false,
-                icon: L.divIcon({
-                    className: 'flight-leg',
-                    html: markerContent,
-                    iconSize: [250, 0]
-                })
+                distance: distance,
+                heading: heading,
+                time: time,
+                speed: route.speed,
+                icon: textIconFactory(markerContent, 'flight-leg map-text')
             });
             marker.parentId = id;
+            marker.on('click', markerClickHandlerFactory(marker));
             marker.addTo(map);
         }
         var endMarker = L.circleMarker(coords[coords.length-1], {
@@ -75,11 +116,7 @@
         var nameCoords = L.latLng(coords[0].lat, coords[0].lng);
         var nameMarker = L.marker(nameCoords, {
             draggable: false,
-            icon: L.divIcon({
-                className: 'map-title flight-title',
-                html: route.name,
-                iconSize: [250,0]
-            })
+            icon: textIconFactory(route.name, 'map-title flight-title map-text')
         });
         nameMarker.parentId = id;
         nameMarker.on('click', function() {
@@ -87,14 +124,14 @@
             applyFlightPlan(route);
         });
         nameMarker.addTo(map);
-    };
+    }
 
-    applyFlightPlan = function(route) {
+    function applyFlightPlan(route) {
         if (typeof route.speed === 'undefined') {
             route.speed = DEFAULT_SPEED;
         }
         if (typeof route.name === 'undefined') {
-            route.name = '';
+            route.name = 'New Flight';
         }
         map.openModal({
             okCls: 'modal-ok',
@@ -111,23 +148,19 @@
             },
             onHide: function(e) {
                 e.modal.route.name = document.getElementById('flight-name').value;
-                e.modal.route.speed = document.getElementById('flight-speed').value;
+                e.modal.route.speed = parseInt(document.getElementById('flight-speed').value);
                 applyFlightPlanCallback(e.modal.route);
             }
         });
-    };
+    }
 
-    var applyTargetInfoCallback = function(target) {
+    function applyTargetInfoCallback(target) {
         var id = target._leaflet_id;
         var coords = target.getLatLng();
         var nameCoords = L.latLng(coords.lat, coords.lng);
         var nameMarker = L.marker(nameCoords, {
             draggable: false,
-            icon: L.divIcon({
-                className: 'map-title target-title',
-                html: target.name,
-                iconSize: [250,0]
-            })
+            icon: textIconFactory(target.name, 'map-title target-title map-text')
         });
         nameMarker.parentId = id;
         nameMarker.on('click', function() {
@@ -138,11 +171,11 @@
         if (target.notes !== '') {
             target.bindLabel(target.notes).addTo(map);
         }
-    };
+    }
 
-    applyTargetInfo = function(target) {
+    function applyTargetInfo(target) {
         if (typeof target.name === 'undefined') {
-            target.name = '';
+            target.name = 'New Target';
         }
         if (typeof target.notes === 'undefined') {
             target.notes = '';
@@ -166,9 +199,9 @@
                 applyTargetInfoCallback(e.modal.target);
             }
         });
-    };
+    }
 
-    deleteAssociatedLayers = function(parentLayers) {
+    function deleteAssociatedLayers(parentLayers) {
         var toDelete = [];
         parentLayers.eachLayer(function(layer) {
             toDelete.push(layer._leaflet_id);
@@ -184,46 +217,44 @@
                 hiddenLayers.removeLayer(layer);
             }
         });
-    };
+    }
 
-    var transferChildLayer = function(from, to) {
+    function transferChildLayers(from, to) {
         from.eachLayer(function(layer) {
             if (typeof layer.parentId !== 'undefined') {
                 from.removeLayer(layer);
                 to.addLayer(layer);
             }
         });
-    };
+    }
 
-    var showChildLayers = function() {
-        transferChildLayer(hiddenLayers, map);
-    };
+    function showChildLayers() {
+        transferChildLayers(hiddenLayers, map);
+    }
 
-    var hideChildLayers = function() {
-        transferChildLayer(map, hiddenLayers);
-    };
+    function hideChildLayers() {
+        transferChildLayers(map, hiddenLayers);
+    }
 
-    var checkClearButtonDisabled = function() {
+    function checkClearButtonDisabled() {
         var element = document.getElementById('clear-button');
         if (drawnItems.getLayers().length === 0) {
             element.classList.add('leaflet-disabled');
         } else {
             element.classList.remove('leaflet-disabled');
         }
-    };
-
-    if (window.location.hash === '#moscow') {
-        mapConfig = content.maps.moscow;
-    } else {
-        mapConfig = content.maps.stalingrad;
-        window.location.hash = '#stalingrad';
     }
 
-    var center = [mapConfig.latMax / 2, mapConfig.lngMax / 2],
+    function clearMap() {
+        drawnItems.clearLayers();
+        hideChildLayers();
+        hiddenLayers.clearLayers();
+    }
+
     map = L.map('map', {
         crs: L.CRS.Simple,
         attributionControl: false
-    }).setView(center, 3);
+    });
 
     mapTiles = L.tileLayer(mapConfig.tileUrl, {
         minZoom: 2,
@@ -231,17 +262,14 @@
         noWrap: true,
         tms: true,
         continuousWorld: true
-    });
-    mapTiles.addTo(map);
+    }).addTo(map);
 
-    map.setMaxBounds(new L.LatLngBounds(
-        [mapConfig.latMin - BORDER, mapConfig.lngMin - BORDER],
-        [mapConfig.latMax + BORDER, mapConfig.lngMax + BORDER]
-    ));
+    map.setView(calc.center(mapConfig), 3);
+    map.setMaxBounds(calc.maxBounds(mapConfig));
 
-    drawnItems = new L.FeatureGroup();
+    drawnItems = L.featureGroup();
     map.addLayer(drawnItems);
-    hiddenLayers = new L.FeatureGroup();
+    hiddenLayers = L.featureGroup();
 
     var mapSelectButton = new L.Control.CustomButton({
         position: 'topleft',
@@ -259,26 +287,17 @@
                     L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
                         selectedMapIndex = selectElement.selectedIndex;
                         var selectedMap = selectElement.options[selectedMapIndex].value;
-                        window.location.hash = '#' + selectedMap;
-                        window.location.reload();
-                        // TODO fix tile purging issue with code below
-                        // deleteAssociatedLayers(drawnItems);
-                        // drawnItems.clearLayers();
-                        // hiddenLayers.clearLayers();
-                        // selectedMapIndex = selectElement.selectedIndex;
-                        // var selectedMap = selectElement.options[selectedMapIndex].value;
-                        // window.location.hash = '#' + selectedMap;
-                        // mapConfig = content.maps[selectedMap];
-                        // mapTiles = L.tileLayer(mapConfig.tileUrl, {
-                        //     minZoom: 2,
-                        //     maxZoom: 6,
-                        //     noWrap: true,
-                        //     tms: true,
-                        //     continuousWorld: true
-                        // });
-                        // mapTiles.redraw();
-                        // mapTiles.addTo(map);
-                        // e.modal.hide();
+                        mapConfig = content.maps[selectedMap];
+                        window.location.hash = mapConfig.hash;
+                        deleteAssociatedLayers(drawnItems);
+                        drawnItems.clearLayers();
+                        hiddenLayers.clearLayers();
+                        mapTiles.setUrl(mapConfig.tileUrl);
+                        map.setMaxBounds(calc.maxBounds(mapConfig));
+                        map.setView(calc.center(mapConfig), 3);
+                        mapTiles.redraw();
+                        mapTiles.addTo(map);
+                        e.modal.hide();
                     });
                 }
             });
@@ -286,12 +305,6 @@
     });
     map.addControl(mapSelectButton);
 
-    var editOptions = {
-        selectedPathOptions: {
-            maintainColor: true,
-            opacity: 0.4
-        }
-    };
     var drawControl = new L.Control.Draw({
         draw: {
             polygon: false,
@@ -315,13 +328,20 @@
         },
         edit: {
             featureGroup: drawnItems,
-            edit: L.Browser.touch ? false : editOptions
+            edit: L.Browser.touch ? false : {
+                selectedPathOptions: {
+                    maintainColor: true,
+                    opacity: 0.4
+                }
+            }
         }
     });
     map.addControl(drawControl);
 
     var titleControl = new L.Control.TitleControl({});
     map.addControl(titleControl);
+
+
 
     var clearButton = new L.Control.CustomButton({
         id: 'clear-button',
@@ -338,9 +358,7 @@
                     onShow: function(e) {
                         L.DomEvent
                             .on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
-                                drawnItems.clearLayers();
-                                hideChildLayers();
-                                hiddenLayers.clearLayers();
+                                clearMap();
                                 e.modal.hide();
                                 checkClearButtonDisabled();
                             })
@@ -374,8 +392,156 @@
     });
     map.addControl(helpButton);
 
+    var exportButton = new L.Control.CustomButton({
+        position: 'bottomright',
+        id: 'export-button',
+        icon: 'fa-download',
+        tooltip: content.exportTooltip,
+        clickFn: function() {
+            // var saveFile = {routes:[],points:[]};
+            // drawnItems.eachLayer(function(layer) {
+            //     if (util.isLine(layer)) {
+            //         var saveObject = {associatedObjects:[]};
+            //         map.eachLayer(function(associated) {
+            //             if (typeof associated.parentId !== 'undefined' && associated.parentId === layer._leaflet_id) {
+            //                 console.log(associated);
+            //             }
+            //         });
+            //         saveObject.id = layer._leaflet_id;
+            //         saveObject.latLngs = layer.getLatLngs();
+            //         saveFile.routes.push(saveObject);
+            //     } else if (util.isMarker(layer)) {
+            //         var saveObject = {associatedObjects:[]};
+            //         map.eachLayer(function(associated) {
+            //             if (typeof associated.parentId !== 'undefined' && associated.parentId === layer._leaflet_id) {
+            //                 console.log(associated);
+            //             }
+            //         });
+            //         saveObject.id = layer._leaflet_id;
+            //         saveObject.latLng = layer.getLatLng();
+            //         saveFile.points.push(saveObject);
+            //     }
+            // });
+
+            // var saveData = {};
+            // var drawnItemsJson = drawnItems.toGeoJSON();
+            // for (var i = 0; i < drawnItemsJson.feature.length; i++) {
+            //
+            // }
+
+            var saveData = {routes:[],points:[]};
+            drawnItems.eachLayer(function(layer) {
+                console.log(layer);
+                var saveLayer = {};
+                if (util.isLine(layer)) {
+                    saveLayer.latLngs = layer.getLatLngs();
+                    saveLayer.name = layer.name;
+                    saveLayer.speed = layer.speed;
+                    map.eachLayer(function(associated) {
+                        if (typeof associated.parentId !== 'undefined' && associated.parentId === layer._leaflet_id) {
+                            console.log(associated);
+                        }
+                    });
+                    saveData.routes.push(saveLayer);
+                } else if (util.isMarker(layer)) {
+                    saveLayer.latLng = layer.getLatLng();
+                    saveLayer.name = layer.name;
+                    saveLayer.notes = layer.notes;
+                    saveData.points.push(saveLayer);
+                }
+            });
+
+            console.log(saveData);
+            window.open('data:text/json;charset=utf-8,' + window.escape(JSON.stringify(saveData)));
+        }
+    });
+    map.addControl(exportButton);
+
+    var importButton = new L.Control.CustomButton({
+        position: 'bottomright',
+        id: 'import-button',
+        icon: 'fa-upload',
+        tooltip: content.importTooltip,
+        clickFn: function() {
+            map.openModal({
+                template: content.importTemplate,
+                okCls: 'modal-ok',
+                okText: 'Import',
+                cancelCls: 'modal-cancel',
+                cancelText: 'Cancel',
+                onShow: function(e) {
+                    var importInput = document.getElementById('import-file');
+                    var fileContent;
+                    L.DomEvent.on(importInput, 'change', function(evt) {
+                        var reader = new window.FileReader();
+                        reader.onload = function(evt) {
+                            if(evt.target.readyState !== 2) {
+                                return;
+                            }
+                            if(evt.target.error) {
+                                window.alert('Error while reading file');
+                                return;
+                            }
+                            fileContent = evt.target.result;
+                        };
+                        reader.readAsText(evt.target.files[0]);
+                    });
+                    L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
+                        console.log(fileContent);
+                        clearMap();
+                        var saveData = JSON.parse(fileContent);
+                        console.log(saveData);
+                        for (var i = 0; i < saveData.routes.length; i++) {
+                            var route = saveData.routes[i];
+                            console.log(route);
+                            var newRoute = L.polyline(route.latLngs, {
+                                color: RED,
+                                weight: 2,
+                                opacity: FLIGHT_OPACITY
+                            });
+                            newRoute.name = route.name;
+                            newRoute.speed = route.speed;
+                            drawnItems.addLayer(newRoute);
+                            applyFlightPlanCallback(newRoute);
+                        }
+                        for (var i = 0; i < saveData.points.length; i++) {
+                            var point = saveData.points[i];
+                            console.log(point);
+                            var newPoint = L.marker(point.latLng, {
+                                icon: L.icon({
+                                    iconUrl: 'img/explosion.png',
+                                    iconSize: [30, 30],
+                                    iconAnchor: [15, 25]
+                                })
+                            });
+                            newPoint.name = point.name;
+                            newPoint.notes = point.notes;
+                            drawnItems.addLayer(newPoint);
+                            applyTargetInfoCallback(newPoint);
+                        }
+                        // var geoJson = L.geoJson(JSON.parse(fileContent).drawnItems);
+                        // geoJson.eachLayer(function(layer) {
+                        //     console.log(layer);
+                        //     drawnItems.addLayer(layer);
+                        //     if (util.isLine(layer)) {
+                        //         applyFlightPlanCallback(layer);
+                        //     } else if (util.isMarker(layer)) {
+                        //         applyTargetInfoCallback(layer);
+                        //     }
+                        // });
+                        checkClearButtonDisabled();
+                        e.modal.hide();
+                    });
+                    L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
+                        e.modal.hide();
+                    });
+                }
+            });
+        }
+    });
+    map.addControl(importButton);
+
     map.on('draw:created', function(e) {
-        map.addLayer(e.layer);
         drawnItems.addLayer(e.layer);
         if (e.layerType === 'polyline') {
             applyFlightPlan(e.layer);
@@ -393,9 +559,9 @@
     map.on('draw:edited', function(e) {
         deleteAssociatedLayers(e.layers);
         e.layers.eachLayer(function(layer) {
-            if (typeof layer.getLatLngs !== 'undefined') {
+            if (util.isLine(layer)) {
                 applyFlightPlanCallback(layer);
-            } else if (typeof layer.getLatLng !== 'undefined') {
+            } else if (util.isMarker(layer)) {
                 applyTargetInfoCallback(layer);
             }
         });

@@ -100,31 +100,43 @@ module.exports = (function() {
 
     var mapConfigs = {
         stalingrad: {
+            fullName: 'Stalingrad',
             name: 'stalingrad',
+            hash: '#stalingrad',
+            selectIndex: 0,
             scale: 1.40056,
             latMin: 0,
             latMax: 164,
             lngMin: 0,
             lngMax: 252,
             tileUrl: 'http://tiles.il2missionplanner.com/stalingrad/{z}/{x}/{y}.png'
+            //tileUrl: 'file:///Users/fkc930/Development/personal/tiles.il2missionplanner.com/dist/stalingrad/{z}/{x}/{y}.png'
         },
         moscow: {
+            fullName: 'Moscow',
             name: 'moscow',
+            hash: '#moscow',
+            selectIndex: 1,
             scale: 1.46621,
             latMin: 0,
             latMax: 192,
             lngMin: 0,
             lngMax: 192,
             tileUrl: 'http://tiles.il2missionplanner.com/moscow/{z}/{x}/{y}.png'
+            //tileUrl: 'file:///Users/fkc930/Development/personal/tiles.il2missionplanner.com/dist/moscow/{z}/{x}/{y}.png'
         },
         luki: {
+            fullName: 'Velikie Luki',
             name: 'luki',
-            scale: 1.40056,
+            hash: '#luki',
+            selectIndex: 2,
+            scale: 0.65306,
             latMin: 0,
-            latMax: 164,
+            latMax: 160,
             lngMin: 0,
-            lngMax: 252,
-            tileUrl: 'http://tiles.il2missionplanner.com/stalingrad/{z}/{x}/{y}.png'
+            lngMax: 224,
+            tileUrl: 'http://tiles.il2missionplanner.com/luki/{z}/{x}/{y}.png'
+            //tileUrl: 'file:///Users/fkc930/Development/personal/tiles.il2missionplanner.com/dist/luki/{z}/{x}/{y}.png'
         }
     };
 
@@ -135,7 +147,9 @@ module.exports = (function() {
         titleText: 'Il-2 Mission Planner',
         helpTooltip: 'How to use this tool',
         clearTooltip: 'Clear the map',
-        mapSelectTooltip: 'Select a game map',
+        mapSelectTooltip: 'Select game map',
+        exportTooltip: 'Export mission plan',
+        importTooltip: 'Import mission plan',
         flightModalTemplate:
             '<div id="flight-modal"> \
                 <h2>Configure flight</h2> \
@@ -147,6 +161,17 @@ module.exports = (function() {
                     <div class="modal-item"> \
                         <label class="modal-item-label" for="flight-speed">Average speed</label> \
                         <input id="flight-speed" class="modal-item-input" value="{speed}"></input> \
+                    </div> \
+                    <button class="{okCls}" type="button">{okText}</button> \
+                </form> \
+            </div>',
+        flightLegModalTemplate:
+            '<div id="flight-leg-modal"> \
+                <h2>Configure flight leg</h2> \
+                <form onsubmit="return false;"> \
+                    <div class="modal-item"> \
+                        <label class="modal-item-label" for="flight-speed">Speed</label> \
+                        <input id="flight-leg-speed" class="modal-item-input" value="{speed}"></input> \
                     </div> \
                     <button class="{okCls}" type="button">{okText}</button> \
                 </form> \
@@ -185,11 +210,17 @@ module.exports = (function() {
                     <select id="map-select"> \
                         <option value="stalingrad">Stalingrad</option> \
                         <option value="moscow">Moscow</option> \
-                        <!-- <option value="luki">Velikie Luki</option> --> \
+                        <option value="luki">Velikie Luki</option> \
                     </select> \
                     <button class="{okCls}" type="button">{okText}</button> \
                 </form> \
             </div>',
+        importTemplate:
+            '<div id="import-modal"> \
+                <h2>Import Mission Plan</h2> \
+                <input id="import-file" type="file" name="importFile"></input>\
+                <button class="{okCls}">{okText}</button> \
+                <button class="{cancelCls}">{cancelText}</button> \
+            </div>',
     };
-
 })();

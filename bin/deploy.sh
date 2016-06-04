@@ -43,7 +43,6 @@ function deploy_dev {
 function main {
 
     bower install
-    npm run lint && npm test
 
     # Do not deploy any PRs or code from other repos
     if [[ "${TRAVIS_REPO_SLUG}" != "${REPO}" ]] || \
@@ -52,6 +51,7 @@ function main {
         [[ "${TRAVIS_BRANCH}" != "${BETA_BRANCH}" ]] && \
         [[ "${TRAVIS_BRANCH}" != "${DEV_BRANCH}" ]])
     then
+        npm run nodist
         abort "0" "No deploy necessary - exiting happily"
     fi
 
