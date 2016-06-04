@@ -150,6 +150,7 @@ module.exports = (function() {
         mapSelectTooltip: 'Select game map',
         exportTooltip: 'Export mission plan',
         importTooltip: 'Import mission plan',
+        gridHopTooltip: 'Jump to grid',
         flightModalTemplate:
             '<div id="flight-modal"> \
                 <h2>Configure flight</h2> \
@@ -221,6 +222,18 @@ module.exports = (function() {
                 <input id="import-file" type="file" name="importFile"></input>\
                 <button class="{okCls}">{okText}</button> \
                 <button class="{cancelCls}">{cancelText}</button> \
+            </div>',
+        gridHopTemplate:
+            '<div id="gridhop-modal"> \
+                <h2>Jump to grid</h2> \
+                <form onsubmit="return false;"> \
+                    <div class="modal-item"> \
+                        <label class="modal-item-label" for="grid-input">Grid</label> \
+                        <input id="grid-input" class="modal-item-input" placeholder="0000" maxlength="4"></input> \
+                    </div> \
+                    <button class="{okCls}" type="button">{okText}</button> \
+                    <button class="{cancelCls}" type="button">{cancelText}</button> \
+                </form> \
             </div>',
     };
 })();
