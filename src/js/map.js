@@ -3,13 +3,18 @@
     var content = require('./content.js');
     var calc = require('./calc.js');
     var util = require('./util.js');
-    var test = require('./text.js')(L);
+    var icons = require('./icons.js')(L);
     require('./controls.js');
 
     const
         RED = '#ff0000',
         DEFAULT_SPEED = 300,
-        FLIGHT_OPACITY = 0.8
+        FLIGHT_OPACITY = 0.8,
+        LINE_OPTIONS = {
+            color: RED,
+            weight: 2,
+            opacity: FLIGHT_OPACITY
+        }
     ;
 
     var map, mapTiles, mapConfig, drawnItems, hiddenLayers;
@@ -59,19 +64,11 @@
         });
     }
 
-    function textIconFactory(text, classes) {
-        return L.divIcon({
-            className: classes,
-            html: text,
-            iconSize: [200, 0]
-        });
-    }
-
     function applyCustomFlightLegCallback(marker) {
         marker.options.time = util.formatTime(calc.time(marker.options.speed, marker.options.distance));
         var newContent = util.formatFlightLegMarker(
                 marker.options.distance, marker.options.heading, marker.options.speed, marker.options.time);
-        marker.setIcon(textIconFactory(newContent, 'flight-leg map-text'));
+        marker.setIcon(icons.textIconFactory(newContent, 'flight-leg map-text'));
     }
 
     function applyFlightPlanCallback(route) {
@@ -97,7 +94,7 @@
                 heading: heading,
                 time: time,
                 speed: route.speed,
-                icon: textIconFactory(markerContent, 'flight-leg map-text')
+                icon: icons.textIconFactory(markerContent, 'flight-leg map-text')
             });
             marker.parentId = id;
             marker.on('click', markerClickHandlerFactory(marker));
@@ -116,7 +113,7 @@
         var nameCoords = L.latLng(coords[0].lat, coords[0].lng);
         var nameMarker = L.marker(nameCoords, {
             draggable: false,
-            icon: textIconFactory(route.name, 'map-title flight-title map-text')
+            icon: icons.textIconFactory(route.name, 'map-title flight-title map-text')
         });
         nameMarker.parentId = id;
         nameMarker.on('click', function() {
@@ -160,7 +157,7 @@
         var nameCoords = L.latLng(coords.lat, coords.lng);
         var nameMarker = L.marker(nameCoords, {
             draggable: false,
-            icon: textIconFactory(target.name, 'map-title target-title map-text')
+            icon: icons.textIconFactory(target.name, 'map-title target-title map-text')
         });
         nameMarker.parentId = id;
         nameMarker.on('click', function() {
@@ -312,18 +309,10 @@
             circle: false,
             polyline: {
                 showLength: false,
-                shapeOptions: {
-                    color: RED,
-                    weight: 2,
-                    opacity: FLIGHT_OPACITY
-                }
+                shapeOptions: LINE_OPTIONS
             },
             marker: {
-                icon: L.icon({
-                    iconUrl: 'img/explosion.png',
-                    iconSize: [30, 30],
-                    iconAnchor: [15, 25]
-                })
+                icon: icons.factory()
             }
         },
         edit: {
@@ -340,8 +329,6 @@
 
     var titleControl = new L.Control.TitleControl({});
     map.addControl(titleControl);
-
-
 
     var clearButton = new L.Control.CustomButton({
         id: 'clear-button',
@@ -437,11 +424,6 @@
                     saveLayer.latLngs = layer.getLatLngs();
                     saveLayer.name = layer.name;
                     saveLayer.speed = layer.speed;
-                    map.eachLayer(function(associated) {
-                        if (typeof associated.parentId !== 'undefined' && associated.parentId === layer._leaflet_id) {
-                            console.log(associated);
-                        }
-                    });
                     saveData.routes.push(saveLayer);
                 } else if (util.isMarker(layer)) {
                     saveLayer.latLng = layer.getLatLng();
@@ -494,11 +476,7 @@
                         for (var i = 0; i < saveData.routes.length; i++) {
                             var route = saveData.routes[i];
                             console.log(route);
-                            var newRoute = L.polyline(route.latLngs, {
-                                color: RED,
-                                weight: 2,
-                                opacity: FLIGHT_OPACITY
-                            });
+                            var newRoute = L.polyline(route.latLngs, LINE_OPTIONS);
                             newRoute.name = route.name;
                             newRoute.speed = route.speed;
                             drawnItems.addLayer(newRoute);
@@ -508,11 +486,7 @@
                             var point = saveData.points[i];
                             console.log(point);
                             var newPoint = L.marker(point.latLng, {
-                                icon: L.icon({
-                                    iconUrl: 'img/explosion.png',
-                                    iconSize: [30, 30],
-                                    iconAnchor: [15, 25]
-                                })
+                                icon: icons.factory()
                             });
                             newPoint.name = point.name;
                             newPoint.notes = point.notes;
