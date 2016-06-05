@@ -8,7 +8,7 @@ module.exports = function(leaflet) {
                 iconAnchor: [15, 25]
             });
         },
-        textIconFactory(text, classes) {
+        textIconFactory: function(text, classes) {
             return leaflet.divIcon({
                 className: classes,
                 html: text,
