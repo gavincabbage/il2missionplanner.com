@@ -543,6 +543,17 @@
     });
     map.addControl(gridHopButton);
 
+    var missionHopButton = new L.Control.CustomButton({
+        position: 'topleft',
+        id: 'missionhop-button',
+        icon: 'fa-crop',
+        tooltip: content.missionHopTooltip,
+        clickFn: function() {
+            map.fitBounds(drawnItems.getBounds());
+        }
+    });
+    map.addControl(missionHopButton);
+
     map.on('draw:created', function(e) {
         drawnItems.addLayer(e.layer);
         if (e.layerType === 'polyline') {

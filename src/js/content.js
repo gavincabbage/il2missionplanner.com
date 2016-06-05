@@ -160,6 +160,7 @@ module.exports = (function() {
         exportTooltip: 'Export mission plan',
         importTooltip: 'Import mission plan',
         gridHopTooltip: 'Jump to grid',
+        missionHopTooltip: 'Jump to mission',
         flightModalTemplate:
             '<div id="flight-modal"> \
                 <h2>Configure flight</h2> \
