@@ -529,7 +529,9 @@
                 cancelText: 'Cancel',
                 onShow: function(e) {
                     L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
-                        // hop logic here
+                        var grid = document.getElementById('grid-input').value;
+                        var viewLatLng = calc.gridLatLng(grid, mapConfig);
+                        map.setView(viewLatLng, mapConfig.gridHopZoom);
                         e.modal.hide();
                     });
                     L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {

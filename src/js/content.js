@@ -107,8 +107,11 @@ module.exports = (function() {
             scale: 1.40056,
             latMin: 0,
             latMax: 164,
+            latGridMax: 23,
             lngMin: 0,
             lngMax: 252,
+            lngGridMax: 37,
+            gridHopZoom: 5,
             tileUrl: 'http://tiles.il2missionplanner.com/stalingrad/{z}/{x}/{y}.png'
             //tileUrl: 'file:///Users/fkc930/Development/personal/tiles.il2missionplanner.com/dist/stalingrad/{z}/{x}/{y}.png'
         },
@@ -120,8 +123,11 @@ module.exports = (function() {
             scale: 1.46621,
             latMin: 0,
             latMax: 192,
+            latGridMax: 29,
             lngMin: 0,
             lngMax: 192,
+            lngGridMax: 29,
+            gridHopZoom: 5,
             tileUrl: 'http://tiles.il2missionplanner.com/moscow/{z}/{x}/{y}.png'
             //tileUrl: 'file:///Users/fkc930/Development/personal/tiles.il2missionplanner.com/dist/moscow/{z}/{x}/{y}.png'
         },
@@ -133,8 +139,11 @@ module.exports = (function() {
             scale: 0.65306,
             latMin: 0,
             latMax: 160,
+            latGridMax: 10.4,
             lngMin: 0,
             lngMax: 224,
+            lngGridMax: 16.6,
+            gridHopZoom: 4,
             tileUrl: 'http://tiles.il2missionplanner.com/luki/{z}/{x}/{y}.png'
             //tileUrl: 'file:///Users/fkc930/Development/personal/tiles.il2missionplanner.com/dist/luki/{z}/{x}/{y}.png'
         }

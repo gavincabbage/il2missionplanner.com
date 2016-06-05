@@ -230,4 +230,59 @@ describe('calc', function() {
             });
         });
     });
+
+    describe('calc.gridLatLng', function() {
+
+        it('must be defined', function() {
+            assert.isDefined(calc.center);
+        });
+
+        var tests = [
+            {
+                given: {
+                    grid: '0101',
+                    map: {
+                        latMin: 0,
+                        latMax: 160,
+                        latGridMax: 11,
+                        lngMin: 0,
+                        lngMax: 224,
+                        lngGridMax: 17,
+                    }
+                },
+                expected: [146, 13.5]
+            },
+            {
+                given: {
+                    grid: '1101',
+                    map: {
+                        latMin: 0,
+                        latMax: 160,
+                        latGridMax: 11,
+                        lngMin: 0,
+                        lngMax: 224,
+                        lngGridMax: 17,
+                    }
+                },
+                expected: [7.5, 13.5]
+            }
+        ];
+
+        function latLngFloatEqual(given, expected) {
+            const EPSILON = 0.5;
+            var latMax = expected[0] + EPSILON;
+            var latMin = expected[0] - EPSILON;
+            var lngMax = expected[1] + EPSILON;
+            var lngMin = expected[1] - EPSILON;
+            return given[0] < latMax && given[0] > latMin && given[1] < lngMax && given[1] > lngMin;
+        }
+
+        tests.forEach(function(test) {
+            it('must return '+JSON.stringify(test.expected)+' given '+JSON.stringify(test.given), function() {
+                var result = calc.gridLatLng(test.given.grid, test.given.map);
+                console.log(result);
+                assert(latLngFloatEqual(result, test.expected));
+            });
+        });
+    });
 });
