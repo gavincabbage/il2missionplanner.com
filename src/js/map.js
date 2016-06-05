@@ -46,10 +46,11 @@
     }
 
     function applyCustomFlightLeg(marker) {
+        var parentRoute = drawnItems.getLayer(marker.parentId);
         map.openModal({
             okCls: 'modal-ok',
             okText: 'Done',
-            speed: marker.options.speed,
+            speed: parentRoute.speeds[marker.index],
             template: content.flightLegModalTemplate,
             zIndex: 10000,
             onShow: function(e) {
@@ -58,7 +59,9 @@
                 });
             },
             onHide: function(e) {
-                marker.options.speed = parseInt(document.getElementById('flight-leg-speed').value);
+                var newSpeed = parseInt(document.getElementById('flight-leg-speed').value);
+                parentRoute.speeds[marker.index] = newSpeed;
+                marker.options.speed = newSpeed;
                 applyCustomFlightLegCallback(marker);
             }
         });
@@ -77,7 +80,9 @@
         var decorator = newFlightDecorator(route);
         decorator.parentId = id;
         decorator.addTo(map);
-        var speedArray = util.defaultSpeedArray(route.speed, coords.length-1);
+        if (typeof route.speeds === 'undefined' || route.speedDirty || route.wasEdited) {
+            route.speeds = util.defaultSpeedArray(route.speed, coords.length-1);
+        }
         function markerClickHandlerFactory(clickedMarker) {
             return function() {
                 applyCustomFlightLeg(clickedMarker);
@@ -87,16 +92,17 @@
             var distance = mapConfig.scale * calc.distance(coords[i], coords[i+1]);
             var heading = calc.heading(coords[i], coords[i+1]);
             var midpoint = calc.midpoint(coords[i], coords[i+1]);
-            var time = util.formatTime(calc.time(route.speed, distance));
-            var markerContent = util.formatFlightLegMarker(distance, heading, route.speed, time);
+            var time = util.formatTime(calc.time(route.speeds[i], distance));
+            var markerContent = util.formatFlightLegMarker(distance, heading, route.speeds[i], time);
             var marker =  L.marker(midpoint, {
                 distance: distance,
                 heading: heading,
                 time: time,
-                speed: route.speed,
+                speed: route.speeds[i],
                 icon: icons.textIconFactory(markerContent, 'flight-leg map-text')
             });
             marker.parentId = id;
+            marker.index = i;
             marker.on('click', markerClickHandlerFactory(marker));
             marker.addTo(map);
         }
@@ -130,6 +136,7 @@
         if (typeof route.name === 'undefined') {
             route.name = 'New Flight';
         }
+        var initialSpeed = route.speed;
         map.openModal({
             okCls: 'modal-ok',
             okText: 'Done',
@@ -138,15 +145,15 @@
             template: content.flightModalTemplate,
             zIndex: 10000,
             onShow: function(e) {
-                e.modal.route = route;
                 L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
                     e.modal.hide();
                 });
             },
             onHide: function(e) {
-                e.modal.route.name = document.getElementById('flight-name').value;
-                e.modal.route.speed = parseInt(document.getElementById('flight-speed').value);
-                applyFlightPlanCallback(e.modal.route);
+                route.name = document.getElementById('flight-name').value;
+                route.speed = parseInt(document.getElementById('flight-speed').value);
+                route.speedDirty = (route.speed !== initialSpeed);
+                applyFlightPlanCallback(route);
             }
         });
     }
@@ -387,45 +394,14 @@
         icon: 'fa-download',
         tooltip: content.exportTooltip,
         clickFn: function() {
-            // var saveFile = {routes:[],points:[]};
-            // drawnItems.eachLayer(function(layer) {
-            //     if (util.isLine(layer)) {
-            //         var saveObject = {associatedObjects:[]};
-            //         map.eachLayer(function(associated) {
-            //             if (typeof associated.parentId !== 'undefined' && associated.parentId === layer._leaflet_id) {
-            //                 console.log(associated);
-            //             }
-            //         });
-            //         saveObject.id = layer._leaflet_id;
-            //         saveObject.latLngs = layer.getLatLngs();
-            //         saveFile.routes.push(saveObject);
-            //     } else if (util.isMarker(layer)) {
-            //         var saveObject = {associatedObjects:[]};
-            //         map.eachLayer(function(associated) {
-            //             if (typeof associated.parentId !== 'undefined' && associated.parentId === layer._leaflet_id) {
-            //                 console.log(associated);
-            //             }
-            //         });
-            //         saveObject.id = layer._leaflet_id;
-            //         saveObject.latLng = layer.getLatLng();
-            //         saveFile.points.push(saveObject);
-            //     }
-            // });
-
-            // var saveData = {};
-            // var drawnItemsJson = drawnItems.toGeoJSON();
-            // for (var i = 0; i < drawnItemsJson.feature.length; i++) {
-            //
-            // }
-
             var saveData = {routes:[],points:[]};
             drawnItems.eachLayer(function(layer) {
-                console.log(layer);
                 var saveLayer = {};
                 if (util.isLine(layer)) {
                     saveLayer.latLngs = layer.getLatLngs();
                     saveLayer.name = layer.name;
                     saveLayer.speed = layer.speed;
+                    saveLayer.speeds = layer.speeds;
                     saveData.routes.push(saveLayer);
                 } else if (util.isMarker(layer)) {
                     saveLayer.latLng = layer.getLatLng();
@@ -434,8 +410,6 @@
                     saveData.points.push(saveLayer);
                 }
             });
-
-            console.log(saveData);
             window.open('data:text/json;charset=utf-8,' + window.escape(JSON.stringify(saveData)));
         }
     });
@@ -471,22 +445,19 @@
                         reader.readAsText(evt.target.files[0]);
                     });
                     L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
-                        console.log(fileContent);
                         clearMap();
                         var saveData = JSON.parse(fileContent);
-                        console.log(saveData);
                         for (var i = 0; i < saveData.routes.length; i++) {
                             var route = saveData.routes[i];
-                            console.log(route);
                             var newRoute = L.polyline(route.latLngs, LINE_OPTIONS);
                             newRoute.name = route.name;
                             newRoute.speed = route.speed;
+                            newRoute.speeds = route.speeds;
                             drawnItems.addLayer(newRoute);
                             applyFlightPlanCallback(newRoute);
                         }
                         for (var i = 0; i < saveData.points.length; i++) {
                             var point = saveData.points[i];
-                            console.log(point);
                             var newPoint = L.marker(point.latLng, {
                                 icon: icons.factory()
                             });
@@ -495,16 +466,6 @@
                             drawnItems.addLayer(newPoint);
                             applyTargetInfoCallback(newPoint);
                         }
-                        // var geoJson = L.geoJson(JSON.parse(fileContent).drawnItems);
-                        // geoJson.eachLayer(function(layer) {
-                        //     console.log(layer);
-                        //     drawnItems.addLayer(layer);
-                        //     if (util.isLine(layer)) {
-                        //         applyFlightPlanCallback(layer);
-                        //     } else if (util.isMarker(layer)) {
-                        //         applyTargetInfoCallback(layer);
-                        //     }
-                        // });
                         checkClearButtonDisabled();
                         e.modal.hide();
                     });
@@ -575,6 +536,7 @@
         deleteAssociatedLayers(e.layers);
         e.layers.eachLayer(function(layer) {
             if (util.isLine(layer)) {
+                layer.wasEdited = (layer.getLatLngs().length-1 !== layer.speeds.length);
                 applyFlightPlanCallback(layer);
             } else if (util.isMarker(layer)) {
                 applyTargetInfoCallback(layer);
