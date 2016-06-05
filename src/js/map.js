@@ -166,7 +166,9 @@
         });
         nameMarker.addTo(map);
         if (target.notes !== '') {
-            target.bindLabel(target.notes).addTo(map);
+            target.bindLabel(target.notes, {
+                direction: 'left'
+            }).addTo(map);
         }
     }
 
