@@ -197,7 +197,7 @@ module.exports = (function() {
         helpTemplate:
             '<div id="help-modal"> \
                 <h2>How to</h2> \
-                <img class="modal-image" src="img/howto.png"></img> \
+                <img class="modal-image" src="img/help.png" height="480"></img> \
             </div>',
         targetModalTemplate:
             '<div id="target-modal"> \
