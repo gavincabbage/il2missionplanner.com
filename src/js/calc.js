@@ -55,6 +55,20 @@ module.exports = (function() {
 
         center: function(mapConfig) {
             return [mapConfig.latMax / 2, mapConfig.lngMax / 2];
+        },
+
+        gridLatLng: function(grid, mapConfig) {
+            var width = mapConfig.lngMax - mapConfig.lngMin;
+            var height = mapConfig.latMax - mapConfig.latMin;
+            var gridWidth = width / mapConfig.lngGridMax;
+            var gridHeight = height / mapConfig.latGridMax;
+            var gridSideLength = (gridWidth + gridHeight) / 2;
+            var gridLat = parseInt(grid.substring(0, 2));
+            var gridLng = parseInt(grid.substring(2, 4));
+            var halfSideLength = gridSideLength / 2;
+            var lat = mapConfig.latMax - (gridLat*gridSideLength);
+            var lng = (gridLng*gridSideLength);
+            return [lat, lng];
         }
     };
 })();

@@ -107,8 +107,11 @@ module.exports = (function() {
             scale: 1.40056,
             latMin: 0,
             latMax: 164,
+            latGridMax: 23,
             lngMin: 0,
             lngMax: 252,
+            lngGridMax: 37,
+            gridHopZoom: 5,
             tileUrl: 'http://tiles.il2missionplanner.com/stalingrad/{z}/{x}/{y}.png'
             //tileUrl: 'file:///Users/fkc930/Development/personal/tiles.il2missionplanner.com/dist/stalingrad/{z}/{x}/{y}.png'
         },
@@ -120,8 +123,11 @@ module.exports = (function() {
             scale: 1.46621,
             latMin: 0,
             latMax: 192,
+            latGridMax: 29,
             lngMin: 0,
             lngMax: 192,
+            lngGridMax: 29,
+            gridHopZoom: 5,
             tileUrl: 'http://tiles.il2missionplanner.com/moscow/{z}/{x}/{y}.png'
             //tileUrl: 'file:///Users/fkc930/Development/personal/tiles.il2missionplanner.com/dist/moscow/{z}/{x}/{y}.png'
         },
@@ -133,8 +139,11 @@ module.exports = (function() {
             scale: 0.65306,
             latMin: 0,
             latMax: 160,
+            latGridMax: 10.4,
             lngMin: 0,
             lngMax: 224,
+            lngGridMax: 16.6,
+            gridHopZoom: 4,
             tileUrl: 'http://tiles.il2missionplanner.com/luki/{z}/{x}/{y}.png'
             //tileUrl: 'file:///Users/fkc930/Development/personal/tiles.il2missionplanner.com/dist/luki/{z}/{x}/{y}.png'
         }
@@ -150,6 +159,7 @@ module.exports = (function() {
         mapSelectTooltip: 'Select game map',
         exportTooltip: 'Export mission plan',
         importTooltip: 'Import mission plan',
+        gridHopTooltip: 'Jump to grid',
         flightModalTemplate:
             '<div id="flight-modal"> \
                 <h2>Configure flight</h2> \
@@ -221,6 +231,18 @@ module.exports = (function() {
                 <input id="import-file" type="file" name="importFile"></input>\
                 <button class="{okCls}">{okText}</button> \
                 <button class="{cancelCls}">{cancelText}</button> \
+            </div>',
+        gridHopTemplate:
+            '<div id="gridhop-modal"> \
+                <h2>Jump to grid</h2> \
+                <form onsubmit="return false;"> \
+                    <div class="modal-item"> \
+                        <label class="modal-item-label" for="grid-input">Grid</label> \
+                        <input id="grid-input" class="modal-item-input" placeholder="0000" maxlength="4"></input> \
+                    </div> \
+                    <button class="{okCls}" type="button">{okText}</button> \
+                    <button class="{cancelCls}" type="button">{cancelText}</button> \
+                </form> \
             </div>',
     };
 })();

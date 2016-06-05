@@ -515,6 +515,34 @@
     });
     map.addControl(importButton);
 
+    var gridHopButton = new L.Control.CustomButton({
+        position: 'topleft',
+        id: 'gridhop-button',
+        icon: 'fa-th-large',
+        tooltip: content.gridHopTooltip,
+        clickFn: function() {
+            map.openModal({
+                template: content.gridHopTemplate,
+                okCls: 'modal-ok',
+                okText: 'Go',
+                cancelCls: 'modal-cancel',
+                cancelText: 'Cancel',
+                onShow: function(e) {
+                    L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
+                        var grid = document.getElementById('grid-input').value;
+                        var viewLatLng = calc.gridLatLng(grid, mapConfig);
+                        map.setView(viewLatLng, mapConfig.gridHopZoom);
+                        e.modal.hide();
+                    });
+                    L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
+                        e.modal.hide();
+                    });
+                }
+            });
+        }
+    });
+    map.addControl(gridHopButton);
+
     map.on('draw:created', function(e) {
         drawnItems.addLayer(e.layer);
         if (e.layerType === 'polyline') {
