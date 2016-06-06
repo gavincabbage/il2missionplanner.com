@@ -152,7 +152,6 @@ module.exports = (function() {
     return {
         augmentedLeafletDrawLocal: augmentedLeafletDrawLocal,
         maps: mapConfigs,
-        tileServiceUrl: 'http://tiles.il2missionplanner.com/img/moscow/{z}/{x}/{y}.png',
         titleText: 'Il-2 Mission Planner',
         helpTooltip: 'How to use this tool',
         clearTooltip: 'Clear the map',
