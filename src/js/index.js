@@ -15,7 +15,6 @@
     var calc = require('./calc.js');
     var util = require('./util.js');
     var icons = require('./icons.js')(L);
-    var state = require('./state.js')(L);
     require('./controls.js');
 
     // VARS
@@ -276,6 +275,30 @@
         hiddenLayers.clearLayers();
     }
 
+    function exportMapState() {
+        var saveData = {
+            mapHash: window.location.hash,
+            routes: [],
+            points: []
+        };
+        drawnItems.eachLayer(function(layer) {
+            var saveLayer = {};
+            if (util.isLine(layer)) {
+                saveLayer.latLngs = layer.getLatLngs();
+                saveLayer.name = layer.name;
+                saveLayer.speed = layer.speed;
+                saveLayer.speeds = layer.speeds;
+                saveData.routes.push(saveLayer);
+            } else if (util.isMarker(layer)) {
+                saveLayer.latLng = layer.getLatLng();
+                saveLayer.name = layer.name;
+                saveLayer.notes = layer.notes;
+                saveData.points.push(saveLayer);
+            }
+        });
+        return saveData;
+    }
+
     // MAP SETUP
 
     map = L.map('map', {
@@ -417,7 +440,7 @@
         icon: 'fa-download',
         tooltip: content.exportTooltip,
         clickFn: function() {
-            var saveData = state.export(drawnItems);
+            var saveData = exportMapState();
             var escapedData = window.escape(JSON.stringify(saveData));
             var formattedData = SAVE_HEADER + escapedData;
             window.open(formattedData);
