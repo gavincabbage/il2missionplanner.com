@@ -43,9 +43,6 @@ function deploy_dev {
 
 function main {
 
-    git branch
-    git checkout ${TRAVIS_BRANCH}
-    git branch
     bower install
 
     # Do not deploy any PRs or code from other repos
