@@ -1,5 +1,5 @@
 module.exports = function(leaflet) {
-    
+
     return {
         factory: function() {
             return leaflet.icon({
@@ -16,4 +16,5 @@ module.exports = function(leaflet) {
             });
         }
     };
+
 };

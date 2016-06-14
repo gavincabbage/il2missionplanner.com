@@ -85,7 +85,7 @@ describe('calc', function() {
             assert.isDefined(calc.heading);
         });
 
-        var tests = [
+        tests = [
             {
                 a: {lat: 1, lng: 1},
                 b: {lat: 0, lng: 1},
@@ -280,6 +280,7 @@ describe('calc', function() {
         tests.forEach(function(test) {
             it('must return '+JSON.stringify(test.expected)+' given '+JSON.stringify(test.given), function() {
                 var result = calc.gridLatLng(test.given.grid, test.given.map);
+                console.log(result);
                 assert(latLngFloatEqual(result, test.expected));
             });
         });

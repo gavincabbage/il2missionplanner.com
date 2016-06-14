@@ -37,8 +37,7 @@ function deploy_dev {
     git add .
     git commit --quiet -m "${GIT_COMMIT_MSG}"
     log "Pushing to gh-pages"
-    git push --force --quiet "https://${GH_TOKEN}@${GH_REF}" master:gh-pages #> /dev/null 2>&1
-    log "TEST done with push"
+    git push --force --quiet "https://${GH_TOKEN}@${GH_REF}" master:gh-pages > /dev/null 2>&1
 }
 
 function main {
@@ -61,7 +60,7 @@ function main {
     # Deploy dev branch - beta and prod deployments are handled by travis
     if [[ "${TRAVIS_BRANCH}" == "${DEV_BRANCH}" ]]
     then
-        log "Deploying branch:${DEV_BRANCH} to dev"
+        log "Deploying branch:${BETA_BRANCH} to beta"
         deploy_dev
     fi
 
