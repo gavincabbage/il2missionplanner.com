@@ -37,7 +37,7 @@ function deploy_dev {
     git add .
     git commit --quiet -m "${GIT_COMMIT_MSG}"
     log "Pushing to gh-pages"
-    git push --force --quiet "https://${GH_TOKEN}@${GH_REF}" master:gh-pages #> /dev/null 2>&1
+    git push --force --quiet "https://${GH_TOKEN}@${GH_REF}" master:gh-pages > /dev/null 2>&1
     log "TEST done with push"
 }
 
