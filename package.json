@@ -20,6 +20,7 @@
     "clean-css": "^3.4.12",
     "istanbul": "^0.4.3",
     "jshint": "^2.9.1",
+    "livereload": "^0.4.1",
     "mocha": "^2.4.5",
     "uglify-js": "^2.6.2",
     "watch-run": "^1.2.4"
@@ -30,12 +31,12 @@
     "test": "mocha src/js/**/*.test.js",
     "lint": "jshint src/js/**.js",
     "clean": "rm -rf dist",
-    "browserify": "browserify src/js/map.js -o dist/index.tmp.js",
-    "browserify:dev": "browserify src/js/map.js -o dist/index.js -d",
-    "copy:libs": "cp -R src/libs dist/libs",
+    "browserify": "browserify src/js/index.js -o dist/index.tmp.js",
+    "browserify:dev": "browserify src/js/index.js -o dist/index.js -d",
+    "copy:vendor": "cp -R src/vendor dist/vendor",
     "copy:img": "cp -R src/img dist/img",
     "copy:html": "cp src/index.html dist/index.html",
-    "copy": "mkdir -p dist && npm run copy:libs && npm run copy:img && npm run copy:html",
+    "copy": "mkdir -p dist && npm run copy:vendor && npm run copy:img && npm run copy:html",
     "dist:js:dev": "npm run lint && npm test && npm run browserify:dev",
     "dist:js": "npm run lint && npm test && npm run browserify && npm run uglify",
     "dist:dev": "npm run copy && npm run dist:js:dev && npm run dist:css",
@@ -43,8 +44,9 @@
     "watch:css": "watch-run -p 'src/css/**/*.css' npm run dist:css",
     "watch:html": "watch-run -p 'src/index.html' npm run copy:html",
     "watch:js": "watch-run -p 'src/js/**/*.js' npm run dist:js:dev",
-    "develop": "npm run clean && npm run dist:dev && concurrently \"npm run watch:css\" \"npm run watch:html\" \"npm run watch:js\"",
+    "develop": "npm run clean && npm run dist:dev && concurrently \"npm run watch:css\" \"npm run watch:html\" \"npm run watch:js\" \"npm run reload\"",
     "dist:css": "cleancss -o dist/index.css src/css/index.css",
-    "nodist": "npm run lint && npm test"
+    "nodist": "npm run lint && npm test",
+    "reload": "livereload ./dist/"
   }
 }

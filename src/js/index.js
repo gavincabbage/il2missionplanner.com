@@ -1,12 +1,26 @@
 (function() {
 
+    /* CLEANUP NOTES
+
+    Going to be quite the process...
+
+    Next: Put map setup and last line into a main function, then organize controls
+
+    */
+
+
+    // IMPORTS
+
     var content = require('./content.js');
     var calc = require('./calc.js');
     var util = require('./util.js');
     var icons = require('./icons.js')(L);
     require('./controls.js');
 
+    // VARS
+
     const
+        SAVE_HEADER = 'data:text/json;charset=utf-8,',
         RED = '#ff0000',
         DEFAULT_SPEED = 300,
         FLIGHT_OPACITY = 0.8,
@@ -21,11 +35,15 @@
     var mapConfig = util.getSelectedMapConfig(window.location.hash, content.maps);
     var selectedMapIndex = mapConfig.selectIndex;
 
+    // PATCHING
+
     // Patch a leaflet bug, see https://github.com/bbecquet/Leaflet.PolylineDecorator/issues/17
     L.PolylineDecorator.include(L.Mixin.Events);
 
     // Patch leaflet content with custom language
     L.drawLocal = content.augmentedLeafletDrawLocal;
+
+    // FUNCTIONS
 
     function newFlightDecorator(route) {
         return L.polylineDecorator(route, {
@@ -257,6 +275,32 @@
         hiddenLayers.clearLayers();
     }
 
+    function exportMapState() {
+        var saveData = {
+            mapHash: window.location.hash,
+            routes: [],
+            points: []
+        };
+        drawnItems.eachLayer(function(layer) {
+            var saveLayer = {};
+            if (util.isLine(layer)) {
+                saveLayer.latLngs = layer.getLatLngs();
+                saveLayer.name = layer.name;
+                saveLayer.speed = layer.speed;
+                saveLayer.speeds = layer.speeds;
+                saveData.routes.push(saveLayer);
+            } else if (util.isMarker(layer)) {
+                saveLayer.latLng = layer.getLatLng();
+                saveLayer.name = layer.name;
+                saveLayer.notes = layer.notes;
+                saveData.points.push(saveLayer);
+            }
+        });
+        return saveData;
+    }
+
+    // MAP SETUP
+
     map = L.map('map', {
         crs: L.CRS.Simple,
         attributionControl: false
@@ -276,6 +320,8 @@
     drawnItems = L.featureGroup();
     map.addLayer(drawnItems);
     hiddenLayers = L.featureGroup();
+
+    // BUTTONS
 
     var mapSelectButton = new L.Control.CustomButton({
         position: 'topleft',
@@ -394,23 +440,10 @@
         icon: 'fa-download',
         tooltip: content.exportTooltip,
         clickFn: function() {
-            var saveData = {routes:[],points:[]};
-            drawnItems.eachLayer(function(layer) {
-                var saveLayer = {};
-                if (util.isLine(layer)) {
-                    saveLayer.latLngs = layer.getLatLngs();
-                    saveLayer.name = layer.name;
-                    saveLayer.speed = layer.speed;
-                    saveLayer.speeds = layer.speeds;
-                    saveData.routes.push(saveLayer);
-                } else if (util.isMarker(layer)) {
-                    saveLayer.latLng = layer.getLatLng();
-                    saveLayer.name = layer.name;
-                    saveLayer.notes = layer.notes;
-                    saveData.points.push(saveLayer);
-                }
-            });
-            window.open('data:text/json;charset=utf-8,' + window.escape(JSON.stringify(saveData)));
+            var saveData = exportMapState();
+            var escapedData = window.escape(JSON.stringify(saveData));
+            var formattedData = SAVE_HEADER + escapedData;
+            window.open(formattedData);
         }
     });
     map.addControl(exportButton);
@@ -517,6 +550,8 @@
     });
     map.addControl(missionHopButton);
 
+    // MAP.ON EVENTS
+
     map.on('draw:created', function(e) {
         drawnItems.addLayer(e.layer);
         if (e.layerType === 'polyline') {
@@ -559,6 +594,8 @@
     map.on('draw:deletestop', function() {
         showChildLayers();
     });
+
+    // END EVENTS
 
     checkClearButtonDisabled();
 
