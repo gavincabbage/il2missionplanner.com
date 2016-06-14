@@ -1,9 +1,8 @@
 .DS_Store
-src/libs/bower_components/
+src/vendor/bower_components/
 node_modules/
 clipboard.js
 dist/
-!src/libs/leaflet.label/dist/
 npm-debug.log*
 coverage/
 sandbox/
