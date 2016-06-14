@@ -1,7 +1,7 @@
 #!/bin/bash
 
 REPO="gavincabbage/il2missionplanner.com"
-DEV_BRANCH="develop"
+DEV_BRANCH="polish"
 BETA_BRANCH="beta"
 PROD_BRANCH="master"
 SRC="src/"
@@ -60,7 +60,7 @@ function main {
     # Deploy dev branch - beta and prod deployments are handled by travis
     if [[ "${TRAVIS_BRANCH}" == "${DEV_BRANCH}" ]]
     then
-        log "Deploying branch:${BETA_BRANCH} to beta"
+        log "Deploying branch:${DEV_BRANCH} to dev"
         deploy_dev
     fi
 
