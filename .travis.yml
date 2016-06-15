@@ -1,9 +1,9 @@
 language: node_js
 node_js: 5.3.0
-install:
-    - npm install -g bower jshint 
+before_script:
     - bower install
-script: npm run dist
+script:
+    - npm run dist
 env:
   global:
     - GH_REF: github.com/gavincabbage/il2missionplanner.com.git
