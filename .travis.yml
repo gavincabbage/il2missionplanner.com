@@ -4,10 +4,6 @@ before_script:
     - bower install
 script:
     - npm run dist
-env:
-  global:
-    - GH_REF: github.com/gavincabbage/il2missionplanner.com.git
-    - secure: tCcYozTXIT0fsIvDMYz3SqFLVOGsbrHnqOsHgVgPTrfe+5WT+ycXsR8nNinLvL9Wqb1n2KMlxxO1io6tENj8R5OJ99WVvwd9XazRl8s+/qATadrVF7UAghusaZMYZgAxkYSLNMiJEkxOa8/zPSG8jxQIGQcwBGIvKi9xEX5mrJ6JzjaRF4msm4E6iBnBookMV9gCwGU5Ls1ilLM9fwtoS5weS5eAWXteYWGu7tqkaUH8NZdjwgIb6IFpGRsQFnubsl/hq/ZBF/inKZPvnTdUHCRUizU0Umt4CdFv9fXa8JMY2v0BZhE6crU9msFTZbJXWtMiOD1CD9ectSL1WFeVKmSxW+loZNPYUlCgQNznMcdCV9B1R0IxbvOExvZaPh6QJJyHTqnVTSC2euuPSmkNFilVdGCbLrePCm188gQNa2rS9UnVWk2SW7SRy0yyWOm6Z3kI4wg6T+TiPhynFV6uCe9nXJq24+NPquHz1ry1g0VbP6DaCjAjmu5Qq2fryKXj9yIh06VtIzSa0peHU9+jRvcdbxkuFS7Og6UkLf0jhuDkmX7Ex5ncocX6oqqvKaOMCs1cad9TDI/GgWsVBDjNfjfxUIG6RBGl04KeNbIZ5Ovjg+qTuqVHcQg0LN9DYfGsH4rDixcEzESMCsSIy/9iflCyVwNS+MrYTjJ2Rv30sRw=
 deploy:
   - provider: s3
     access_key_id: AKIAIVOD3WGLQHXFCTTQ

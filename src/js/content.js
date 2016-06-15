@@ -152,7 +152,7 @@ module.exports = (function() {
     return {
         augmentedLeafletDrawLocal: augmentedLeafletDrawLocal,
         maps: mapConfigs,
-        titleText: 'Il-2 Mission Planner!',
+        titleText: 'Il-2 Mission Planner',
         helpTooltip: 'How to use this tool',
         clearTooltip: 'Clear the map',
         mapSelectTooltip: 'Select game map',
