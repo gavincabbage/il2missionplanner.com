@@ -263,7 +263,8 @@
     function checkButtonsDisabled() {
         var elements = [
             document.getElementById('clear-button'),
-            document.getElementById('export-button')
+            document.getElementById('export-button'),
+            document.getElementById('missionhop-button')
         ];
         if (drawnItems.getLayers().length === 0) {
             isEmpty = true;
@@ -569,7 +570,9 @@
         icon: 'fa-crop',
         tooltip: content.missionHopTooltip,
         clickFn: function() {
-            fitViewToMission();
+            if (!isEmpty) {
+                fitViewToMission();
+            }
         }
     });
     map.addControl(missionHopButton);

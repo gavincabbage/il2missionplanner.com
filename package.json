@@ -14,6 +14,7 @@
   },
   "homepage": "https://github.com/gavincabbage/il2missionplanner.com#readme",
   "devDependencies": {
+    "brfs": "^1.4.3",
     "bower": "^1.7.7",
     "browserify": "^13.0.0",
     "chai": "^3.5.0",
