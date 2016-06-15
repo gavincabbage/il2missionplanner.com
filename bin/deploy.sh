@@ -1,7 +1,7 @@
 #!/bin/bash
 
 REPO="gavincabbage/il2missionplanner.com"
-DEV_BRANCH="polish"
+DEV_BRANCH="develop"
 BETA_BRANCH="beta"
 PROD_BRANCH="master"
 SRC="src/"
