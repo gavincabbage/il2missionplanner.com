@@ -2,10 +2,6 @@ module.exports = (function() {
 
     var calc = require('./calc.js');
 
-    function getFirstAttribute(obj) {
-        return obj[Object.keys(obj)[0]];
-    }
-
     return {
 
         formatTime: function(timeInSeconds) {
@@ -20,7 +16,7 @@ module.exports = (function() {
                     return maps[map];
                 }
             }
-            return getFirstAttribute(maps);
+            return maps.stalingrad;
         },
 
         defaultSpeedArray: function(speed, count) {

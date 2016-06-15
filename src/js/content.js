@@ -1,5 +1,7 @@
 module.exports = (function() {
 
+    var fs = require('fs');
+
     // Edited original leaflet object
     var augmentedLeafletDrawLocal = {
         draw: {
@@ -160,89 +162,13 @@ module.exports = (function() {
         importTooltip: 'Import mission plan',
         gridHopTooltip: 'Jump to grid',
         missionHopTooltip: 'Jump to mission',
-        flightModalTemplate:
-            '<div id="flight-modal"> \
-                <h2>Configure flight</h2> \
-                <form onsubmit="return false;"> \
-                    <div class="modal-item"> \
-                        <label class="modal-item-label" for="flight-name">Flight name</label> \
-                        <input id="flight-name" class="modal-item-input" value="{name}" placeholder="name"></input> \
-                    </div> \
-                    <div class="modal-item"> \
-                        <label class="modal-item-label" for="flight-speed">Average speed</label> \
-                        <input id="flight-speed" class="modal-item-input" value="{speed}"></input> \
-                    </div> \
-                    <button class="{okCls}" type="button">{okText}</button> \
-                </form> \
-            </div>',
-        flightLegModalTemplate:
-            '<div id="flight-leg-modal"> \
-                <h2>Configure flight leg</h2> \
-                <form onsubmit="return false;"> \
-                    <div class="modal-item"> \
-                        <label class="modal-item-label" for="flight-speed">Speed</label> \
-                        <input id="flight-leg-speed" class="modal-item-input" value="{speed}"></input> \
-                    </div> \
-                    <button class="{okCls}" type="button">{okText}</button> \
-                </form> \
-            </div>',
-        confirmClearTemplate:
-            '<div id="confirm-clear-modal"> \
-                <h2>Clear the map</h2> \
-                <p>Are you sure? This action cannot be undone.</p> \
-                <button class="{okCls}">{okText}</button> \
-                <button class="{cancelCls}">{cancelText}</button> \
-            </div>',
-        helpTemplate:
-            '<div id="help-modal"> \
-                <h2>How to</h2> \
-                <img class="modal-image" src="img/help.png" height="480"></img> \
-            </div>',
-        targetModalTemplate:
-            '<div id="target-modal"> \
-                <h2>Configure target</h2> \
-                <form onsubmit="return false;"> \
-                    <div class="modal-item"> \
-                        <label class="modal-item-label" for="target-name">Target name</label> \
-                        <input id="target-name" class="modal-item-input" value="{name}" placeholder="name"></input> \
-                    </div> \
-                    <div class="modal-item"> \
-                        <label class="modal-item-label" for="target-notes">Notes</label> \
-                        <textarea id="target-notes" class="modal-item-text" value="{notes}">{notes}</textarea> \
-                    </div> \
-                    <button class="{okCls}" type="button">{okText}</button> \
-                </form> \
-            </div>',
-        mapSelectTemplate:
-            '<div id="help-modal"> \
-                <h2>Change map</h2> \
-                <form> \
-                    <select id="map-select"> \
-                        <option value="stalingrad">Stalingrad</option> \
-                        <option value="moscow">Moscow</option> \
-                        <option value="luki">Velikie Luki</option> \
-                    </select> \
-                    <button class="{okCls}" type="button">{okText}</button> \
-                </form> \
-            </div>',
-        importTemplate:
-            '<div id="import-modal"> \
-                <h2>Import Mission Plan</h2> \
-                <input id="import-file" type="file" name="importFile"></input>\
-                <button class="{okCls}">{okText}</button> \
-                <button class="{cancelCls}">{cancelText}</button> \
-            </div>',
-        gridHopTemplate:
-            '<div id="gridhop-modal"> \
-                <h2>Jump to grid</h2> \
-                <form onsubmit="return false;"> \
-                    <div class="modal-item"> \
-                        <label class="modal-item-label" for="grid-input">Grid</label> \
-                        <input id="grid-input" class="modal-item-input" placeholder="0000" maxlength="4"></input> \
-                    </div> \
-                    <button class="{okCls}" type="button">{okText}</button> \
-                    <button class="{cancelCls}" type="button">{cancelText}</button> \
-                </form> \
-            </div>',
+        flightModalTemplate: fs.readFileSync('src/html/flightModal.html', 'utf8'),
+        flightLegModalTemplate: fs.readFileSync('src/html/flightLegModal.html', 'utf8'),
+        confirmClearModalTemplate: fs.readFileSync('src/html/confirmClearModal.html', 'utf8'),
+        helpModalTemplate: fs.readFileSync('src/html/helpModal.html', 'utf8'),
+        pointModalTemplate: fs.readFileSync('src/html/pointModal.html', 'utf8'),
+        mapSelectModalTemplate: fs.readFileSync('src/html/mapSelectModal.html', 'utf8'),
+        importModalTemplate: fs.readFileSync('src/html/importModal.html', 'utf8'),
+        gridJumpModalTemplate: fs.readFileSync('src/html/gridJumpModal.html', 'utf8')
     };
 })();

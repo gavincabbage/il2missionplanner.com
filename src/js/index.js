@@ -10,7 +10,6 @@
 
 
     // IMPORTS
-
     var content = require('./content.js');
     var calc = require('./calc.js');
     var util = require('./util.js');
@@ -34,6 +33,7 @@
     var map, mapTiles, mapConfig, drawnItems, hiddenLayers;
     var mapConfig = util.getSelectedMapConfig(window.location.hash, content.maps);
     var selectedMapIndex = mapConfig.selectIndex;
+    var isEmpty = true;
 
     // PATCHING
 
@@ -209,7 +209,7 @@
             okText: 'Done',
             name: target.name,
             notes: target.notes,
-            template: content.targetModalTemplate,
+            template: content.pointModalTemplate,
             zIndex: 10000,
             onShow: function(e) {
                 e.modal.target = target;
@@ -260,12 +260,21 @@
         transferChildLayers(map, hiddenLayers);
     }
 
-    function checkClearButtonDisabled() {
-        var element = document.getElementById('clear-button');
+    function checkButtonsDisabled() {
+        var elements = [
+            document.getElementById('clear-button'),
+            document.getElementById('export-button')
+        ];
         if (drawnItems.getLayers().length === 0) {
-            element.classList.add('leaflet-disabled');
+            isEmpty = true;
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].classList.add('leaflet-disabled');
+            }
         } else {
-            element.classList.remove('leaflet-disabled');
+            isEmpty = false;
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].classList.remove('leaflet-disabled');
+            }
         }
     }
 
@@ -299,6 +308,23 @@
         return saveData;
     }
 
+    function selectMap(mapConfig) {
+        selectedMapIndex = mapConfig.selectIndex;
+        window.location.hash = mapConfig.hash;
+        deleteAssociatedLayers(drawnItems);
+        drawnItems.clearLayers();
+        hiddenLayers.clearLayers();
+        mapTiles.setUrl(mapConfig.tileUrl);
+        map.setMaxBounds(calc.maxBounds(mapConfig));
+        map.setView(calc.center(mapConfig), 3);
+        mapTiles.redraw();
+        mapTiles.addTo(map);
+    }
+
+    function fitViewToMission() {
+        map.fitBounds(drawnItems.getBounds());
+    }
+
     // MAP SETUP
 
     map = L.map('map', {
@@ -330,7 +356,7 @@
         tooltip: content.mapSelectTooltip,
         clickFn: function() {
             map.openModal({
-                template: content.mapSelectTemplate,
+                template: content.mapSelectModalTemplate,
                 okCls: 'modal-ok',
                 okText: 'Okay',
                 onShow: function(e) {
@@ -340,15 +366,7 @@
                         selectedMapIndex = selectElement.selectedIndex;
                         var selectedMap = selectElement.options[selectedMapIndex].value;
                         mapConfig = content.maps[selectedMap];
-                        window.location.hash = mapConfig.hash;
-                        deleteAssociatedLayers(drawnItems);
-                        drawnItems.clearLayers();
-                        hiddenLayers.clearLayers();
-                        mapTiles.setUrl(mapConfig.tileUrl);
-                        map.setMaxBounds(calc.maxBounds(mapConfig));
-                        map.setView(calc.center(mapConfig), 3);
-                        mapTiles.redraw();
-                        mapTiles.addTo(map);
+                        selectMap(mapConfig);
                         e.modal.hide();
                     });
                 }
@@ -390,9 +408,9 @@
         icon: 'fa-trash',
         tooltip: content.clearTooltip,
         clickFn: function() {
-            if (drawnItems.getLayers().length !== 0) {
+            if (!isEmpty) {
                 map.openModal({
-                    template: content.confirmClearTemplate,
+                    template: content.confirmClearModalTemplate,
                     okCls: 'modal-ok',
                     okText: 'Yes',
                     cancelCls: 'modal-cancel',
@@ -402,7 +420,7 @@
                             .on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
                                 clearMap();
                                 e.modal.hide();
-                                checkClearButtonDisabled();
+                                checkButtonsDisabled();
                             })
                             .on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
                                 e.modal.hide();
@@ -421,7 +439,7 @@
         tooltip: content.helpTooltip,
         clickFn: function() {
             map.openModal({
-                template: content.helpTemplate,
+                template: content.helpModalTemplate,
                 cancelCls: 'modal-cancel',
                 cancelText: 'Close',
                 onShow: function(e) {
@@ -440,10 +458,12 @@
         icon: 'fa-download',
         tooltip: content.exportTooltip,
         clickFn: function() {
-            var saveData = exportMapState();
-            var escapedData = window.escape(JSON.stringify(saveData));
-            var formattedData = SAVE_HEADER + escapedData;
-            window.open(formattedData);
+            if (!isEmpty) {
+                var saveData = exportMapState();
+                var escapedData = window.escape(JSON.stringify(saveData));
+                var formattedData = SAVE_HEADER + escapedData;
+                window.open(formattedData);
+            }
         }
     });
     map.addControl(exportButton);
@@ -455,7 +475,7 @@
         tooltip: content.importTooltip,
         clickFn: function() {
             map.openModal({
-                template: content.importTemplate,
+                template: content.importModalTemplate,
                 okCls: 'modal-ok',
                 okText: 'Import',
                 cancelCls: 'modal-cancel',
@@ -478,8 +498,11 @@
                         reader.readAsText(evt.target.files[0]);
                     });
                     L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
-                        clearMap();
+                        //clearMap();
                         var saveData = JSON.parse(fileContent);
+                        var importedMapConfig = util.getSelectedMapConfig(saveData.mapHash, content.maps);
+                        window.location.hash = importedMapConfig.hash;
+                        selectMap(importedMapConfig);
                         for (var i = 0; i < saveData.routes.length; i++) {
                             var route = saveData.routes[i];
                             var newRoute = L.polyline(route.latLngs, LINE_OPTIONS);
@@ -499,8 +522,9 @@
                             drawnItems.addLayer(newPoint);
                             applyTargetInfoCallback(newPoint);
                         }
-                        checkClearButtonDisabled();
+                        checkButtonsDisabled();
                         e.modal.hide();
+                        fitViewToMission();
                     });
                     L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
                         e.modal.hide();
@@ -518,7 +542,7 @@
         tooltip: content.gridHopTooltip,
         clickFn: function() {
             map.openModal({
-                template: content.gridHopTemplate,
+                template: content.gridJumpModalTemplate,
                 okCls: 'modal-ok',
                 okText: 'Go',
                 cancelCls: 'modal-cancel',
@@ -545,7 +569,7 @@
         icon: 'fa-crop',
         tooltip: content.missionHopTooltip,
         clickFn: function() {
-            map.fitBounds(drawnItems.getBounds());
+            fitViewToMission();
         }
     });
     map.addControl(missionHopButton);
@@ -559,12 +583,12 @@
         } else if (e.layerType === 'marker') {
             applyTargetInfo(e.layer);
         }
-        checkClearButtonDisabled();
+        checkButtonsDisabled();
     });
 
     map.on('draw:deleted', function(e) {
         deleteAssociatedLayers(e.layers);
-        checkClearButtonDisabled();
+        checkButtonsDisabled();
     });
 
     map.on('draw:edited', function(e) {
@@ -597,6 +621,6 @@
 
     // END EVENTS
 
-    checkClearButtonDisabled();
+    checkButtonsDisabled();
 
 })();
