@@ -59,11 +59,11 @@ function main {
     npm run dist
 
     # Deploy dev branch - beta and prod deployments are handled by travis
-    if [[ "${TRAVIS_BRANCH}" == "${DEV_BRANCH}" ]]
-    then
-        log "Deploying branch:${DEV_BRANCH} to dev"
-        deploy_dev
-    fi
+    # if [[ "${TRAVIS_BRANCH}" == "${DEV_BRANCH}" ]]
+    # then
+    #     log "Deploying branch:${DEV_BRANCH} to dev"
+    #     deploy_dev
+    # fi
 
     abort "0" "Finished deployment successfully!"
 }
