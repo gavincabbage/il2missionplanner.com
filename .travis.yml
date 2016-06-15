@@ -1,6 +1,8 @@
 language: node_js
 node_js: 5.3.0
-install: bower install
+install:
+    - npm install -g bower 
+    - bower install
 script: npm run dist
 env:
   global:
