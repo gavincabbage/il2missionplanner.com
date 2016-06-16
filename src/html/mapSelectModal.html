@@ -1,11 +1,18 @@
-<div id="help-modal">
-    <h2>Change map</h2>
-    <form>
-        <select id="map-select">
-            <option value="stalingrad">Stalingrad</option>
-            <option value="moscow">Moscow</option>
-            <option value="luki">Velikie Luki</option>
-        </select>
-        <button class="{okCls}" type="button">{okText}</button>
+<div id="selectmap-modal" class="container">
+    <div class="row">
+        <h2>Select Map</h2>
+    </div>
+    <form onsubmit="return false;">
+        <div class="row">
+            <select id="map-select">
+                <option value="stalingrad">Stalingrad</option>
+                <option value="moscow">Moscow</option>
+                <option value="luki">Velikie Luki</option>
+            </select>
+        </div>
+        <div class="row">
+            <button class="modal-ok button-primary" type="submit">Okay</button>
+            <button class="modal-cancel">Cancel</button>
+        </div>
     </form>
 </div>

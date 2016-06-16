@@ -1,14 +1,19 @@
-<div id="flight-modal">
-    <h2>Configure flight</h2>
+<div id="flight-modal" class="container">
+    <div class="row">
+        <h2>Configure Flight</h2>
+    </div>
     <form onsubmit="return false;">
-        <div class="modal-item">
+        <div class="modal-item row">
             <label class="modal-item-label" for="flight-name">Flight name</label>
             <input id="flight-name" class="modal-item-input" value="{name}" placeholder="name"></input>
         </div>
-        <div class="modal-item">
+        <div class="modal-item row">
             <label class="modal-item-label" for="flight-speed">Average speed</label>
             <input id="flight-speed" class="modal-item-input" value="{speed}"></input>
         </div>
-        <button class="{okCls}" type="button">{okText}</button>
+        <div class="row">
+            <button class="modal-ok button-primary" type="submit">Okay</button>
+            <button class="modal-cancel" type="button">Cancel</button>
+        </div>
     </form>
 </div>

@@ -162,6 +162,7 @@ module.exports = (function() {
         importTooltip: 'Import mission plan',
         gridHopTooltip: 'Jump to grid',
         missionHopTooltip: 'Jump to mission',
+        settingsTooltip: 'Settings',
         flightModalTemplate: fs.readFileSync('src/html/flightModal.html', 'utf8'),
         flightLegModalTemplate: fs.readFileSync('src/html/flightLegModal.html', 'utf8'),
         confirmClearModalTemplate: fs.readFileSync('src/html/confirmClearModal.html', 'utf8'),
@@ -169,6 +170,7 @@ module.exports = (function() {
         pointModalTemplate: fs.readFileSync('src/html/pointModal.html', 'utf8'),
         mapSelectModalTemplate: fs.readFileSync('src/html/mapSelectModal.html', 'utf8'),
         importModalTemplate: fs.readFileSync('src/html/importModal.html', 'utf8'),
-        gridJumpModalTemplate: fs.readFileSync('src/html/gridJumpModal.html', 'utf8')
+        gridJumpModalTemplate: fs.readFileSync('src/html/gridJumpModal.html', 'utf8'),
+        settingsModalTemplate: fs.readFileSync('src/html/settingsModal.html', 'utf8')
     };
 })();

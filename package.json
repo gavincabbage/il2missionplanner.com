@@ -43,9 +43,10 @@
     "dist:dev": "npm run copy && npm run dist:js:dev && npm run dist:css",
     "dist": "npm run copy && npm run dist:js && npm run dist:css",
     "watch:css": "watch-run -p 'src/css/**/*.css' npm run dist:css",
-    "watch:html": "watch-run -p 'src/index.html' npm run copy:html",
+    "watch:index": "watch-run -p 'src/index.html' npm run copy:html",
     "watch:js": "watch-run -p 'src/js/**/*.js' npm run dist:js:dev",
-    "develop": "npm run clean && npm run dist:dev && concurrently \"npm run watch:css\" \"npm run watch:html\" \"npm run watch:js\" \"npm run reload\"",
+    "watch:html": "watch-run -p 'src/html/**/*.html' npm run dist:js:dev",
+    "develop": "npm run clean && npm run dist:dev && concurrently \"npm run watch:css\" \"npm run watch:index\" \"npm run watch:js\"  \"npm run watch:html\" \"npm run reload\"",
     "dist:css": "cleancss -o dist/index.css src/css/index.css",
     "nodist": "npm run lint && npm test",
     "reload": "livereload ./dist/"

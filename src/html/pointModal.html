@@ -1,14 +1,19 @@
-<div id="target-modal">
-    <h2>Configure target</h2>
+<div id="target-modal" class="container">
+    <div class="row">
+        <h2>Configure Target</h2>
+    </div>
     <form onsubmit="return false;">
-        <div class="modal-item">
+        <div class="modal-item row">
             <label class="modal-item-label" for="target-name">Target name</label>
             <input id="target-name" class="modal-item-input" value="{name}" placeholder="name"></input>
         </div>
-        <div class="modal-item">
+        <div class="modal-item row">
             <label class="modal-item-label" for="target-notes">Notes</label>
             <textarea id="target-notes" class="modal-item-text" value="{notes}">{notes}</textarea>
         </div>
-        <button class="{okCls}" type="button">{okText}</button>
+        <div class="row">
+            <button class="modal-ok button-primary" type="submit">Okay</button>
+            <button class="modal-cancel" type="button">Cancel</button>
+        </div>
     </form>
 </div>

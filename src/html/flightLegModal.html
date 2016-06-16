@@ -1,10 +1,15 @@
-<div id="flight-leg-modal">
-    <h2>Configure flight leg</h2>
+<div id="flight-leg-modal" class="container">
+    <div class="row">
+        <h2>Configure Leg</h2>
+    </div>
     <form onsubmit="return false;">
-        <div class="modal-item">
+        <div class="modal-item row">
             <label class="modal-item-label" for="flight-speed">Speed</label>
             <input id="flight-leg-speed" class="modal-item-input" value="{speed}"></input>
         </div>
-        <button class="{okCls}" type="button">{okText}</button>
+        <div class="row">
+            <button class="modal-ok button-primary" type="submit">Okay</button>
+            <button class="modal-cancel" type="button">Cancel</button>
+        </div>
     </form>
 </div>

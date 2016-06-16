@@ -4,7 +4,13 @@ body {
 }
 
 html, body, #map {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 400;
     height: 100%;
+}
+
+html, body, h2 {
+    font-weight: 400;
 }
 
 div.title-control {
@@ -14,7 +20,6 @@ div.title-control {
 }
 
 div.flight-leg {
-    font-family: 'Courier', Courier, monospace;
     font-weight: 700;
     font-size: 1.2em;
 }
@@ -29,7 +34,7 @@ div.map-text {
 }
 
 div.map-text:hover {
-    color: #0099ff;
+    color: #32608C;
 }
 
 div.map-title {
@@ -60,15 +65,21 @@ div.target-title {
     text-align: right;
 }
 
-.modal-item-input {
-
-}
-
 .modal-item-text {
     height: 100px;
     width: 65%;
     resize: none;
     vertical-align: top;
+}
+
+button.button-primary {
+    background-color: #9A070B;
+    border-color: #9A070B;
+}
+
+button.button-primary:hover {
+    background-color: #B91C20;
+    border-color: #B91C20;
 }
 
 img.modal-image {
