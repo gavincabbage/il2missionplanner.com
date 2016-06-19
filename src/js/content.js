@@ -157,7 +157,6 @@ module.exports = (function() {
         titleText: 'Il-2 Mission Planner',
         helpTooltip: 'How to use this tool',
         clearTooltip: 'Clear the map',
-        mapSelectTooltip: 'Select game map',
         exportTooltip: 'Export mission plan',
         importTooltip: 'Import mission plan',
         gridHopTooltip: 'Jump to grid',
@@ -168,7 +167,6 @@ module.exports = (function() {
         confirmClearModalTemplate: fs.readFileSync('src/html/confirmClearModal.html', 'utf8'),
         helpModalTemplate: fs.readFileSync('src/html/helpModal.html', 'utf8'),
         pointModalTemplate: fs.readFileSync('src/html/pointModal.html', 'utf8'),
-        mapSelectModalTemplate: fs.readFileSync('src/html/mapSelectModal.html', 'utf8'),
         importModalTemplate: fs.readFileSync('src/html/importModal.html', 'utf8'),
         gridJumpModalTemplate: fs.readFileSync('src/html/gridJumpModal.html', 'utf8'),
         settingsModalTemplate: fs.readFileSync('src/html/settingsModal.html', 'utf8')

@@ -3,6 +3,16 @@ body {
     margin: 0;
 }
 
+fieldset {
+    border: 1px solid #D1D1D1;
+    border-radius: 4px;
+}
+
+fieldset, legend {
+    margin-left: 2%;
+    margin-bottom: 3%;
+}
+
 html, body, #map {
     font-family: 'Courier New', Courier, monospace;
     font-weight: 400;
@@ -11,6 +21,10 @@ html, body, #map {
 
 html, body, h2 {
     font-weight: 400;
+}
+
+span.modal-icon {
+    font-size: 0.8em;
 }
 
 div.title-control {
@@ -29,12 +43,25 @@ div.map-text {
     height: unset !important;
     width: unset !important;
     color: #ffffff;
-    background: rgba(54, 25, 25, .5);
+    background: rgba(100, 100, 100, .5);
     padding: 0 5px;
 }
 
-div.map-text:hover {
-    color: #10306A;
+div.map-text.inverted {
+    color: #000000;
+}
+
+div.map-text:hover,
+div.map-text.inverted:hover {
+    color: #1B4FB1;
+}
+
+div.map-text.nobg {
+    background: unset !important;
+}
+
+div.button-row {
+    margin-top: 5%;
 }
 
 div.map-title {
@@ -53,38 +80,53 @@ div.target-title {
     font-size: 1.3em;
 }
 
-.modal-item {
+h3.help-header {
+    font-size: 2.0rem;
+    text-align: right;
+}
+
+.half-width {
+    width: 50%;
+}
+
+.bold {
+    font-weight: 700;
+}
+
+/*.modal-item {
     width: 100%;
     padding-bottom: 10px;
 }
 
 .modal-item-label {
     display: inline-block;
-    width: 20%;
-    padding-right: 5%;
     text-align: right;
 }
 
 .modal-item-text {
     height: 100px;
-    width: 65%;
     resize: none;
     vertical-align: top;
-}
+}*/
 
 button.button-primary {
     background-color: #9A070B;
     border-color: #9A070B;
 }
 
-button.button-primary:hover {
-    background-color: #B91C20;
-    border-color: #B91C20;
+button.button-primary:hover,
+button.button-primary:focus {
+    background-color: #DB0A11;
+    border-color: #DB0A11;
 }
 
 img.modal-image {
     max-height: 100%;
     max-width: 100% !important;
+}
+
+#point-type-select {
+    margin-left: 0%;
 }
 
 @media(max-width: 1600px) {

@@ -27,6 +27,11 @@
     var selectedMapIndex = mapConfig.selectIndex;
     var isEmpty = true;
 
+    var state = {
+        colorsInverted: false,
+        showBackground: true
+    };
+
     // PATCHING
 
     // Patch a leaflet bug, see https://github.com/bbecquet/Leaflet.PolylineDecorator/issues/17
@@ -62,8 +67,10 @@
             template: content.flightLegModalTemplate,
             zIndex: 10000,
             onShow: function(e) {
+                var element = document.getElementById('flight-leg-speed');
+                element.focus();
                 L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
-                    var newSpeed = parseInt(document.getElementById('flight-leg-speed').value);
+                    var newSpeed = parseInt(element.value);
                     parentRoute.speeds[marker.index] = newSpeed;
                     marker.options.speed = newSpeed;
                     applyCustomFlightLegCallback(marker);
@@ -80,7 +87,7 @@
         marker.options.time = util.formatTime(calc.time(marker.options.speed, marker.options.distance));
         var newContent = util.formatFlightLegMarker(
                 marker.options.distance, marker.options.heading, marker.options.speed, marker.options.time);
-        marker.setIcon(icons.textIconFactory(newContent, 'flight-leg map-text'));
+        marker.setIcon(icons.textIconFactory(newContent, 'flight-leg ' + getMapTextClasses(state)));
     }
 
     function applyFlightPlanCallback(route) {
@@ -108,7 +115,7 @@
                 heading: heading,
                 time: time,
                 speed: route.speeds[i],
-                icon: icons.textIconFactory(markerContent, 'flight-leg map-text')
+                icon: icons.textIconFactory(markerContent, 'flight-leg ' + getMapTextClasses(state))
             });
             marker.parentId = id;
             marker.index = i;
@@ -128,7 +135,7 @@
         var nameCoords = L.latLng(coords[0].lat, coords[0].lng);
         var nameMarker = L.marker(nameCoords, {
             draggable: false,
-            icon: icons.textIconFactory(route.name, 'map-title flight-title map-text')
+            icon: icons.textIconFactory(route.name, 'map-title flight-titles ' + getMapTextClasses(state))
         });
         nameMarker.parentId = id;
         nameMarker.on('click', function() {
@@ -139,8 +146,10 @@
     }
 
     function applyFlightPlan(route) {
+        var newFlight = false;
         if (typeof route.speed === 'undefined') {
             route.speed = DEFAULT_SPEED;
+            newFlight = true;
         }
         if (typeof route.name === 'undefined') {
             route.name = 'New Flight';
@@ -153,6 +162,8 @@
             template: content.flightModalTemplate,
             zIndex: 10000,
             onShow: function(e) {
+                var element = document.getElementById('flight-name');
+                element.focus();
                 L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
                     clickedOk = true;
                     e.modal.hide();
@@ -162,7 +173,7 @@
                 });
             },
             onHide: function(e) {
-                if (clickedOk) {
+                if (clickedOk || !newFlight) {
                     route.name = document.getElementById('flight-name').value;
                     route.speed = parseInt(document.getElementById('flight-speed').value);
                     route.speedDirty = (route.speed !== initialSpeed);
@@ -181,7 +192,7 @@
         var nameCoords = L.latLng(coords.lat, coords.lng);
         var nameMarker = L.marker(nameCoords, {
             draggable: false,
-            icon: icons.textIconFactory(target.name, 'map-title target-title map-text')
+            icon: icons.textIconFactory(target.name, 'map-title target-title ' + getMapTextClasses(state))
         });
         nameMarker.parentId = id;
         nameMarker.on('click', function() {
@@ -197,8 +208,10 @@
     }
 
     function applyTargetInfo(target) {
+        var newTarget = false;
         if (typeof target.name === 'undefined') {
             target.name = 'New Target';
+            var newTarget = true;
         }
         if (typeof target.notes === 'undefined') {
             target.notes = '';
@@ -210,6 +223,8 @@
             template: content.pointModalTemplate,
             zIndex: 10000,
             onShow: function(e) {
+                var element = document.getElementById('target-name');
+                element.focus();
                 L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
                     clickedOk = true;
                     e.modal.hide();
@@ -219,7 +234,7 @@
                 });
             },
             onHide: function(e) {
-                if (clickedOk) {
+                if (clickedOk || !newTarget) {
                     target.name = document.getElementById('target-name').value;
                     target.notes = document.getElementById('target-notes').value;
                     applyTargetInfoCallback(target);
@@ -332,6 +347,19 @@
         map.fitBounds(drawnItems.getBounds());
     }
 
+    function getMapTextClasses(state) {
+        console.log('in it');
+        var classes = 'map-text';
+        if (state.colorsInverted) {
+            classes += ' inverted';
+        }
+        if (!state.showBackground) {
+            classes += ' nobg';
+        }
+        console.log(classes);
+        return classes;
+    }
+
     // MAP SETUP
 
     map = L.map('map', {
@@ -355,37 +383,6 @@
     hiddenLayers = L.featureGroup();
 
     // BUTTONS
-
-    var mapSelectToolbar= new L.Control.CustomToolbar({
-        position: 'topleft',
-        buttons: [
-            {
-                id: 'map-select-button',
-                icon: 'fa-map',
-                tooltip: content.mapSelectTooltip,
-                clickFn: function() {
-                    map.openModal({
-                        template: content.mapSelectModalTemplate,
-                        onShow: function(e) {
-                            var selectElement = document.getElementById('map-select');
-                            selectElement.selectedIndex = selectedMapIndex;
-                            L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
-                                selectedMapIndex = selectElement.selectedIndex;
-                                var selectedMap = selectElement.options[selectedMapIndex].value;
-                                mapConfig = content.maps[selectedMap];
-                                selectMap(mapConfig);
-                                e.modal.hide();
-                            });
-                            L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
-                                e.modal.hide();
-                            });
-                        }
-                    });
-                }
-            }
-        ]
-    });
-    map.addControl(mapSelectToolbar);
 
     var drawControl = new L.Control.Draw({
         draw: {
@@ -427,6 +424,8 @@
                         map.openModal({
                             template: content.confirmClearModalTemplate,
                             onShow: function(e) {
+                                var element = document.getElementById('confirm-cancel-button');
+                                element.focus();
                                 L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
                                     clearMap();
                                     e.modal.hide();
@@ -457,7 +456,44 @@
                     map.openModal({
                         template: content.settingsModalTemplate,
                         onShow: function(e) {
+                            var mapSelect = document.getElementById('map-select');
+                            mapSelect.selectedIndex = selectedMapIndex;
+                            var originalIndex = selectedMapIndex;
+                            var invertCheckbox = document.getElementById('invert-text-checkbox');
+                            invertCheckbox.checked = state.colorsInverted;
+                            var backgroundCheckbox = document.getElementById('text-background-checkbox');
+                            backgroundCheckbox.checked = state.showBackground;
+                            mapSelect.focus();
                             L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
+                                if (mapSelect.selectedIndex !== originalIndex) {
+                                    selectedMapIndex = mapSelect.selectedIndex;
+                                    var selectedMap = mapSelect.options[selectedMapIndex].value;
+                                    mapConfig = content.maps[selectedMap];
+                                    selectMap(mapConfig);
+                                }
+                                if (invertCheckbox.checked !== state.colorsInverted) {
+                                    state.colorsInverted = invertCheckbox.checked;
+                                    var textElements = document.getElementsByClassName('map-text');
+                                    console.log(textElements);
+                                    for (var i = 0; i < textElements.length; i++) {
+                                        if (state.colorsInverted) {
+                                            textElements[i].classList.add('inverted');
+                                        } else {
+                                            textElements[i].classList.remove('inverted');
+                                        }
+                                    }
+                                }
+                                if (backgroundCheckbox.checked !== state.showBackground) {
+                                    state.showBackground = backgroundCheckbox.checked;
+                                    var textElements = document.getElementsByClassName('map-text');
+                                    for (var i = 0; i < textElements.length; i++) {
+                                        if (state.showBackground) {
+                                            textElements[i].classList.remove('nobg');
+                                        } else {
+                                            textElements[i].classList.add('nobg');
+                                        }
+                                    }
+                                }
                                 e.modal.hide();
                             });
                             L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
@@ -474,8 +510,6 @@
                 clickFn: function() {
                     map.openModal({
                         template: content.helpModalTemplate,
-                        cancelCls: 'modal-cancel',
-                        cancelText: 'Close',
                         onShow: function(e) {
                             L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
                                 e.modal.hide();
@@ -500,6 +534,7 @@
                         template: content.importModalTemplate,
                         onShow: function(e) {
                             var importInput = document.getElementById('import-file');
+                            importInput.focus();
                             var fileContent;
                             L.DomEvent.on(importInput, 'change', function(evt) {
                                 var reader = new window.FileReader();

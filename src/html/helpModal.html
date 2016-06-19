@@ -1,13 +1,77 @@
 <div id="help-modal" class="container">
     <div class="row">
-        <h2>Tips &amp; Tricks</h2>
+        <h2><span class='fa fa-question modal-icon'></span> Help</h2>
+    </div>
+    <!-- <div class="row">
+        <img class="modal-image" src="img/help.png" height="480"></img>
+    </div> -->
+    <div class="row">
+        <h3 class="help-header">Map your flight plan</h3>
     </div>
     <div class="row">
-        <img class="modal-image" src="img/help.png" height="480"></img>
+        <p>
+            Use the <span class="bold">flight mapping tool</span> <span class='fa fa-plane'></span>
+            to plan your flight, one leg at a time. After naming your flight and giving it a default speed,
+            you can edit the speed of a particular leg by clicking on it's info.
+        </p>
+    </div>
+    <div class="row">
+        <p>
+            Use the <span class="bold">point mapping tool</span> <span class='fa fa-map-marker'></span>
+            to mark a point of interest, such as a target, airfield or ground position. Hover over points
+            to view their notes.
+        </p>
+    </div>
+    <div class="row">
+        <p>
+            After placement, use the <span class="bold">edit button</span> <span class='fa fa-edit'></span>
+            to move and change elements on the map. Use the <span class="bold">delete button</span>
+            <span class='fa fa-eraser'></span> to remove specific elements, and clear the entire map
+            with the <span class="bold">clear button</span> <span class='fa fa-trash'></span>.
+        </p>
+    </div>
+    <div class="row">
+        <h3 class="help-header">Navigate the map</h3>
+    </div>
+    <div class="row">
+        <p>
+            Use the <span class="bold">jump to grid tool</span> <span class='fa fa-th-large'></span>
+            to jump to a specific, four digit grid number on the map.
+        </p>
+    </div>
+    <div class="row">
+        <p>
+            Use the <span class="bold">crop tool</span> <span class='fa fa-crop'></span>
+            to fit the current flight plan in the window.
+        </p>
+    </div>
+    <div class="row">
+        <h3 class="help-header">Share mission plans</h3>
+    </div>
+    <div class="row">
+        <p>
+            Use the <span class="bold">export tool</span> <span class='fa fa-download'></span>
+            to download a save file of the current mission plan.
+        </p>
+    </div>
+    <div class="row">
+        <p>
+            Use the <span class="bold">import tool</span> <span class='fa fa-upload'></span>
+            to load a mission plan from a save file.
+        </p>
+    </div>
+    <div class="row">
+        <h3 class="help-header">Configure the map</h3>
+    </div>
+    <div class="row">
+        <p>
+            Access the <span class="bold">settings</span> <span class='fa fa-gear'></span>
+            to change the map and alter the style of the map text.
+        </p>
     </div>
     <form onsubmit="return false;">
-        <div class="row">
-            <button class="modal-ok button-primary" type="submit">Done</button>
+        <div class="row buttom-row">
+            <button id="help-done-button" class="modal-ok button-primary" type="submit">Done</button>
         </div>
     </form>
 </div>

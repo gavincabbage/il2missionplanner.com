@@ -1,9 +1,42 @@
-<div id="import-modal" class="container">
+<div id="settings-modal" class="container">
     <div class="row">
-        <h2>Settings</h2>
+        <h2><span class='fa fa-gear modal-icon'></span> Settings</h2>
     </div>
-    <form onsubmit="return false;">
-        <div class="row">
+    <form id="settings-form" onsubmit="return false;">
+        <fieldset>
+            <legend>Select Map</legend>
+            <div class="row">
+                <div class="one column"></div>
+                <select class="eleven columns" id="map-select">
+                    <option value="stalingrad">Stalingrad</option>
+                    <option value="moscow">Moscow</option>
+                    <option value="luki">Velikie Luki</option>
+                </select>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Map Text</legend>
+            <div class="row">
+                <div class="one column"></div>
+                <div class="three columns">
+                    <label class="" for="invertText">Dark</label>
+                </div>
+                <div class="eight columns">
+                    <input id="invert-text-checkbox" type="checkbox" name="invertText">
+                </div>
+            </div>
+            <div class="row">
+                <div class="one column"></div>
+                <div class="three columns">
+                    <label class="" for="showBackground">Background</label>
+                </div>
+                <div class="eight columns">
+                    <input id="text-background-checkbox" type="checkbox" name="showBackground" value="inverted">
+                </div>
+            </div>
+        </fieldset>
+        <div class="row button-row">
             <button class="modal-ok button-primary" type="submit">Okay</button>
             <button class="modal-cancel">Cancel</button>
         </div>
