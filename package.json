@@ -35,7 +35,7 @@
     "browserify": "browserify -t brfs src/js/index.js -o dist/index.tmp.js",
     "browserify:dev": "browserify -t brfs src/js/index.js -o dist/index.js -d",
     "copy:vendor": "cp -R src/vendor dist/vendor",
-    "copy:img": "cp -R src/img/dist dist/img",
+    "copy:img": "mkdir -p dist/img; cp src/img/dist/* dist/img/",
     "copy:html": "cp src/index.html dist/index.html",
     "copy": "mkdir -p dist && npm run copy:vendor && npm run copy:img && npm run copy:html",
     "dist:js:dev": "npm run lint && npm test && npm run browserify:dev",

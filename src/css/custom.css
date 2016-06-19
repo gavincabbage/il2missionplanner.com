@@ -76,7 +76,7 @@ div.flight-title {
 }
 
 div.target-title {
-    margin: unset !important;
+    margin-left: 18px !important;
     font-size: 1.3em;
 }
 
