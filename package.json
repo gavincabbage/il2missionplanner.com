@@ -35,7 +35,7 @@
     "browserify": "browserify -t brfs src/js/index.js -o dist/index.tmp.js",
     "browserify:dev": "browserify -t brfs src/js/index.js -o dist/index.js -d",
     "copy:vendor": "cp -R src/vendor dist/vendor",
-    "copy:img": "cp -R src/img dist/img",
+    "copy:img": "cp -R src/img/dist dist/img",
     "copy:html": "cp src/index.html dist/index.html",
     "copy": "mkdir -p dist && npm run copy:vendor && npm run copy:img && npm run copy:html",
     "dist:js:dev": "npm run lint && npm test && npm run browserify:dev",
@@ -46,7 +46,8 @@
     "watch:index": "watch-run -p 'src/index.html' npm run copy:html",
     "watch:js": "watch-run -p 'src/js/**/*.js' npm run dist:js:dev",
     "watch:html": "watch-run -p 'src/html/**/*.html' npm run dist:js:dev",
-    "develop": "npm run clean && npm run dist:dev && concurrently \"npm run watch:css\" \"npm run watch:index\" \"npm run watch:js\"  \"npm run watch:html\" \"npm run reload\"",
+    "watch:img": "watch-run -p 'src/img/dist/*' npm run copy:img",
+    "develop": "npm run clean && npm run dist:dev && concurrently \"npm run watch:css\" \"npm run watch:index\" \"npm run watch:js\"  \"npm run watch:html\" \"npm run watch:img\" \"npm run reload\"",
     "dist:css": "cleancss -o dist/index.css src/css/index.css",
     "nodist": "npm run lint && npm test",
     "reload": "livereload ./dist/"

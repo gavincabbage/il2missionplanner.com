@@ -1,11 +1,11 @@
 module.exports = function(leaflet) {
-    
+
     return {
-        factory: function() {
+        factory: function(type) {
+            var imgUrl = 'img/' + type + '.png';
             return leaflet.icon({
-                iconUrl: 'img/explosion.png',
-                iconSize: [30, 30],
-                iconAnchor: [15, 25]
+                iconUrl: imgUrl,
+                iconSize: [30, 30]
             });
         },
         textIconFactory: function(text, classes) {

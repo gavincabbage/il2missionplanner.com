@@ -19,7 +19,8 @@
             color: RED,
             weight: 2,
             opacity: FLIGHT_OPACITY
-        }
+        },
+        DEFAULT_POINT_TYPE = 'generic'
     ;
 
     var map, mapTiles, mapConfig, drawnItems, hiddenLayers;
@@ -189,6 +190,7 @@
     function applyTargetInfoCallback(target) {
         var id = target._leaflet_id;
         var coords = target.getLatLng();
+        target.setIcon(icons.factory(target.type));
         var nameCoords = L.latLng(coords.lat, coords.lng);
         var nameMarker = L.marker(nameCoords, {
             draggable: false,
@@ -216,6 +218,9 @@
         if (typeof target.notes === 'undefined') {
             target.notes = '';
         }
+        if (typeof target.type === 'undefined') {
+            target.type = DEFAULT_POINT_TYPE;
+        }
         var clickedOk = false;
         map.openModal({
             name: target.name,
@@ -225,6 +230,8 @@
             onShow: function(e) {
                 var element = document.getElementById('target-name');
                 element.focus();
+                var typeSelect = document.getElementById('point-type-select');
+                typeSelect.value = target.type;
                 L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
                     clickedOk = true;
                     e.modal.hide();
@@ -237,6 +244,7 @@
                 if (clickedOk || !newTarget) {
                     target.name = document.getElementById('target-name').value;
                     target.notes = document.getElementById('target-notes').value;
+                    target.type = document.getElementById('point-type-select').value;
                     applyTargetInfoCallback(target);
                 } else {
                     drawnItems.removeLayer(target);
@@ -323,6 +331,7 @@
             } else if (util.isMarker(layer)) {
                 saveLayer.latLng = layer.getLatLng();
                 saveLayer.name = layer.name;
+                saveLayer.type = layer.type;
                 saveLayer.notes = layer.notes;
                 saveData.points.push(saveLayer);
             }
@@ -348,7 +357,6 @@
     }
 
     function getMapTextClasses(state) {
-        console.log('in it');
         var classes = 'map-text';
         if (state.colorsInverted) {
             classes += ' inverted';
@@ -356,7 +364,6 @@
         if (!state.showBackground) {
             classes += ' nobg';
         }
-        console.log(classes);
         return classes;
     }
 
@@ -394,7 +401,7 @@
                 shapeOptions: LINE_OPTIONS
             },
             marker: {
-                icon: icons.factory()
+                icon: icons.factory(DEFAULT_POINT_TYPE)
             }
         },
         edit: {
@@ -474,7 +481,6 @@
                                 if (invertCheckbox.checked !== state.colorsInverted) {
                                     state.colorsInverted = invertCheckbox.checked;
                                     var textElements = document.getElementsByClassName('map-text');
-                                    console.log(textElements);
                                     for (var i = 0; i < textElements.length; i++) {
                                         if (state.colorsInverted) {
                                             textElements[i].classList.add('inverted');
@@ -570,6 +576,7 @@
                                         icon: icons.factory()
                                     });
                                     newPoint.name = point.name;
+                                    newPoint.type = point.type;
                                     newPoint.notes = point.notes;
                                     drawnItems.addLayer(newPoint);
                                     applyTargetInfoCallback(newPoint);
