@@ -20,7 +20,8 @@
             weight: 2,
             opacity: FLIGHT_OPACITY
         },
-        DEFAULT_POINT_TYPE = 'generic'
+        DEFAULT_POINT_TYPE = 'marker',
+        DEFAULT_POINT_COLOR = 'black'
     ;
 
     var map, mapTiles, mapConfig, drawnItems, hiddenLayers;
@@ -70,6 +71,7 @@
             onShow: function(e) {
                 var element = document.getElementById('flight-leg-speed');
                 element.focus();
+                element.select();
                 L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
                     var newSpeed = parseInt(element.value);
                     parentRoute.speeds[marker.index] = newSpeed;
@@ -165,6 +167,7 @@
             onShow: function(e) {
                 var element = document.getElementById('flight-name');
                 element.focus();
+                element.select();
                 L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
                     clickedOk = true;
                     e.modal.hide();
@@ -190,7 +193,7 @@
     function applyTargetInfoCallback(target) {
         var id = target._leaflet_id;
         var coords = target.getLatLng();
-        target.setIcon(icons.factory(target.type));
+        target.setIcon(icons.factory(target.type, target.color));
         var nameCoords = L.latLng(coords.lat, coords.lng);
         var nameMarker = L.marker(nameCoords, {
             draggable: false,
@@ -221,6 +224,9 @@
         if (typeof target.type === 'undefined') {
             target.type = DEFAULT_POINT_TYPE;
         }
+        if (typeof target.color === 'undefined') {
+            target.color = DEFAULT_POINT_COLOR;
+        }
         var clickedOk = false;
         map.openModal({
             name: target.name,
@@ -230,8 +236,11 @@
             onShow: function(e) {
                 var element = document.getElementById('target-name');
                 element.focus();
+                element.select();
                 var typeSelect = document.getElementById('point-type-select');
                 typeSelect.value = target.type;
+                var colorSelect = document.getElementById('point-color-select');
+                colorSelect.value = target.color;
                 L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
                     clickedOk = true;
                     e.modal.hide();
@@ -245,6 +254,7 @@
                     target.name = document.getElementById('target-name').value;
                     target.notes = document.getElementById('target-notes').value;
                     target.type = document.getElementById('point-type-select').value;
+                    target.color = document.getElementById('point-color-select').value;
                     applyTargetInfoCallback(target);
                 } else {
                     drawnItems.removeLayer(target);
@@ -332,6 +342,7 @@
                 saveLayer.latLng = layer.getLatLng();
                 saveLayer.name = layer.name;
                 saveLayer.type = layer.type;
+                saveLayer.color = layer.color;
                 saveLayer.notes = layer.notes;
                 saveData.points.push(saveLayer);
             }
@@ -401,7 +412,7 @@
                 shapeOptions: LINE_OPTIONS
             },
             marker: {
-                icon: icons.factory(DEFAULT_POINT_TYPE)
+                icon: icons.factory(DEFAULT_POINT_TYPE, DEFAULT_POINT_COLOR)
             }
         },
         edit: {
@@ -573,10 +584,11 @@
                                 for (var i = 0; i < saveData.points.length; i++) {
                                     var point = saveData.points[i];
                                     var newPoint = L.marker(point.latLng, {
-                                        icon: icons.factory()
+                                        icon: icons.factory(point.type, point.color)
                                     });
                                     newPoint.name = point.name;
                                     newPoint.type = point.type;
+                                    newPoint.color = point.color;
                                     newPoint.notes = point.notes;
                                     drawnItems.addLayer(newPoint);
                                     applyTargetInfoCallback(newPoint);
