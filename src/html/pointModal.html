@@ -1,0 +1,41 @@
+<div id="target-modal" class="container">
+    <div class="row">
+        <h2><span class='fa fa-map-marker modal-icon'></span> Point of Interest</h2>
+    </div>
+    <form onsubmit="return false;">
+        <div class="row">
+            <label class="" for="target-name">Name</label>
+            <input id="target-name" class="half-width" value="{name}" placeholder="name"></input>
+        </div>
+        <div class="row">
+            <label for="point-type-select">Type</label>
+            <select class="u-full-width" id="point-type-select">
+                <option value="marker">Marker</option>
+                <option value="target">Target</option>
+                <option value="bomb-target">Bombing Target</option>
+                <option value="combat">Combat</option>
+                <option value="ground-combat">Ground Combat</option>
+                <option value="takeoff">Takeoff</option>
+                <option value="landing">Landing</option>
+                <option value="base">Base</option>
+                <option value="plane">Aircraft</option>
+            </select>
+        </div>
+        <div class="row">
+            <label for="point-color-select">Color</label>
+            <select class="u-full-width" id="point-color-select">
+                <option value="black">Black</option>
+                <option value="red">Red</option>
+                <option value="blue">Blue</option>
+            </select>
+        </div>
+        <div class="row">
+            <label class="" for="target-notes">Notes</label>
+            <textarea id="target-notes" class="u-full-width" value="{notes}">{notes}</textarea>
+        </div>
+        <div class="row buttom-row">
+            <button class="modal-ok button-primary" type="submit">Okay</button>
+            <button class="modal-cancel" type="button">Cancel</button>
+        </div>
+    </form>
+</div>
