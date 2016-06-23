@@ -11,21 +11,21 @@
 }
 
 .leaflet-draw-draw-polyline:before {
-    content: "\f072";
+    content: "\f072"; /* fa-plane */
     font-family: FontAwesome;
 }
 
 .leaflet-draw-draw-marker:before {
-    content: "\f05b"; /* fa-crosshairs */
+    content: "\f041"; /* fa-map-marker */
     font-family: FontAwesome;
 }
 
 .leaflet-draw-edit-edit:before {
-    content: "\f044";
+    content: "\f044"; /* fa-edit */
     font-family: FontAwesome;
 }
 
 .leaflet-draw-edit-remove:before {
-    content: "\f12d";
+    content: "\f12d"; /* fa-eraser */
     font-family: FontAwesome;
 }

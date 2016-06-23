@@ -47,8 +47,8 @@ describe('util', function() {
         });
 
         var mockMaps = {
-            test: {
-                hash: '#test',
+            stalingrad: {
+                hash: '#stalingrad',
                 selectIndex: 0
             },
             other: {
@@ -59,8 +59,8 @@ describe('util', function() {
 
         var tests = [
             {
-                given: '#test',
-                expected: 'test'
+                given: '#stalingrad',
+                expected: 'stalingrad'
             },
             {
                 given: '#other',
@@ -68,7 +68,7 @@ describe('util', function() {
             },
             {
                 given: '#none',
-                expected: 'test'
+                expected: 'stalingrad'
             }
         ]
 

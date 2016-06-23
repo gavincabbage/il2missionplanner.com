@@ -17,7 +17,7 @@
         }
     });
 
-    L.Control.CustomButton = L.Control.extend({
+    L.Control.CustomToolbar = L.Control.extend({
 
         options: {
             position: 'bottomleft'
@@ -31,10 +31,12 @@
             L.DomEvent.stop(e);
             var container = L.DomUtil.create('div', 'leaflet-bar');
             L.DomEvent.disableClickPropagation(container);
-            var link = L.DomUtil.create('a', 'fa '+this.options.icon, container);
-            container.title = this.options.tooltip;
-            link.id = this.options.id;
-            link.addEventListener('click', this.options.clickFn);
+            for (var i = 0; i < this.options.buttons.length; i++) {
+                var link = L.DomUtil.create('a', 'fa '+this.options.buttons[i].icon, container);
+                link.title = this.options.buttons[i].tooltip;
+                link.id = this.options.buttons[i].id;
+                link.addEventListener('click', this.options.buttons[i].clickFn);
+            }
             return container;
         }
     });

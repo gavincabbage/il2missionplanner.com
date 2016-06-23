@@ -3,6 +3,7 @@ src/vendor/bower_components/
 node_modules/
 clipboard.js
 dist/
+!src/img/dist/
 npm-debug.log*
 coverage/
 sandbox/

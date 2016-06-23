@@ -1,14 +1,5 @@
 (function() {
 
-    /* CLEANUP NOTES
-
-    Going to be quite the process...
-
-    Next: Put map setup and last line into a main function, then organize controls
-
-    */
-
-
     // IMPORTS
 
     var content = require('./content.js');
@@ -21,19 +12,27 @@
 
     const
         SAVE_HEADER = 'data:text/json;charset=utf-8,',
-        RED = '#ff0000',
+        RED = '#9A070B',
         DEFAULT_SPEED = 300,
         FLIGHT_OPACITY = 0.8,
         LINE_OPTIONS = {
             color: RED,
             weight: 2,
             opacity: FLIGHT_OPACITY
-        }
+        },
+        DEFAULT_POINT_TYPE = 'marker',
+        DEFAULT_POINT_COLOR = 'black'
     ;
 
     var map, mapTiles, mapConfig, drawnItems, hiddenLayers;
     var mapConfig = util.getSelectedMapConfig(window.location.hash, content.maps);
     var selectedMapIndex = mapConfig.selectIndex;
+    var isEmpty = true;
+
+    var state = {
+        colorsInverted: false,
+        showBackground: true
+    };
 
     // PATCHING
 
@@ -66,21 +65,23 @@
     function applyCustomFlightLeg(marker) {
         var parentRoute = drawnItems.getLayer(marker.parentId);
         map.openModal({
-            okCls: 'modal-ok',
-            okText: 'Done',
             speed: parentRoute.speeds[marker.index],
             template: content.flightLegModalTemplate,
             zIndex: 10000,
             onShow: function(e) {
+                var element = document.getElementById('flight-leg-speed');
+                element.focus();
+                element.select();
                 L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
+                    var newSpeed = parseInt(element.value);
+                    parentRoute.speeds[marker.index] = newSpeed;
+                    marker.options.speed = newSpeed;
+                    applyCustomFlightLegCallback(marker);
                     e.modal.hide();
                 });
-            },
-            onHide: function(e) {
-                var newSpeed = parseInt(document.getElementById('flight-leg-speed').value);
-                parentRoute.speeds[marker.index] = newSpeed;
-                marker.options.speed = newSpeed;
-                applyCustomFlightLegCallback(marker);
+                L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
+                    e.modal.hide();
+                });
             }
         });
     }
@@ -89,7 +90,7 @@
         marker.options.time = util.formatTime(calc.time(marker.options.speed, marker.options.distance));
         var newContent = util.formatFlightLegMarker(
                 marker.options.distance, marker.options.heading, marker.options.speed, marker.options.time);
-        marker.setIcon(icons.textIconFactory(newContent, 'flight-leg map-text'));
+        marker.setIcon(icons.textIconFactory(newContent, 'flight-leg ' + getMapTextClasses(state)));
     }
 
     function applyFlightPlanCallback(route) {
@@ -117,7 +118,7 @@
                 heading: heading,
                 time: time,
                 speed: route.speeds[i],
-                icon: icons.textIconFactory(markerContent, 'flight-leg map-text')
+                icon: icons.textIconFactory(markerContent, 'flight-leg ' + getMapTextClasses(state))
             });
             marker.parentId = id;
             marker.index = i;
@@ -137,7 +138,7 @@
         var nameCoords = L.latLng(coords[0].lat, coords[0].lng);
         var nameMarker = L.marker(nameCoords, {
             draggable: false,
-            icon: icons.textIconFactory(route.name, 'map-title flight-title map-text')
+            icon: icons.textIconFactory(route.name, 'map-title flight-titles ' + getMapTextClasses(state))
         });
         nameMarker.parentId = id;
         nameMarker.on('click', function() {
@@ -148,30 +149,43 @@
     }
 
     function applyFlightPlan(route) {
+        var newFlight = false;
         if (typeof route.speed === 'undefined') {
             route.speed = DEFAULT_SPEED;
+            newFlight = true;
         }
         if (typeof route.name === 'undefined') {
             route.name = 'New Flight';
         }
         var initialSpeed = route.speed;
+        var clickedOk = false;
         map.openModal({
-            okCls: 'modal-ok',
-            okText: 'Done',
             speed: route.speed,
             name: route.name,
             template: content.flightModalTemplate,
             zIndex: 10000,
             onShow: function(e) {
+                var element = document.getElementById('flight-name');
+                element.focus();
+                element.select();
                 L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
+                    clickedOk = true;
+                    e.modal.hide();
+                });
+                L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
                     e.modal.hide();
                 });
             },
             onHide: function(e) {
-                route.name = document.getElementById('flight-name').value;
-                route.speed = parseInt(document.getElementById('flight-speed').value);
-                route.speedDirty = (route.speed !== initialSpeed);
-                applyFlightPlanCallback(route);
+                if (clickedOk || !newFlight) {
+                    route.name = document.getElementById('flight-name').value;
+                    route.speed = parseInt(document.getElementById('flight-speed').value);
+                    route.speedDirty = (route.speed !== initialSpeed);
+                    applyFlightPlanCallback(route);
+                } else {
+                    drawnItems.removeLayer(route);
+                }
+                checkButtonsDisabled();
             }
         });
     }
@@ -179,10 +193,11 @@
     function applyTargetInfoCallback(target) {
         var id = target._leaflet_id;
         var coords = target.getLatLng();
+        target.setIcon(icons.factory(target.type, target.color));
         var nameCoords = L.latLng(coords.lat, coords.lng);
         var nameMarker = L.marker(nameCoords, {
             draggable: false,
-            icon: icons.textIconFactory(target.name, 'map-title target-title map-text')
+            icon: icons.textIconFactory(target.name, 'map-title target-title ' + getMapTextClasses(state))
         });
         nameMarker.parentId = id;
         nameMarker.on('click', function() {
@@ -198,29 +213,53 @@
     }
 
     function applyTargetInfo(target) {
+        var newTarget = false;
         if (typeof target.name === 'undefined') {
-            target.name = 'New Target';
+            target.name = 'New Marker';
+            var newTarget = true;
         }
         if (typeof target.notes === 'undefined') {
             target.notes = '';
         }
+        if (typeof target.type === 'undefined') {
+            target.type = DEFAULT_POINT_TYPE;
+        }
+        if (typeof target.color === 'undefined') {
+            target.color = DEFAULT_POINT_COLOR;
+        }
+        var clickedOk = false;
         map.openModal({
-            okCls: 'modal-ok',
-            okText: 'Done',
             name: target.name,
             notes: target.notes,
-            template: content.targetModalTemplate,
+            template: content.pointModalTemplate,
             zIndex: 10000,
             onShow: function(e) {
-                e.modal.target = target;
+                var element = document.getElementById('target-name');
+                element.focus();
+                element.select();
+                var typeSelect = document.getElementById('point-type-select');
+                typeSelect.value = target.type;
+                var colorSelect = document.getElementById('point-color-select');
+                colorSelect.value = target.color;
                 L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
+                    clickedOk = true;
+                    e.modal.hide();
+                });
+                L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
                     e.modal.hide();
                 });
             },
             onHide: function(e) {
-                e.modal.target.name = document.getElementById('target-name').value;
-                e.modal.target.notes = document.getElementById('target-notes').value;
-                applyTargetInfoCallback(e.modal.target);
+                if (clickedOk || !newTarget) {
+                    target.name = document.getElementById('target-name').value;
+                    target.notes = document.getElementById('target-notes').value;
+                    target.type = document.getElementById('point-type-select').value;
+                    target.color = document.getElementById('point-color-select').value;
+                    applyTargetInfoCallback(target);
+                } else {
+                    drawnItems.removeLayer(target);
+                }
+                checkButtonsDisabled();
             }
         });
     }
@@ -260,12 +299,22 @@
         transferChildLayers(map, hiddenLayers);
     }
 
-    function checkClearButtonDisabled() {
-        var element = document.getElementById('clear-button');
+    function checkButtonsDisabled() {
+        var elements = [
+            document.getElementById('clear-button'),
+            document.getElementById('export-button'),
+            document.getElementById('missionhop-button')
+        ];
         if (drawnItems.getLayers().length === 0) {
-            element.classList.add('leaflet-disabled');
+            isEmpty = true;
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].classList.add('leaflet-disabled');
+            }
         } else {
-            element.classList.remove('leaflet-disabled');
+            isEmpty = false;
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].classList.remove('leaflet-disabled');
+            }
         }
     }
 
@@ -292,11 +341,41 @@
             } else if (util.isMarker(layer)) {
                 saveLayer.latLng = layer.getLatLng();
                 saveLayer.name = layer.name;
+                saveLayer.type = layer.type;
+                saveLayer.color = layer.color;
                 saveLayer.notes = layer.notes;
                 saveData.points.push(saveLayer);
             }
         });
         return saveData;
+    }
+
+    function selectMap(mapConfig) {
+        selectedMapIndex = mapConfig.selectIndex;
+        window.location.hash = mapConfig.hash;
+        deleteAssociatedLayers(drawnItems);
+        drawnItems.clearLayers();
+        hiddenLayers.clearLayers();
+        mapTiles.setUrl(mapConfig.tileUrl);
+        map.setMaxBounds(calc.maxBounds(mapConfig));
+        map.setView(calc.center(mapConfig), 3);
+        mapTiles.redraw();
+        mapTiles.addTo(map);
+    }
+
+    function fitViewToMission() {
+        map.fitBounds(drawnItems.getBounds());
+    }
+
+    function getMapTextClasses(state) {
+        var classes = 'map-text';
+        if (state.colorsInverted) {
+            classes += ' inverted';
+        }
+        if (!state.showBackground) {
+            classes += ' nobg';
+        }
+        return classes;
     }
 
     // MAP SETUP
@@ -323,40 +402,6 @@
 
     // BUTTONS
 
-    var mapSelectButton = new L.Control.CustomButton({
-        position: 'topleft',
-        id: 'map-select-button',
-        icon: 'fa-map',
-        tooltip: content.mapSelectTooltip,
-        clickFn: function() {
-            map.openModal({
-                template: content.mapSelectTemplate,
-                okCls: 'modal-ok',
-                okText: 'Okay',
-                onShow: function(e) {
-                    var selectElement = document.getElementById('map-select');
-                    selectElement.selectedIndex = selectedMapIndex;
-                    L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
-                        selectedMapIndex = selectElement.selectedIndex;
-                        var selectedMap = selectElement.options[selectedMapIndex].value;
-                        mapConfig = content.maps[selectedMap];
-                        window.location.hash = mapConfig.hash;
-                        deleteAssociatedLayers(drawnItems);
-                        drawnItems.clearLayers();
-                        hiddenLayers.clearLayers();
-                        mapTiles.setUrl(mapConfig.tileUrl);
-                        map.setMaxBounds(calc.maxBounds(mapConfig));
-                        map.setView(calc.center(mapConfig), 3);
-                        mapTiles.redraw();
-                        mapTiles.addTo(map);
-                        e.modal.hide();
-                    });
-                }
-            });
-        }
-    });
-    map.addControl(mapSelectButton);
-
     var drawControl = new L.Control.Draw({
         draw: {
             polygon: false,
@@ -367,7 +412,7 @@
                 shapeOptions: LINE_OPTIONS
             },
             marker: {
-                icon: icons.factory()
+                icon: icons.factory(DEFAULT_POINT_TYPE, DEFAULT_POINT_COLOR)
             }
         },
         edit: {
@@ -385,170 +430,238 @@
     var titleControl = new L.Control.TitleControl({});
     map.addControl(titleControl);
 
-    var clearButton = new L.Control.CustomButton({
-        id: 'clear-button',
-        icon: 'fa-trash',
-        tooltip: content.clearTooltip,
-        clickFn: function() {
-            if (drawnItems.getLayers().length !== 0) {
-                map.openModal({
-                    template: content.confirmClearTemplate,
-                    okCls: 'modal-ok',
-                    okText: 'Yes',
-                    cancelCls: 'modal-cancel',
-                    cancelText: 'No',
-                    onShow: function(e) {
-                        L.DomEvent
-                            .on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
-                                clearMap();
-                                e.modal.hide();
-                                checkClearButtonDisabled();
-                            })
-                            .on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
-                                e.modal.hide();
-                            });
+    var clearButton = new L.Control.CustomToolbar({
+        position: 'bottomleft',
+        buttons: [
+            {
+                id: 'clear-button',
+                icon: 'fa-trash',
+                tooltip: content.clearTooltip,
+                clickFn: function() {
+                    if (!isEmpty) {
+                        map.openModal({
+                            template: content.confirmClearModalTemplate,
+                            onShow: function(e) {
+                                var element = document.getElementById('confirm-cancel-button');
+                                element.focus();
+                                L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
+                                    clearMap();
+                                    e.modal.hide();
+                                });
+                                L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
+                                    e.modal.hide();
+                                });
+                            },
+                            onHide: function() {
+                                checkButtonsDisabled();
+                            }
+                        });
                     }
-                });
+                }
             }
-        }
+        ]
     });
     map.addControl(clearButton);
 
-    var helpButton = new L.Control.CustomButton({
+    var helpSettingsToolbar = new L.Control.CustomToolbar({
         position: 'bottomright',
-        id: 'help-button',
-        icon: 'fa-question',
-        tooltip: content.helpTooltip,
-        clickFn: function() {
-            map.openModal({
-                template: content.helpTemplate,
-                cancelCls: 'modal-cancel',
-                cancelText: 'Close',
-                onShow: function(e) {
-                    L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
-                        e.modal.hide();
-                    });
-                }
-            });
-        }
-    });
-    map.addControl(helpButton);
-
-    var exportButton = new L.Control.CustomButton({
-        position: 'bottomright',
-        id: 'export-button',
-        icon: 'fa-download',
-        tooltip: content.exportTooltip,
-        clickFn: function() {
-            var saveData = exportMapState();
-            var escapedData = window.escape(JSON.stringify(saveData));
-            var formattedData = SAVE_HEADER + escapedData;
-            window.open(formattedData);
-        }
-    });
-    map.addControl(exportButton);
-
-    var importButton = new L.Control.CustomButton({
-        position: 'bottomright',
-        id: 'import-button',
-        icon: 'fa-upload',
-        tooltip: content.importTooltip,
-        clickFn: function() {
-            map.openModal({
-                template: content.importTemplate,
-                okCls: 'modal-ok',
-                okText: 'Import',
-                cancelCls: 'modal-cancel',
-                cancelText: 'Cancel',
-                onShow: function(e) {
-                    var importInput = document.getElementById('import-file');
-                    var fileContent;
-                    L.DomEvent.on(importInput, 'change', function(evt) {
-                        var reader = new window.FileReader();
-                        reader.onload = function(evt) {
-                            if(evt.target.readyState !== 2) {
-                                return;
-                            }
-                            if(evt.target.error) {
-                                window.alert('Error while reading file');
-                                return;
-                            }
-                            fileContent = evt.target.result;
-                        };
-                        reader.readAsText(evt.target.files[0]);
-                    });
-                    L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
-                        clearMap();
-                        var saveData = JSON.parse(fileContent);
-                        for (var i = 0; i < saveData.routes.length; i++) {
-                            var route = saveData.routes[i];
-                            var newRoute = L.polyline(route.latLngs, LINE_OPTIONS);
-                            newRoute.name = route.name;
-                            newRoute.speed = route.speed;
-                            newRoute.speeds = route.speeds;
-                            drawnItems.addLayer(newRoute);
-                            applyFlightPlanCallback(newRoute);
-                        }
-                        for (var i = 0; i < saveData.points.length; i++) {
-                            var point = saveData.points[i];
-                            var newPoint = L.marker(point.latLng, {
-                                icon: icons.factory()
+        buttons: [
+            {
+                id: 'settings-button',
+                icon: 'fa-gear',
+                tooltip: content.settingsTooltip,
+                clickFn: function() {
+                    map.openModal({
+                        template: content.settingsModalTemplate,
+                        onShow: function(e) {
+                            var mapSelect = document.getElementById('map-select');
+                            mapSelect.selectedIndex = selectedMapIndex;
+                            var originalIndex = selectedMapIndex;
+                            var invertCheckbox = document.getElementById('invert-text-checkbox');
+                            invertCheckbox.checked = state.colorsInverted;
+                            var backgroundCheckbox = document.getElementById('text-background-checkbox');
+                            backgroundCheckbox.checked = state.showBackground;
+                            mapSelect.focus();
+                            L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
+                                if (mapSelect.selectedIndex !== originalIndex) {
+                                    selectedMapIndex = mapSelect.selectedIndex;
+                                    var selectedMap = mapSelect.options[selectedMapIndex].value;
+                                    mapConfig = content.maps[selectedMap];
+                                    selectMap(mapConfig);
+                                }
+                                if (invertCheckbox.checked !== state.colorsInverted) {
+                                    state.colorsInverted = invertCheckbox.checked;
+                                    var textElements = document.getElementsByClassName('map-text');
+                                    for (var i = 0; i < textElements.length; i++) {
+                                        if (state.colorsInverted) {
+                                            textElements[i].classList.add('inverted');
+                                        } else {
+                                            textElements[i].classList.remove('inverted');
+                                        }
+                                    }
+                                }
+                                if (backgroundCheckbox.checked !== state.showBackground) {
+                                    state.showBackground = backgroundCheckbox.checked;
+                                    var textElements = document.getElementsByClassName('map-text');
+                                    for (var i = 0; i < textElements.length; i++) {
+                                        if (state.showBackground) {
+                                            textElements[i].classList.remove('nobg');
+                                        } else {
+                                            textElements[i].classList.add('nobg');
+                                        }
+                                    }
+                                }
+                                e.modal.hide();
                             });
-                            newPoint.name = point.name;
-                            newPoint.notes = point.notes;
-                            drawnItems.addLayer(newPoint);
-                            applyTargetInfoCallback(newPoint);
+                            L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
+                                e.modal.hide();
+                            });
                         }
-                        checkClearButtonDisabled();
-                        e.modal.hide();
-                    });
-                    L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
-                        e.modal.hide();
                     });
                 }
-            });
-        }
-    });
-    map.addControl(importButton);
-
-    var gridHopButton = new L.Control.CustomButton({
-        position: 'topleft',
-        id: 'gridhop-button',
-        icon: 'fa-th-large',
-        tooltip: content.gridHopTooltip,
-        clickFn: function() {
-            map.openModal({
-                template: content.gridHopTemplate,
-                okCls: 'modal-ok',
-                okText: 'Go',
-                cancelCls: 'modal-cancel',
-                cancelText: 'Cancel',
-                onShow: function(e) {
-                    L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
-                        var grid = document.getElementById('grid-input').value;
-                        var viewLatLng = calc.gridLatLng(grid, mapConfig);
-                        map.setView(viewLatLng, mapConfig.gridHopZoom);
-                        e.modal.hide();
-                    });
-                    L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
-                        e.modal.hide();
+            },
+            {
+                id: 'help-button',
+                icon: 'fa-question',
+                tooltip: content.helpTooltip,
+                clickFn: function() {
+                    map.openModal({
+                        template: content.helpModalTemplate,
+                        onShow: function(e) {
+                            L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
+                                e.modal.hide();
+                            });
+                        }
                     });
                 }
-            });
-        }
+            }
+        ]
     });
-    map.addControl(gridHopButton);
+    map.addControl(helpSettingsToolbar);
 
-    var missionHopButton = new L.Control.CustomButton({
-        position: 'topleft',
-        id: 'missionhop-button',
-        icon: 'fa-crop',
-        tooltip: content.missionHopTooltip,
-        clickFn: function() {
-            map.fitBounds(drawnItems.getBounds());
-        }
+    var importExportToolbar = new L.Control.CustomToolbar({
+        position: 'bottomleft',
+        buttons: [
+            {
+                id: 'import-button',
+                icon: 'fa-upload',
+                tooltip: content.importTooltip,
+                clickFn: function() {
+                    map.openModal({
+                        template: content.importModalTemplate,
+                        onShow: function(e) {
+                            var importInput = document.getElementById('import-file');
+                            importInput.focus();
+                            var fileContent;
+                            L.DomEvent.on(importInput, 'change', function(evt) {
+                                var reader = new window.FileReader();
+                                reader.onload = function(evt) {
+                                    if(evt.target.readyState !== 2) {
+                                        return;
+                                    }
+                                    if(evt.target.error) {
+                                        window.alert('Error while reading file');
+                                        return;
+                                    }
+                                    fileContent = evt.target.result;
+                                };
+                                reader.readAsText(evt.target.files[0]);
+                            });
+                            L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
+                                var saveData = JSON.parse(fileContent);
+                                var importedMapConfig = util.getSelectedMapConfig(saveData.mapHash, content.maps);
+                                window.location.hash = importedMapConfig.hash;
+                                selectMap(importedMapConfig);
+                                for (var i = 0; i < saveData.routes.length; i++) {
+                                    var route = saveData.routes[i];
+                                    var newRoute = L.polyline(route.latLngs, LINE_OPTIONS);
+                                    newRoute.name = route.name;
+                                    newRoute.speed = route.speed;
+                                    newRoute.speeds = route.speeds;
+                                    drawnItems.addLayer(newRoute);
+                                    applyFlightPlanCallback(newRoute);
+                                }
+                                for (var i = 0; i < saveData.points.length; i++) {
+                                    var point = saveData.points[i];
+                                    var newPoint = L.marker(point.latLng, {
+                                        icon: icons.factory(point.type, point.color)
+                                    });
+                                    newPoint.name = point.name;
+                                    newPoint.type = point.type;
+                                    newPoint.color = point.color;
+                                    newPoint.notes = point.notes;
+                                    drawnItems.addLayer(newPoint);
+                                    applyTargetInfoCallback(newPoint);
+                                }
+                                e.modal.hide();
+                                fitViewToMission();
+                            });
+                            L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
+                                e.modal.hide();
+                            });
+                        },
+                        onHide: function() {
+                            checkButtonsDisabled();
+                        }
+                    });
+                }
+            },
+            {
+                id: 'export-button',
+                icon: 'fa-download',
+                tooltip: content.exportTooltip,
+                clickFn: function() {
+                    if (!isEmpty) {
+                        var saveData = exportMapState();
+                        var escapedData = window.escape(JSON.stringify(saveData));
+                        var formattedData = SAVE_HEADER + escapedData;
+                        window.open(formattedData);
+                    }
+                }
+            },
+        ]
     });
-    map.addControl(missionHopButton);
+    map.addControl(importExportToolbar);
+
+    var gridToolbar = new L.Control.CustomToolbar({
+        position: 'topleft',
+        buttons: [
+            {
+                id: 'gridhop-button',
+                icon: 'fa-th-large',
+                tooltip: content.gridHopTooltip,
+                clickFn: function() {
+                    map.openModal({
+                        template: content.gridJumpModalTemplate,
+                        onShow: function(e) {
+                            var gridElement = document.getElementById('grid-input');
+                            gridElement.focus();
+                            L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
+                                var grid = gridElement.value;
+                                var viewLatLng = calc.gridLatLng(grid, mapConfig);
+                                map.setView(viewLatLng, mapConfig.gridHopZoom);
+                                e.modal.hide();
+                            });
+                            L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
+                                e.modal.hide();
+                            });
+                        }
+                    });
+                }
+            },
+            {
+                id: 'missionhop-button',
+                icon: 'fa-crop',
+                tooltip: content.missionHopTooltip,
+                clickFn: function() {
+                    if (!isEmpty) {
+                        fitViewToMission();
+                    }
+                }
+            }
+        ]
+    });
+    map.addControl(gridToolbar);
 
     // MAP.ON EVENTS
 
@@ -559,12 +672,12 @@
         } else if (e.layerType === 'marker') {
             applyTargetInfo(e.layer);
         }
-        checkClearButtonDisabled();
+        checkButtonsDisabled();
     });
 
     map.on('draw:deleted', function(e) {
         deleteAssociatedLayers(e.layers);
-        checkClearButtonDisabled();
+        checkButtonsDisabled();
     });
 
     map.on('draw:edited', function(e) {
@@ -585,6 +698,7 @@
 
     map.on('draw:editstop', function() {
         showChildLayers();
+        checkButtonsDisabled();
     });
 
     map.on('draw:deletestart', function() {
@@ -593,10 +707,11 @@
 
     map.on('draw:deletestop', function() {
         showChildLayers();
+        checkButtonsDisabled();
     });
 
     // END EVENTS
 
-    checkClearButtonDisabled();
+    checkButtonsDisabled();
 
 })();
