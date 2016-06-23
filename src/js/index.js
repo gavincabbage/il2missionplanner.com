@@ -215,7 +215,7 @@
     function applyTargetInfo(target) {
         var newTarget = false;
         if (typeof target.name === 'undefined') {
-            target.name = 'New Target';
+            target.name = 'New Marker';
             var newTarget = true;
         }
         if (typeof target.notes === 'undefined') {
