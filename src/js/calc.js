@@ -69,6 +69,10 @@ module.exports = (function() {
             var lat = mapConfig.latMax - (gridLat*gridSideLength);
             var lng = (gridLng*gridSideLength);
             return [lat, lng];
-        }
+        },
+
+        invertHeading: function(heading) {
+            return Math.abs(heading - 180);
+        },
     };
 })();

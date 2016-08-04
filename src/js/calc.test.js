@@ -284,4 +284,33 @@ describe('calc', function() {
             });
         });
     });
+
+    describe('calc.invertHeading', function() {
+
+        it('must be defined', function() {
+            assert.isDefined(calc.invertHeading);
+        });
+
+        var tests = [
+            {
+                given: 116,
+                expected: 64
+            },
+            {
+                given: 360,
+                expected: 180
+            },
+            {
+                given: 0,
+                expected: 180
+            }
+        ];
+
+        tests.forEach(function(test) {
+            it('must return '+test.expected+' given '+test.given, function() {
+                var result = calc.invertHeading(test.given);
+                assert.equal(result, test.expected);
+            });
+        });
+    });
 });

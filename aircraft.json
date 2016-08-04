@@ -1,0 +1,33 @@
+[
+    {
+        "name": "LaGG-3",
+        "faction": "VVS",
+        "nation": "Russian",
+        "game": "BOS",
+        "maxTemperatures": {
+            "water": "100",
+            "oilOutput": "115"
+        },
+        "engineSettings": {
+            "normal": {
+                "manifold": "1050",
+                "rpm": "2700",
+                "time": "unlimited"
+            },
+            "supercharger": "2500"
+        },
+        "airspeeds": {
+            "unit": "kph",
+            "takeoff": "165-200",
+            "final": "200",
+            "glideslope": "200-210",
+            "stall": "163-189",
+            "max": "505",
+            "max2000": "548",
+            "max4000": "573",
+            "maxDive": "750"
+        },
+        "maxClimb": "14.9",
+        "ceiling": "10500"
+    }
+]
