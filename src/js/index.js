@@ -697,6 +697,7 @@
     });
 
     map.on('draw:edited', function(e) {
+        console.log('DRAW - EDITED');
         deleteAssociatedLayers(e.layers);
         e.layers.eachLayer(function(layer) {
             if (util.isLine(layer)) {
@@ -709,10 +710,12 @@
     });
 
     map.on('draw:editstart', function() {
+        console.log('DRAW - EDIT START');
         hideChildLayers();
     });
 
     map.on('draw:editstop', function() {
+        console.log('DRAW - EDIT STOP');
         showChildLayers();
         checkButtonsDisabled();
     });
