@@ -106,7 +106,7 @@
             };
         }
         if (newFlight) {
-            route.on('click', routeClickHandlerFactory(route));    
+            route.on('click', routeClickHandlerFactory(route));
         }
         var id = route._leaflet_id;
         var coords = route.getLatLngs();
@@ -199,11 +199,8 @@
     }
 
     function applyTargetInfoCallback(target, newTarget) {
-        console.log('TARGET INFO CALLBACK');
         function targetClickHandlerFactory(clickedTarget) {
-            console.log('TARGET CLICK HANDLER FACTORY');
             return function() {
-                console.log('TARGET CLICK FUNCTION - ' + clickedTarget._leaflet_id);
                 deleteAssociatedLayers(L.layerGroup([clickedTarget]));
                 applyTargetInfo(clickedTarget);
             };
@@ -230,7 +227,6 @@
     }
 
     function applyTargetInfo(target) {
-        console.log('TARGET INFO');
         var newTarget = false;
         if (typeof target.name === 'undefined') {
             target.name = 'New Marker';
