@@ -115,7 +115,7 @@ describe('util', function() {
             assert.isDefined(util.formatFlightLegMarker);
         });
 
-        var expected = '[300.0km|116&deg;/064&deg;|300kph|60:00]';
+        var expected = '[300.0km|116&deg;/296&deg;|300kph|60:00]';
         var given = {
             distance: 300,
             heading: 116,

@@ -294,7 +294,7 @@ describe('calc', function() {
         var tests = [
             {
                 given: 116,
-                expected: 64
+                expected: 296
             },
             {
                 given: 360,
