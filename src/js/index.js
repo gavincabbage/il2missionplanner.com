@@ -93,7 +93,21 @@
         marker.setIcon(icons.textIconFactory(newContent, 'flight-leg ' + getMapTextClasses(state)));
     }
 
-    function applyFlightPlanCallback(route) {
+    function applyFlightPlanCallback(route, newFlight) {
+        function routeClickHandlerFactory(clickedRoute) {
+            return function() {
+                deleteAssociatedLayers(L.layerGroup([clickedRoute]));
+                applyFlightPlan(clickedRoute);
+            };
+        }
+        function markerClickHandlerFactory(clickedMarker) {
+            return function() {
+                applyCustomFlightLeg(clickedMarker);
+            };
+        }
+        if (newFlight) {
+            route.on('click', routeClickHandlerFactory(route));
+        }
         var id = route._leaflet_id;
         var coords = route.getLatLngs();
         var decorator = newFlightDecorator(route);
@@ -101,11 +115,6 @@
         decorator.addTo(map);
         if (typeof route.speeds === 'undefined' || route.speedDirty || route.wasEdited) {
             route.speeds = util.defaultSpeedArray(route.speed, coords.length-1);
-        }
-        function markerClickHandlerFactory(clickedMarker) {
-            return function() {
-                applyCustomFlightLeg(clickedMarker);
-            };
         }
         for (var i = 0; i < coords.length-1; i++) {
             var distance = mapConfig.scale * calc.distance(coords[i], coords[i+1]);
@@ -141,10 +150,7 @@
             icon: icons.textIconFactory(route.name, 'map-title flight-titles ' + getMapTextClasses(state))
         });
         nameMarker.parentId = id;
-        nameMarker.on('click', function() {
-            deleteAssociatedLayers(L.layerGroup([route]));
-            applyFlightPlan(route);
-        });
+        nameMarker.on('click', routeClickHandlerFactory(route));
         nameMarker.addTo(map);
     }
 
@@ -177,33 +183,41 @@
                 });
             },
             onHide: function(e) {
-                if (clickedOk || !newFlight) {
+                if (clickedOk) {
                     route.name = document.getElementById('flight-name').value;
                     route.speed = parseInt(document.getElementById('flight-speed').value);
                     route.speedDirty = (route.speed !== initialSpeed);
-                    applyFlightPlanCallback(route);
-                } else {
+                    applyFlightPlanCallback(route, newFlight);
+                } else if (newFlight) {
                     drawnItems.removeLayer(route);
+                } else {
+                    applyFlightPlanCallback(route, newFlight);
                 }
                 checkButtonsDisabled();
             }
         });
     }
 
-    function applyTargetInfoCallback(target) {
+    function applyTargetInfoCallback(target, newTarget) {
+        function targetClickHandlerFactory(clickedTarget) {
+            return function() {
+                deleteAssociatedLayers(L.layerGroup([clickedTarget]));
+                applyTargetInfo(clickedTarget);
+            };
+        }
         var id = target._leaflet_id;
         var coords = target.getLatLng();
         target.setIcon(icons.factory(target.type, target.color));
+        if (newTarget) {
+            target.on('click', targetClickHandlerFactory(target));
+        }
         var nameCoords = L.latLng(coords.lat, coords.lng);
         var nameMarker = L.marker(nameCoords, {
             draggable: false,
             icon: icons.textIconFactory(target.name, 'map-title target-title ' + getMapTextClasses(state))
         });
         nameMarker.parentId = id;
-        nameMarker.on('click', function() {
-            deleteAssociatedLayers(L.layerGroup([target]));
-            applyTargetInfo(target);
-        });
+        nameMarker.on('click', targetClickHandlerFactory(target));
         nameMarker.addTo(map);
         if (target.notes !== '') {
             target.bindLabel(target.notes, {
@@ -250,14 +264,16 @@
                 });
             },
             onHide: function(e) {
-                if (clickedOk || !newTarget) {
+                if (clickedOk) {
                     target.name = document.getElementById('target-name').value;
                     target.notes = document.getElementById('target-notes').value;
                     target.type = document.getElementById('point-type-select').value;
                     target.color = document.getElementById('point-color-select').value;
-                    applyTargetInfoCallback(target);
-                } else {
+                    applyTargetInfoCallback(target, newTarget);
+                } else if (newTarget) {
                     drawnItems.removeLayer(target);
+                } else {
+                    applyTargetInfoCallback(target, newTarget);
                 }
                 checkButtonsDisabled();
             }

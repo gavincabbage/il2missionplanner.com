@@ -30,7 +30,7 @@ module.exports = (function() {
         formatFlightLegMarker: function(distance, heading, speed, time) {
             distance = typeof distance === 'number' ? distance.toFixed(1) : distance;
             heading = typeof heading === 'number' ? heading.toFixed(0) : heading;
-            return '[' + distance + 'km|' + calc.pad(heading, 3) + '&deg;|' + speed + 'kph|' + time + ']';
+            return '[' + distance + 'km|' + calc.pad(heading, 3) + '&deg;/' + calc.pad(calc.invertHeading(heading), 3) +'&deg;|' + speed + 'kph|' + time + ']';
         },
 
         isLine: function(layer) {
