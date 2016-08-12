@@ -13,7 +13,7 @@
     const
         SAVE_HEADER = 'data:text/json;charset=utf-8,',
         RED = '#9A070B',
-        DEFAULT_SPEED = 300,
+        DEFAULT_FLIGHT_SPEED = 300,
         FLIGHT_OPACITY = 0.8,
         LINE_OPTIONS = {
             color: RED,
@@ -21,7 +21,9 @@
             opacity: FLIGHT_OPACITY
         },
         DEFAULT_POINT_TYPE = 'marker',
-        DEFAULT_POINT_COLOR = 'black'
+        DEFAULT_POINT_COLOR = 'black',
+        DEFAULT_POINT_NAME = 'New Marker',
+        DEFAULT_FLIGHT_NAME = 'New Flight'
     ;
 
     var map, mapTiles, mapConfig, drawnItems, hiddenLayers;
@@ -157,11 +159,11 @@
     function applyFlightPlan(route) {
         var newFlight = false;
         if (typeof route.speed === 'undefined') {
-            route.speed = DEFAULT_SPEED;
+            route.speed = DEFAULT_FLIGHT_SPEED;
             newFlight = true;
         }
         if (typeof route.name === 'undefined') {
-            route.name = 'New Flight';
+            route.name = DEFAULT_FLIGHT_NAME;
         }
         var initialSpeed = route.speed;
         var clickedOk = false;
@@ -229,7 +231,7 @@
     function applyTargetInfo(target) {
         var newTarget = false;
         if (typeof target.name === 'undefined') {
-            target.name = 'New Marker';
+            target.name = DEFAULT_POINT_NAME;
             var newTarget = true;
         }
         if (typeof target.notes === 'undefined') {

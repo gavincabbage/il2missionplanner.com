@@ -72,12 +72,7 @@ module.exports = (function() {
         },
 
         invertHeading: function(heading) {
-            var diff = heading - 180;
-            if (diff < 0) {
-                return 360 - Math.abs(diff);
-            } else {
-                return diff;
-            }
+            return (360 + (heading - 180)) % 360;
         },
     };
 })();

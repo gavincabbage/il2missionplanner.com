@@ -10,7 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "leaflet": "^0.7.7",
-    "leaflet-draw": "^0.2.4",
+    "leaflet-draw": "^0.3.0",
     "leaflet-polylinedecorator": "^1.0.1",
     "font-awesome": "fontawesome#^4.5.0",
     "leaflet-modal": "^0.1.3"
