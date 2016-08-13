@@ -438,7 +438,7 @@
             edit: L.Browser.touch ? false : {
                 selectedPathOptions: {
                     maintainColor: true,
-                    opacity: 0.4
+                    opacity: 0.4,
                 }
             }
         }
