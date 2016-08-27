@@ -439,6 +439,7 @@
                 selectedPathOptions: {
                     maintainColor: true,
                     opacity: 0.4,
+                    fill: false
                 }
             }
         }
