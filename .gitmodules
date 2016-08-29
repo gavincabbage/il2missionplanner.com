@@ -1,9 +1,9 @@
-[submodule "src/vendor/Leaflet.label"]
-	path = src/vendor/Leaflet.label
+[submodule "app/vendor/Leaflet.label"]
+	path = app/vendor/Leaflet.label
 	url = https://github.com/Leaflet/Leaflet.label.git
-[submodule "src/vendor/Leaflet.TextPath"]
-	path = src/vendor/Leaflet.TextPath
+[submodule "app/vendor/Leaflet.TextPath"]
+	path = app/vendor/Leaflet.TextPath
 	url = https://github.com/makinacorpus/Leaflet.TextPath.git
-[submodule "src/vendor/Skeleton"]
-	path = src/vendor/Skeleton
+[submodule "app/vendor/Skeleton"]
+	path = app/vendor/Skeleton
 	url = https://github.com/dhg/Skeleton.git

@@ -21,3 +21,8 @@ To version:
 - /etc/init.d/redis_6379
 - /etc/redis/redis.conf
 - /etc/webdis/webdis.json
+
+## Lua scripting
+
+Links:
+- https://www.devbattles.com/en/sand/post-1937-quotStored_Proceduresquot_in_Redis
