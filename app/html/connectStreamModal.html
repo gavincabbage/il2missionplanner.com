@@ -1,0 +1,26 @@
+<div id="stream-modal" class="container">
+    <div class="row">
+        <h2><span class='fa fa-share-alt modal-icon'></span> Start Streaming</h2>
+    </div>
+    <form onsubmit="return false;">
+        <div class="row">
+            <fieldset>
+                <legend>Select Stream</legend>
+                <div class="row">
+                    <div class="one column"></div>
+                    <select class="eleven columns" id="stream-select">
+                        <!-- <option value="stalingrad">none</option> -->
+                    </select>
+                </div>
+            </fieldset>
+            <div class="row">
+                <label for="stream-password">Password</label>
+                <input id="stream-password" class="half-width" placeholder="password"></input>
+            </div>
+        </div>
+        <div class="row buttom-row">
+            <button id="stream-connect-button" class="modal-ok button-primary" type="submit">Connect</button>
+            <button class="modal-cancel">Cancel</button>
+        </div>
+    </form>
+</div>

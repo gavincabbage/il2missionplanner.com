@@ -18,6 +18,8 @@
         "tooltipText": true,
         "require": true,
         "module": true,
-        "window": true
+        "window": true,
+        "XMLHttpRequest": true,
+        "CustomEvent": true
     }
 }
