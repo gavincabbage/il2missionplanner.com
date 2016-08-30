@@ -5,15 +5,14 @@ if not streamName or not password then
     return 1
 end
 
-local stream = redis.call('HGETALL', streamName)
-if not stream then
+local expectedPassword = redis.call('HGET', streamName, 'pw')
+if not password then
     return 2
 end
 
-return stream.pw
+if expectedPassword ~= password then
+    return 3
+end
 
--- if stream.pw ~= password then
---     return 3
--- end
---
--- return stream.channel
+local channel = redis.call('HGET', streamName, 'channel')
+return channel
