@@ -122,7 +122,7 @@ Parameters required by Lua publishing script.
 
 1. List all streams.
 
-    KEYS streams:*
+    KEYS stream:*
 
 ## Misc. Notes
 

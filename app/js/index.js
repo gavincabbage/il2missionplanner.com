@@ -706,9 +706,27 @@
                         map.openModal({
                             template: content.connectStreamModalTemplate,
                             onShow: function(e) {
+                                var streamSelect = document.getElementById('stream-select');
+                                var streams = webdis.getStreamList();
+                                console.log(streams);
+                                streamSelect.options.length = 0;
+                                for (var i=0; i < streams.length; i++) {
+                                    streamSelect.options[i] = new Option(streams[i].substring(7), streams[i]);
+                                }
                                 document.getElementById('stream-connect-button').focus();
                                 L.DomEvent.on(document.getElementById('stream-connect-button'), 'click', function() {
                                     console.log('connect confirm button');
+                                    var selectedStream = streamSelect.options[streamSelect.selectedIndex].value;
+                                    console.log(selectedStream);
+                                    var password = document.getElementById('stream-password').value;
+                                    var code = document.getElementById('stream-password').value;
+                                    if (code) {
+                                        // reconnect
+                                    } else {
+                                        var channel = webdis.getStreamChannel(password);
+                                        state.connectedToStream = true;
+
+                                    }
                                     e.modal.hide();
                                     state.connectedToStream = true;
                                 });
@@ -850,7 +868,12 @@
     });
 
     window.addEventListener('il2:streamupdate', function (e) {
+        console.log('il2:streamupdate here');
         console.log(e.detail);
+        var saveData = e.detail;
+        if (saveData !== 1) {
+            importMapState(JSON.parse(saveData));
+        }
     });
 
     // MISC
