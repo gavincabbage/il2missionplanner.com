@@ -6,7 +6,7 @@ module.exports = (function() {
         WEBDIS_PUBLISH = '/PUBLISH/',
         WEBDIS_KEYS = '/KEYS/',
         SCRIPTS = {
-            GET_CHANNEL: 'dd3a76e4e9b4f6aa51df461b7b060fb3d84a8391'
+            GET_CHANNEL: 'dffd64d2bb526b22768b38b8f7dabebeda82c0fb'
         }
     ;
 
