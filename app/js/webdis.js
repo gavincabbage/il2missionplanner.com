@@ -6,7 +6,7 @@ module.exports = (function() {
         WEBDIS_PUBLISH = '/PUBLISH/',
         WEBDIS_KEYS = '/KEYS/',
         SCRIPTS = {
-            GET_CHANNEL: '257f7e3551895cf664e0b58f962575de4abad893'
+            GET_CHANNEL: 'dd3a76e4e9b4f6aa51df461b7b060fb3d84a8391'
         }
     ;
 
@@ -56,7 +56,7 @@ module.exports = (function() {
         _buildEvalshaUrl: function(hash, args) {
             var url = WEBDIS_HOST + '/EVALSHA/' + hash + '/0';
             for (var i = 0; i < args.length; i++) {
-                url += '/' + args[i];
+                url += ('/' + args[i]);
             }
             return url;
         },

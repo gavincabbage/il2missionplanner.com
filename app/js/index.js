@@ -724,7 +724,7 @@
                                         console.log('reconnect');
                                         // reconnect
                                     } else {
-                                        var channel = webdis.getStreamChannel(password);
+                                        var channel = webdis.getStreamChannel(selectedStream, password);
                                         state.connectedToStream = true;
                                         console.log(channel);
                                     }
