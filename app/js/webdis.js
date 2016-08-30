@@ -6,7 +6,7 @@ module.exports = (function() {
         WEBDIS_PUBLISH = '/PUBLISH/',
         WEBDIS_KEYS = '/KEYS/',
         SCRIPTS = {
-            GET_CHANNEL: ''
+            GET_CHANNEL: '257f7e3551895cf664e0b58f962575de4abad893'
         }
     ;
 
@@ -50,7 +50,7 @@ module.exports = (function() {
         getStreamChannel: function(stream, password) {
             var url = this._buildEvalshaUrl(SCRIPTS.GET_CHANNEL, [stream, password]);
             var response = this._buildSyncWebdisXhr(url);
-            return response; // TODO build lua script to return just the channel if password is correct
+            return response;
         },
 
         _buildEvalshaUrl: function(hash, args) {

@@ -719,13 +719,14 @@
                                     var selectedStream = streamSelect.options[streamSelect.selectedIndex].value;
                                     console.log(selectedStream);
                                     var password = document.getElementById('stream-password').value;
-                                    var code = document.getElementById('stream-password').value;
+                                    var code = document.getElementById('stream-code').value;
                                     if (code) {
+                                        console.log('reconnect');
                                         // reconnect
                                     } else {
                                         var channel = webdis.getStreamChannel(password);
                                         state.connectedToStream = true;
-
+                                        console.log(channel);
                                     }
                                     e.modal.hide();
                                     state.connectedToStream = true;

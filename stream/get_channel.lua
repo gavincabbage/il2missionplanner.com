@@ -5,7 +5,7 @@ if not streamName or not password then
     return 0
 end
 
-local stream = redis.call('HGETALL', 'stream:'+streamName)
+local stream = redis.call('HGETALL', 'stream:' .. streamName)
 if not stream then
     return 0
 end
