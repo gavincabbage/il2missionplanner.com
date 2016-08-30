@@ -10,8 +10,10 @@ if not stream then
     return 2
 end
 
-if stream.pw ~= password then
-    return 3
-end
+return stream.pw
 
-return stream.channel
+-- if stream.pw ~= password then
+--     return 3
+-- end
+--
+-- return stream.channel
