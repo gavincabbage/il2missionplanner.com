@@ -9,8 +9,6 @@
     var webdis = require('./webdis.js');
     require('./controls.js');
 
-    //webdis.subscribe('test');
-
     // VARS
 
     const
@@ -38,7 +36,10 @@
         colorsInverted: false,
         showBackground: true,
         streaming: false,
-        connectedToStream: false
+        connected: false,
+        changing: false,
+        streamInfo: {},
+        streamingAvailable: webdis.init() ? true : false
     };
 
     // PATCHING
@@ -70,6 +71,9 @@
     }
 
     function applyCustomFlightLeg(marker) {
+        if (state.changing) {
+            return;
+        }
         var parentRoute = drawnItems.getLayer(marker.parentId);
         map.openModal({
             speed: parentRoute.speeds[marker.index],
@@ -98,6 +102,7 @@
         var newContent = util.formatFlightLegMarker(
                 marker.options.distance, marker.options.heading, marker.options.speed, marker.options.time);
         marker.setIcon(icons.textIconFactory(newContent, 'flight-leg ' + getMapTextClasses(state)));
+        publishMapState();
     }
 
     function applyFlightPlanCallback(route, newFlight) {
@@ -159,9 +164,13 @@
         nameMarker.parentId = id;
         nameMarker.on('click', routeClickHandlerFactory(route));
         nameMarker.addTo(map);
+        publishMapState();
     }
 
     function applyFlightPlan(route) {
+        if (state.changing) {
+            return;
+        }
         var newFlight = false;
         if (typeof route.speed === 'undefined') {
             route.speed = DEFAULT_FLIGHT_SPEED;
@@ -231,9 +240,13 @@
                 direction: 'left'
             }).addTo(map);
         }
+        publishMapState();
     }
 
     function applyTargetInfo(target) {
+        if (state.changing) {
+            return;
+        }
         var newTarget = false;
         if (typeof target.name === 'undefined') {
             target.name = DEFAULT_POINT_NAME;
@@ -322,22 +335,28 @@
         transferChildLayers(map, hiddenLayers);
     }
 
+    function disableButtons(buttonList) {
+        for (var i = 0; i < buttonList.length; i++) {
+            var element = document.getElementById(buttonList[i]);
+            element.classList.add('leaflet-disabled');
+        }
+    }
+
+    function enableButtons(buttonList) {
+        for (var i = 0; i < buttonList.length; i++) {
+            var element = document.getElementById(buttonList[i]);
+            element.classList.remove('leaflet-disabled');
+        }
+    }
+
     function checkButtonsDisabled() {
-        var elements = [
-            document.getElementById('clear-button'),
-            document.getElementById('export-button'),
-            document.getElementById('missionhop-button')
-        ];
+        var buttons = ['clear-button', 'export-button', 'missionhop-button'];
         if (drawnItems.getLayers().length === 0) {
             isEmpty = true;
-            for (var i = 0; i < elements.length; i++) {
-                elements[i].classList.add('leaflet-disabled');
-            }
+            disableButtons(buttons);
         } else {
             isEmpty = false;
-            for (var i = 0; i < elements.length; i++) {
-                elements[i].classList.remove('leaflet-disabled');
-            }
+            enableButtons(buttons);
         }
     }
 
@@ -425,6 +444,14 @@
             newPoint.notes = point.notes;
             drawnItems.addLayer(newPoint);
             applyTargetInfoCallback(newPoint);
+        }
+    }
+
+    function publishMapState() {
+        if (state.streaming) {
+            var saveData = exportMapState();
+            webdis.publish(state.streamInfo.name, state.streamInfo.password,
+                    state.streamInfo.code, window.escape(JSON.stringify(saveData)));
         }
     }
 
@@ -653,13 +680,13 @@
                 tooltip: content.streamTooltip,
                 clickFn: function() {
                     var template;
-                    if (!state.streaming && !state.connectedToStream) {
+                    if (!state.streaming && !state.connected) {
                         template = content.streamModalTemplate;
                         fireStreamModal();
-                    } else if (state.streaming && !state.connectedToStream) {
+                    } else if (state.streaming && !state.connected) {
                         template = content.alreadyStreamingModalTemplate;
                         fireAlreadyStreamingModal();
-                    } else if (!state.streaming && state.connectedToStream) {
+                    } else if (!state.streaming && state.connected) {
                         template = content.alreadyConnectedModalTemplate;
                         fireAlreadyConnectedModal();
                     }
@@ -691,9 +718,17 @@
                             onShow: function(e) {
                                 document.getElementById('stream-start-confirm-button').focus();
                                 L.DomEvent.on(document.getElementById('stream-start-confirm-button'), 'click', function() {
-                                    console.log('start confirm button');
-                                    e.modal.hide();
+                                    var streamName = document.getElementById('stream-name').value;
+                                    var streamPassword = document.getElementById('stream-password').value;
+                                    var streamCode = document.getElementById('stream-leader-code').value;
+                                    webdis.startStream(streamName, streamPassword, streamCode);
                                     state.streaming = true;
+                                    state.streamInfo = {
+                                        name: streamName,
+                                        password: streamPassword,
+                                        code: streamCode
+                                    };
+                                    e.modal.hide();
                                 });
                                 L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
                                     console.log('start cancel button');
@@ -708,7 +743,6 @@
                             onShow: function(e) {
                                 var streamSelect = document.getElementById('stream-select');
                                 var streams = webdis.getStreamList();
-                                console.log(streams);
                                 streamSelect.options.length = 0;
                                 for (var i=0; i < streams.length; i++) {
                                     streamSelect.options[i] = new Option(streams[i].substring(7), streams[i]);
@@ -725,11 +759,11 @@
                                         // reconnect
                                     } else {
                                         var channel = webdis.getStreamChannel(selectedStream, password);
-                                        state.connectedToStream = true;
                                         console.log(channel);
+                                        webdis.subscribe(channel);
+                                        state.connected = channel;
                                     }
                                     e.modal.hide();
-                                    state.connectedToStream = true;
                                 });
                                 L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
                                     console.log('connect cancel button');
@@ -745,8 +779,9 @@
                                 document.getElementById('disconnect-button').focus();
                                 L.DomEvent.on(document.getElementById('disconnect-button'), 'click', function() {
                                     console.log('already connected disconnect button');
+                                    webdis.unsubscribe(state.connected);
+                                    state.connected = false;
                                     e.modal.hide();
-                                    state.connectedToStream = false;
                                 });
                                 L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
                                     console.log('already connected cancel button');
@@ -821,7 +856,6 @@
     // EVENT LISTENERS
 
     map.on('draw:created', function(e) {
-        // TODO publish state to stream
         drawnItems.addLayer(e.layer);
         if (e.layerType === 'polyline') {
             applyFlightPlan(e.layer);
@@ -832,13 +866,12 @@
     });
 
     map.on('draw:deleted', function(e) {
-        // TODO publish state to stream
         deleteAssociatedLayers(e.layers);
+        publishMapState();
         checkButtonsDisabled();
     });
 
     map.on('draw:edited', function(e) {
-        // TODO publish state to stream
         deleteAssociatedLayers(e.layers);
         e.layers.eachLayer(function(layer) {
             if (util.isLine(layer)) {
@@ -848,30 +881,37 @@
                 applyTargetInfoCallback(layer);
             }
         });
+        publishMapState();
     });
 
     map.on('draw:editstart', function() {
+        state.changing = true;
         hideChildLayers();
     });
 
     map.on('draw:editstop', function() {
+        state.changing = false;
         showChildLayers();
         checkButtonsDisabled();
     });
 
     map.on('draw:deletestart', function() {
+        state.changing = true;
         hideChildLayers();
     });
 
     map.on('draw:deletestop', function() {
+        state.changing = false;
         showChildLayers();
         checkButtonsDisabled();
     });
 
     window.addEventListener('il2:streamupdate', function (e) {
-        console.log('il2:streamupdate here');
-        console.log(e.detail);
+        if (!state.connected) {
+            return;
+        }
         var saveData = e.detail;
+        console.log('il2:streamupdate: ' + saveData);
         if (saveData !== 1) {
             importMapState(JSON.parse(saveData));
         }

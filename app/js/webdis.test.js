@@ -54,6 +54,18 @@ describe('webdis', function() {
         });
     });
 
+    describe('webdis._buildUnsubscribeUrl', function() {
+
+        it('must be defined', function() {
+            assert.isDefined(webdis._buildUnsubscribeUrl);
+        });
+
+        it('must build publish url based on channel and message', function() {
+            assert.equal(webdis._buildUnsubscribeUrl('test'),
+                    'http://stream.il2missionplanner.com:7379/UNSUBSCRIBE/test');
+        });
+    });
+
     xhrMock.teardown();
 
 });
