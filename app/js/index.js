@@ -27,7 +27,7 @@
         DEFAULT_FLIGHT_NAME = 'New Flight'
     ;
 
-    var map, mapTiles, mapConfig, drawnItems, hiddenLayers;
+    var map, mapTiles, mapConfig, drawnItems, hiddenLayers, drawControl;
     var mapConfig = util.getSelectedMapConfig(window.location.hash, content.maps);
     var selectedMapIndex = mapConfig.selectIndex;
     var isEmpty = true;
@@ -350,13 +350,15 @@
     }
 
     function checkButtonsDisabled() {
-        var buttons = ['clear-button', 'export-button', 'missionhop-button'];
-        if (drawnItems.getLayers().length === 0) {
-            isEmpty = true;
-            disableButtons(buttons);
-        } else {
-            isEmpty = false;
-            enableButtons(buttons);
+        if (!state.connected) {
+            var buttons = ['clear-button', 'export-button', 'missionhop-button'];
+            if (drawnItems.getLayers().length === 0) {
+                isEmpty = true;
+                disableButtons(buttons);
+            } else {
+                isEmpty = false;
+                enableButtons(buttons);
+            }
         }
     }
 
@@ -393,16 +395,19 @@
     }
 
     function selectMap(mapConfig) {
-        selectedMapIndex = mapConfig.selectIndex;
-        window.location.hash = mapConfig.hash;
-        deleteAssociatedLayers(drawnItems);
-        drawnItems.clearLayers();
-        hiddenLayers.clearLayers();
-        mapTiles.setUrl(mapConfig.tileUrl);
-        map.setMaxBounds(calc.maxBounds(mapConfig));
-        map.setView(calc.center(mapConfig), 3);
-        mapTiles.redraw();
-        mapTiles.addTo(map);
+        var newIndex = mapConfig.selectIndex;
+        if (newIndex !== selectedMapIndex) {
+            selectedMapIndex = mapConfig.selectIndex;
+            window.location.hash = mapConfig.hash;
+            deleteAssociatedLayers(drawnItems);
+            drawnItems.clearLayers();
+            hiddenLayers.clearLayers();
+            mapTiles.setUrl(mapConfig.tileUrl);
+            map.setMaxBounds(calc.maxBounds(mapConfig));
+            map.setView(calc.center(mapConfig), 3);
+            mapTiles.redraw();
+            mapTiles.addTo(map);
+        }
     }
 
     function fitViewToMission() {
@@ -448,11 +453,30 @@
     }
 
     function publishMapState() {
+        console.log('publishing');
         if (state.streaming) {
+            console.log('streaming');
+            console.log(state.streamInfo);
             var saveData = exportMapState();
+            console.log(saveData);
             webdis.publish(state.streamInfo.name, state.streamInfo.password,
                     state.streamInfo.code, window.escape(JSON.stringify(saveData)));
         }
+    }
+
+    function startConnectedMode() {
+        map.removeControl(drawControl);
+        map.removeControl(clearButton);
+    }
+
+    function endConnectedMode() {
+        map.removeControl(gridToolbar);
+        map.removeControl(importExportToolbar);
+        map.addControl(drawControl);
+        map.addControl(gridToolbar);
+        map.addControl(clearButton);
+        map.addControl(importExportToolbar);
+        checkButtonsDisabled();
     }
 
     // MAP SETUP
@@ -479,7 +503,7 @@
 
     // BUTTONS
 
-    var drawControl = new L.Control.Draw({
+    drawControl = new L.Control.Draw({
         draw: {
             polygon: false,
             rectangle: false,
@@ -562,10 +586,10 @@
                             mapSelect.focus();
                             L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
                                 if (mapSelect.selectedIndex !== originalIndex) {
-                                    selectedMapIndex = mapSelect.selectedIndex;
-                                    var selectedMap = mapSelect.options[selectedMapIndex].value;
+                                    var selectedMap = mapSelect.options[mapSelect.selectedIndex].value;
                                     mapConfig = content.maps[selectedMap];
                                     selectMap(mapConfig);
+                                    selectedMapIndex = mapSelect.selectedIndex;
                                 }
                                 if (invertCheckbox.checked !== state.colorsInverted) {
                                     state.colorsInverted = invertCheckbox.checked;
@@ -721,7 +745,8 @@
                                     var streamName = document.getElementById('stream-name').value;
                                     var streamPassword = document.getElementById('stream-password').value;
                                     var streamCode = document.getElementById('stream-leader-code').value;
-                                    webdis.startStream(streamName, streamPassword, streamCode);
+                                    var mapState = window.escape(JSON.stringify(exportMapState()));
+                                    webdis.startStream(streamName, streamPassword, streamCode, mapState);
                                     state.streaming = true;
                                     state.streamInfo = {
                                         name: streamName,
@@ -745,7 +770,7 @@
                                 var streams = webdis.getStreamList();
                                 streamSelect.options.length = 0;
                                 for (var i=0; i < streams.length; i++) {
-                                    streamSelect.options[i] = new Option(streams[i].substring(7), streams[i]);
+                                    streamSelect.options[i] = new Option(streams[i].substring(7), streams[i].substring(7));
                                 }
                                 document.getElementById('stream-connect-button').focus();
                                 L.DomEvent.on(document.getElementById('stream-connect-button'), 'click', function() {
@@ -754,14 +779,25 @@
                                     console.log(selectedStream);
                                     var password = document.getElementById('stream-password').value;
                                     var code = document.getElementById('stream-code').value;
+                                    var info = webdis.getStreamInfo(selectedStream, password);
+                                    console.log(info);
+                                    clearMap();
+                                    importMapState(JSON.parse(info.state));
+                                    checkButtonsDisabled();
                                     if (code) {
-                                        console.log('reconnect');
-                                        // reconnect
+                                        console.log('leader reconnect');
+                                        state.streaming = true;
+                                        state.streamInfo = {
+                                            name: selectedStream,
+                                            password: password,
+                                            code: code
+                                        };
+                                        e.modal.hide();
                                     } else {
-                                        var channel = webdis.getStreamChannel(selectedStream, password);
-                                        console.log(channel);
-                                        webdis.subscribe(channel);
-                                        state.connected = channel;
+                                        console.log('viewer connect');
+                                        webdis.subscribe(info.channel);
+                                        state.connected = info.channel;
+                                        startConnectedMode();
                                     }
                                     e.modal.hide();
                                 });
@@ -781,6 +817,7 @@
                                     console.log('already connected disconnect button');
                                     webdis.unsubscribe(state.connected);
                                     state.connected = false;
+                                    endConnectedMode();
                                     e.modal.hide();
                                 });
                                 L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
@@ -913,8 +950,10 @@
         var saveData = e.detail;
         console.log('il2:streamupdate: ' + saveData);
         if (saveData !== 1) {
+            clearMap();
             importMapState(JSON.parse(saveData));
         }
+        checkButtonsDisabled();
     });
 
     // MISC

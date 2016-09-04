@@ -67,15 +67,20 @@ module.exports = (function() {
             return JSON.parse(response.responseText).KEYS;
         },
 
-        getStreamChannel: function(stream, password) {
+        getStreamInfo: function(stream, password) {
             var url = this._buildEvalshaUrl(this.scripts.getChannel, [stream, password]);
             var response = this._buildSyncWebdisXhr(url);
-            return JSON.parse(response.responseText).EVALSHA;
+            var parsed = JSON.parse(response.responseText).EVALSHA;
+            return {
+                channel: parsed[0],
+                state: parsed[1]
+            };
         },
 
-        startStream: function(name, password, code) {
-            var url = this._buildEvalshaUrl(this.scripts.newStream, [name, password, code]);
+        startStream: function(name, password, code, state) {
+            var url = this._buildEvalshaUrl(this.scripts.newStream, [name, password, code, state]);
             var response = this._buildSyncWebdisXhr(url);
+            console.log(response);
             return true;
         },
 
