@@ -93,6 +93,22 @@ h3.help-header {
     font-weight: 700;
 }
 
+a.streaming {
+    color: green;
+}
+
+a.streaming:hover {
+    color: green;
+}
+
+a.connected {
+    color: blue;
+}
+
+a.connected:hover {
+    color: blue;
+}
+
 /*.modal-item {
     width: 100%;
     padding-bottom: 10px;

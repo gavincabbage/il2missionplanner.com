@@ -748,6 +748,7 @@
                                     var mapState = window.escape(JSON.stringify(exportMapState()));
                                     webdis.startStream(streamName, streamPassword, streamCode, mapState);
                                     state.streaming = true;
+                                    util.addClass(document.querySelector('a.fa-share-alt'), 'streaming');
                                     state.streamInfo = {
                                         name: streamName,
                                         password: streamPassword,
@@ -787,6 +788,7 @@
                                     if (code) {
                                         console.log('leader reconnect');
                                         state.streaming = true;
+                                        util.addClass(document.querySelector('a.fa-share-alt'), 'streaming');
                                         state.streamInfo = {
                                             name: selectedStream,
                                             password: password,
@@ -797,6 +799,7 @@
                                         console.log('viewer connect');
                                         webdis.subscribe(info.channel);
                                         state.connected = info.channel;
+                                        util.addClass(document.querySelector('a.fa-share-alt'), 'connected');
                                         startConnectedMode();
                                     }
                                     e.modal.hide();
@@ -817,6 +820,7 @@
                                     console.log('already connected disconnect button');
                                     webdis.unsubscribe(state.connected);
                                     state.connected = false;
+                                    util.removeClass(document.querySelector('a.fa-share-alt'), 'connected');
                                     endConnectedMode();
                                     e.modal.hide();
                                 });
@@ -836,6 +840,7 @@
                                     console.log('already streaming stop button');
                                     e.modal.hide();
                                     state.streaming = false;
+                                    util.removeClass(document.querySelector('a.fa-share-alt'), 'streaming');
                                 });
                                 L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
                                     console.log('already streaming cancel button');
