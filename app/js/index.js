@@ -479,6 +479,19 @@
         checkButtonsDisabled();
     }
 
+    function setupCheckboxTogglableElement(checkboxId, elementId) {
+        var checkbox = document.getElementById(checkboxId);
+        var element = document.getElementById(elementId);
+        L.DomEvent.on(checkbox, 'click', function() {
+            if (checkbox.checked) {
+                util.removeClass(element, 'hidden-section');
+
+            } else {
+                util.addClass(element, 'hidden-section');
+            }
+        });
+    }
+
     // MAP SETUP
 
     map = L.map('map', {
@@ -745,8 +758,21 @@
                                     var streamName = document.getElementById('stream-name').value;
                                     var streamPassword = document.getElementById('stream-password').value;
                                     var streamCode = document.getElementById('stream-leader-code').value;
+                                    if (!streamName || !streamPassword || !streamCode) {
+                                        var errorElement = document.getElementById('start-stream-error');
+                                        errorElement.innerHTML = 'All fields are required. Try again.';
+                                        util.removeClass(errorElement, 'hidden-section');
+                                        return;
+                                    }
                                     var mapState = window.escape(JSON.stringify(exportMapState()));
-                                    webdis.startStream(streamName, streamPassword, streamCode, mapState);
+                                    var response = webdis.startStream(streamName, streamPassword, streamCode, mapState);
+                                    console.log(response);
+                                    if (response[0] !== 'SUCCESS')  {
+                                        var errorElement = document.getElementById('start-stream-error');
+                                        errorElement.innerHTML = response[1];
+                                        util.removeClass(errorElement, 'hidden-section');
+                                        return;
+                                    }
                                     state.streaming = true;
                                     util.addClass(document.querySelector('a.fa-share-alt'), 'streaming');
                                     state.streamInfo = {
@@ -773,35 +799,61 @@
                                 for (var i=0; i < streams.length; i++) {
                                     streamSelect.options[i] = new Option(streams[i].substring(7), streams[i].substring(7));
                                 }
+                                setupCheckboxTogglableElement('leader-checkbox', 'leader-hidden');
                                 document.getElementById('stream-connect-button').focus();
                                 L.DomEvent.on(document.getElementById('stream-connect-button'), 'click', function() {
                                     console.log('connect confirm button');
                                     var selectedStream = streamSelect.options[streamSelect.selectedIndex].value;
-                                    console.log(selectedStream);
                                     var password = document.getElementById('stream-password').value;
-                                    var code = document.getElementById('stream-code').value;
-                                    var info = webdis.getStreamInfo(selectedStream, password);
-                                    console.log(info);
-                                    clearMap();
-                                    importMapState(JSON.parse(info.state));
-                                    checkButtonsDisabled();
-                                    if (code) {
+                                    var code = null;
+                                    var checkbox = document.getElementById('leader-checkbox');
+                                    if (checkbox.checked) {
+                                        code = document.getElementById('stream-code').value;
+                                        if (!password || !code) {
+                                            var errorElement = document.getElementById('connect-stream-error');
+                                            errorElement.innerHTML = 'All fields are required. Please try again.';
+                                            util.removeClass(errorElement, 'hidden-section');
+                                            return;
+                                        }
+                                        var response = webdis.getStreamReconnect(selectedStream, password, code);
+                                        if (response[0] !== 'SUCCESS') {
+                                            var errorElement = document.getElementById('connect-stream-error');
+                                            errorElement.innerHTML = response[1];
+                                            util.removeClass(errorElement, 'hidden-section');
+                                            return;
+                                        }
+                                        state.streamInfo.code = code;
                                         console.log('leader reconnect');
                                         state.streaming = true;
                                         util.addClass(document.querySelector('a.fa-share-alt'), 'streaming');
-                                        state.streamInfo = {
-                                            name: selectedStream,
-                                            password: password,
-                                            code: code
-                                        };
-                                        e.modal.hide();
                                     } else {
+                                        if (!password) {
+                                            var errorElement = document.getElementById('connect-stream-error');
+                                            errorElement.innerHTML = 'All fields are required. Please try again.';
+                                            util.removeClass(errorElement, 'hidden-section');
+                                            return;
+                                        }
+                                        var response = webdis.getStreamInfo(selectedStream, password);
+                                        if (response[0] !== 'SUCCESS') {
+                                            var errorElement = document.getElementById('connect-stream-error');
+                                            errorElement.innerHTML = response[1];
+                                            util.removeClass(errorElement, 'hidden-section');
+                                            return;
+                                        }
                                         console.log('viewer connect');
-                                        webdis.subscribe(info.channel);
-                                        state.connected = info.channel;
+                                        webdis.subscribe(response[1]);
+                                        state.connected = response[1];
                                         util.addClass(document.querySelector('a.fa-share-alt'), 'connected');
                                         startConnectedMode();
                                     }
+                                    state.streamInfo = {
+                                        name: selectedStream,
+                                        password: password,
+                                        code: code
+                                    };
+                                    clearMap();
+                                    importMapState(JSON.parse(response[2]));
+                                    checkButtonsDisabled();
                                     e.modal.hide();
                                 });
                                 L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
@@ -813,6 +865,7 @@
                     }
                     function fireAlreadyConnectedModal() {
                         map.openModal({
+                            streamName: state.streamInfo.name,
                             template: content.alreadyConnectedModalTemplate,
                             onShow: function(e) {
                                 document.getElementById('disconnect-button').focus();
@@ -833,9 +886,13 @@
                     }
                     function fireAlreadyStreamingModal() {
                         map.openModal({
+                            streamName: state.streamInfo.name,
+                            streamPassword: state.streamInfo.password,
+                            streamCode: state.streamInfo.code,
                             template: content.alreadyStreamingModalTemplate,
                             onShow: function(e) {
                                 document.getElementById('stop-streaming-button').focus();
+                                setupCheckboxTogglableElement('already-streaming-checkbox', 'already-streaming-hidden');
                                 L.DomEvent.on(document.getElementById('stop-streaming-button'), 'click', function() {
                                     console.log('already streaming stop button');
                                     e.modal.hide();

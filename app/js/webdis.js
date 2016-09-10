@@ -9,7 +9,8 @@ module.exports = (function() {
         scripts: {
             getChannel: '',
             publishState: '',
-            newStream: ''
+            newStream: '',
+            getReconnect: ''
         },
 
         init: function() {
@@ -26,7 +27,15 @@ module.exports = (function() {
 
         publish: function(stream, password, code, state) {
             var url = this._buildEvalshaUrl(this.scripts.publishState, [stream, password, code, state]);
-            this._buildWebdisXhr(url, function(){});
+            var xhr = this._buildWebdisXhr(url, function(){
+                if (xhr.readyState === 4) {
+                    var responseBody = JSON.parse(xhr.responseText).EVALSHA;
+                    if (responseBody[0] !== 'SUCCESS') {
+                        console.log('publishing error: ' + responseBody[1]);
+                        // TODO fire an event here to turn stream icon red or something
+                    }
+                }
+            });
         },
 
         hmget: function(key, fields) {
@@ -70,18 +79,19 @@ module.exports = (function() {
         getStreamInfo: function(stream, password) {
             var url = this._buildEvalshaUrl(this.scripts.getChannel, [stream, password]);
             var response = this._buildSyncWebdisXhr(url);
-            var parsed = JSON.parse(response.responseText).EVALSHA;
-            return {
-                channel: parsed[0],
-                state: parsed[1]
-            };
+            return JSON.parse(response.responseText).EVALSHA;
+        },
+
+        getStreamReconnect: function(stream, password, code) {
+            var url = this._buildEvalshaUrl(this.scripts.getReconnect, [stream, password, code]);
+            var response = this._buildSyncWebdisXhr(url);
+            return JSON.parse(response.responseText).EVALSHA;
         },
 
         startStream: function(name, password, code, state) {
             var url = this._buildEvalshaUrl(this.scripts.newStream, [name, password, code, state]);
             var response = this._buildSyncWebdisXhr(url);
-            console.log(response);
-            return true;
+            return JSON.parse(response.responseText).EVALSHA;
         },
 
         _buildEvalshaUrl: function(hash, args) {

@@ -2,27 +2,34 @@
     <div class="row">
         <h2><span class='fa fa-share-alt modal-icon'></span> Start Streaming</h2>
     </div>
+    <div id="connect-stream-error" class="row error-message hidden-section">
+    </div>
     <form onsubmit="return false;">
+        <fieldset>
+            <legend>Select Stream</legend>
+            <div class="row">
+                <div class="one column"></div>
+                <select id="stream-select" class="eleven columns" id="stream-select">
+                </select>
+            </div>
+        </fieldset>
         <div class="row">
-            <fieldset>
-                <legend>Select Stream</legend>
-                <div class="row">
-                    <div class="one column"></div>
-                    <select id="stream-select" class="eleven columns" id="stream-select">
-                    </select>
-                </div>
-            </fieldset>
-            <div class="row">
-                <label for="stream-password">Password</label>
-                <input id="stream-password" class="half-width" placeholder="password"></input>
+            <label for="stream-password">Password</label>
+            <input id="stream-password" class="half-width" placeholder="password"></input>
+        </div>
+        <div class="row">
+            <div class="five columns">
+                <label class="checkbox-label" for="leader-checkbox">
+                    Connect as flight leader?
+                </label>
             </div>
-            <p>
-                Optional: If you're reconnecting as a mission leader to continue streaming, enter your leader code below.
-            </p>
-            <div class="row">
-                <label for="stream-code">Leader Code</label>
-                <input id="stream-code" class="half-width" placeholder="code"></input>
+            <div class="seven columns">
+                <input id="leader-checkbox" name="leader-checkbox" type="checkbox">
             </div>
+        </div>
+        <div id="leader-hidden" class="row hidden-section">
+            <label for="stream-code">Leader Code</label>
+            <input id="stream-code" class="half-width" placeholder="code"></input>
         </div>
         <div class="row buttom-row">
             <button id="stream-connect-button" class="modal-ok button-primary" type="submit">Connect</button>

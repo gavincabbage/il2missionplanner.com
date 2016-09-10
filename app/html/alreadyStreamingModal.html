@@ -5,7 +5,28 @@
     <form onsubmit="return false;">
         <div class="row">
             <p>
-                ALREADY STREAMING
+                You are currently streaming your mission plan.
+            </p>
+        </div>
+        <div class="row">
+            <p>
+                <b>Stream Name: </b>{streamName}
+            </p>
+        </div>
+        <div class="row">
+            <div class="six columns">
+                <label class="checkbox-label" for="already-streaming-checkbox">
+                    Show password and leader code?
+                </label>
+            </div>
+            <div class="six columns">
+                <input id="already-streaming-checkbox" name="already-streaming-checkbox" type="checkbox">
+            </div>
+        </div>
+        <div id="already-streaming-hidden" class="row hidden-section">
+            <p>
+                <b>Password: </b>{streamPassword}<br>
+                <b>Leader Code: </b>{streamCode}
             </p>
         </div>
         <div class="row buttom-row">
