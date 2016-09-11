@@ -21,6 +21,7 @@
         "window": true,
         "XMLHttpRequest": true,
         "CustomEvent": true,
-        "Option": true
+        "Option": true,
+        "Validatinator": true
     }
 }

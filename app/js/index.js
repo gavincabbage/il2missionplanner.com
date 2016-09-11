@@ -50,6 +50,17 @@
     // Patch leaflet content with custom language
     L.drawLocal = content.augmentedLeafletDrawLocal;
 
+    // VALIDATINATOR
+
+    var V = new Validatinator({
+        'grid-jump-form': {
+            'grid-input': 'digitsLength:4'
+        },
+        'flight-leg-form': {
+            'flight-leg-speed': 'between:0,9999'
+        }
+    });
+
     // FUNCTIONS
 
     function newFlightDecorator(route) {
@@ -71,7 +82,7 @@
     }
 
     function applyCustomFlightLeg(marker) {
-        if (state.changing) {
+        if (state.changing || state.connected) {
             return;
         }
         var parentRoute = drawnItems.getLayer(marker.parentId);
@@ -84,11 +95,18 @@
                 element.focus();
                 element.select();
                 L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
-                    var newSpeed = parseInt(element.value);
-                    parentRoute.speeds[marker.index] = newSpeed;
-                    marker.options.speed = newSpeed;
-                    applyCustomFlightLegCallback(marker);
-                    e.modal.hide();
+                    if (V.passes('flight-leg-form')) {
+                        var newSpeed = parseInt(element.value);
+                        parentRoute.speeds[marker.index] = newSpeed;
+                        marker.options.speed = newSpeed;
+                        applyCustomFlightLegCallback(marker);
+                        e.modal.hide();
+                    } else {
+                        var errorElement = document.getElementById('flight-leg-error');
+                        errorElement.innerHTML = 'Please input a valid speed in kilometers per hour.';
+                        util.removeClass(errorElement, 'hidden-section');
+                        errorElement.focus();
+                    }
                 });
                 L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
                     e.modal.hide();
@@ -108,12 +126,18 @@
     function applyFlightPlanCallback(route, newFlight) {
         function routeClickHandlerFactory(clickedRoute) {
             return function() {
+                if (state.changing || state.connected) {
+                    return;
+                }
                 deleteAssociatedLayers(L.layerGroup([clickedRoute]));
                 applyFlightPlan(clickedRoute);
             };
         }
         function markerClickHandlerFactory(clickedMarker) {
             return function() {
+                if (state.changing || state.connected) {
+                    return;
+                }
                 applyCustomFlightLeg(clickedMarker);
             };
         }
@@ -168,7 +192,7 @@
     }
 
     function applyFlightPlan(route) {
-        if (state.changing) {
+        if (state.changing || state.connected) {
             return;
         }
         var newFlight = false;
@@ -217,6 +241,9 @@
     function applyTargetInfoCallback(target, newTarget) {
         function targetClickHandlerFactory(clickedTarget) {
             return function() {
+                if (state.changing || state.connected) {
+                    return;
+                }
                 deleteAssociatedLayers(L.layerGroup([clickedTarget]));
                 applyTargetInfo(clickedTarget);
             };
@@ -244,7 +271,7 @@
     }
 
     function applyTargetInfo(target) {
-        if (state.changing) {
+        if (state.changing || state.connected) {
             return;
         }
         var newTarget = false;
@@ -350,15 +377,16 @@
     }
 
     function checkButtonsDisabled() {
+        var buttons = ['export-button', 'missionhop-button'];
         if (!state.connected) {
-            var buttons = ['clear-button', 'export-button', 'missionhop-button'];
-            if (drawnItems.getLayers().length === 0) {
-                isEmpty = true;
-                disableButtons(buttons);
-            } else {
-                isEmpty = false;
-                enableButtons(buttons);
-            }
+            buttons.push('clear-button');
+        }
+        if (drawnItems.getLayers().length === 0) {
+            isEmpty = true;
+            disableButtons(buttons);
+        } else {
+            isEmpty = false;
+            enableButtons(buttons);
         }
     }
 
@@ -366,6 +394,7 @@
         drawnItems.clearLayers();
         hideChildLayers();
         hiddenLayers.clearLayers();
+        publishMapState();
     }
 
     function exportMapState() {
@@ -453,9 +482,7 @@
     }
 
     function publishMapState() {
-        console.log('publishing');
         if (state.streaming) {
-            console.log('streaming');
             console.log(state.streamInfo);
             var saveData = exportMapState();
             console.log(saveData);
@@ -926,10 +953,17 @@
                             var gridElement = document.getElementById('grid-input');
                             gridElement.focus();
                             L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
-                                var grid = gridElement.value;
-                                var viewLatLng = calc.gridLatLng(grid, mapConfig);
-                                map.setView(viewLatLng, mapConfig.gridHopZoom);
-                                e.modal.hide();
+                                if (V.passes('grid-jump-form')) {
+                                    var grid = gridElement.value;
+                                    var viewLatLng = calc.gridLatLng(grid, mapConfig);
+                                    map.setView(viewLatLng, mapConfig.gridHopZoom);
+                                    e.modal.hide();
+                                } else {
+                                    var errorElement = document.getElementById('grid-jump-error');
+                                    errorElement.innerHTML = 'Please input a valid four digit grid number.';
+                                    util.removeClass(errorElement, 'hidden-section');
+                                    errorElement.focus();
+                                }
                             });
                             L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
                                 e.modal.hide();
@@ -1003,6 +1037,14 @@
         state.changing = false;
         showChildLayers();
         checkButtonsDisabled();
+    });
+
+    window.addEventListener('il2:streamerror', function (e) {
+        if (!state.connected) {
+            return;
+        }
+        console.log('il2:streamerror');
+        util.addClass(document.querySelector('a.fa-share-alt'), 'stream-error');
     });
 
     window.addEventListener('il2:streamupdate', function (e) {

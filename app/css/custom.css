@@ -94,11 +94,11 @@ h3.help-header {
 }
 
 a.streaming {
-    color: green;
+    color: #00CC00;
 }
 
 a.streaming:hover {
-    color: green;
+    color: #00CC00;
 }
 
 a.connected {
@@ -107,6 +107,14 @@ a.connected {
 
 a.connected:hover {
     color: blue;
+}
+
+a.stream-error {
+    color: #9A070B;
+}
+
+a.stream-error:hover {
+    color: #9A070B;
 }
 
 div.error-message {

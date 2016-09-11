@@ -1,5 +1,5 @@
 .DS_Store
-src/vendor/bower_components/
+app/vendor/bower_components/
 node_modules/
 clipboard.js
 dist/

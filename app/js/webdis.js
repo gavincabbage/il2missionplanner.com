@@ -49,18 +49,27 @@ module.exports = (function() {
             var prev_length = 0;
             var url = this._buildSubscribeUrl(channel);
             var xhr = this._buildWebdisXhr(url, function() {
+                function subscribeErrorHandler() {
+                    var evt = new CustomEvent('il2:streamerror');
+                    window.dispatchEvent(evt);
+                }
                 if (xhr.readyState === 3) {
                     var response = xhr.responseText;
-                    var chunk = JSON.parse(response.slice(prev_length));
+                    try {
+                        var chunk = JSON.parse(response.slice(prev_length));
+                        if (!chunk || typeof chunk !== 'object') {
+                            subscribeErrorHandler();
+                        }
+                    } catch(e) {
+                        subscribeErrorHandler();
+                    }
                     console.log(chunk);
                     var newState = chunk.SUBSCRIBE[2];
                     prev_length = response.length;
-                    // TODO parse newState into a proper object
                     var evt = new CustomEvent('il2:streamupdate', {detail: newState});
                     window.dispatchEvent(evt);
                 } else if (xhr.readyState === 4) {
-                    console.log('subscribe ready state 4');
-                    // TODO stream ended
+                    console.log('subscribe ended');
                 }
             });
         },
