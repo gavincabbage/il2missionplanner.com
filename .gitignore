@@ -1,9 +1,10 @@
 .DS_Store
-src/vendor/bower_components/
+app/vendor/bower_components/
 node_modules/
 clipboard.js
 dist/
-!src/img/dist/
+!app/img/dist/
 npm-debug.log*
 coverage/
 sandbox/
+secrets/

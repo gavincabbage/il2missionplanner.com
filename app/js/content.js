@@ -162,13 +162,19 @@ module.exports = (function() {
         gridHopTooltip: 'Jump to grid',
         missionHopTooltip: 'Jump to mission',
         settingsTooltip: 'Settings',
-        flightModalTemplate: fs.readFileSync('src/html/flightModal.html', 'utf8'),
-        flightLegModalTemplate: fs.readFileSync('src/html/flightLegModal.html', 'utf8'),
-        confirmClearModalTemplate: fs.readFileSync('src/html/confirmClearModal.html', 'utf8'),
-        helpModalTemplate: fs.readFileSync('src/html/helpModal.html', 'utf8'),
-        pointModalTemplate: fs.readFileSync('src/html/pointModal.html', 'utf8'),
-        importModalTemplate: fs.readFileSync('src/html/importModal.html', 'utf8'),
-        gridJumpModalTemplate: fs.readFileSync('src/html/gridJumpModal.html', 'utf8'),
-        settingsModalTemplate: fs.readFileSync('src/html/settingsModal.html', 'utf8')
+        streamTooltip: 'Stream mission plan',
+        flightModalTemplate: fs.readFileSync('app/html/flightModal.html', 'utf8'),
+        flightLegModalTemplate: fs.readFileSync('app/html/flightLegModal.html', 'utf8'),
+        confirmClearModalTemplate: fs.readFileSync('app/html/confirmClearModal.html', 'utf8'),
+        helpModalTemplate: fs.readFileSync('app/html/helpModal.html', 'utf8'),
+        pointModalTemplate: fs.readFileSync('app/html/pointModal.html', 'utf8'),
+        importModalTemplate: fs.readFileSync('app/html/importModal.html', 'utf8'),
+        gridJumpModalTemplate: fs.readFileSync('app/html/gridJumpModal.html', 'utf8'),
+        settingsModalTemplate: fs.readFileSync('app/html/settingsModal.html', 'utf8'),
+        streamModalTemplate: fs.readFileSync('app/html/streamModal.html', 'utf8'),
+        startStreamModalTemplate: fs.readFileSync('app/html/startStreamModal.html', 'utf8'),
+        connectStreamModalTemplate: fs.readFileSync('app/html/connectStreamModal.html', 'utf8'),
+        alreadyConnectedModalTemplate: fs.readFileSync('app/html/alreadyConnectedModal.html', 'utf8'),
+        alreadyStreamingModalTemplate: fs.readFileSync('app/html/alreadyStreamingModal.html', 'utf8')
     };
 })();
