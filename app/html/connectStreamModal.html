@@ -1,10 +1,10 @@
-<div id="stream-modal" class="container">
+<div id="connect-modal" class="container">
     <div class="row">
         <h2><span class='fa fa-share-alt modal-icon'></span> Start Streaming</h2>
     </div>
     <div id="connect-stream-error" class="row error-message hidden-section">
     </div>
-    <form onsubmit="return false;">
+    <form name="connect-form" onsubmit="return false;">
         <fieldset>
             <legend>Select Stream</legend>
             <div class="row">
@@ -15,7 +15,7 @@
         </fieldset>
         <div class="row">
             <label for="stream-password">Password</label>
-            <input id="stream-password" class="half-width" placeholder="password"></input>
+            <input id="stream-password" name="stream-password" class="half-width" placeholder="password"></input>
         </div>
         <div class="row">
             <div class="five columns">
@@ -29,7 +29,7 @@
         </div>
         <div id="leader-hidden" class="row hidden-section">
             <label for="stream-code">Leader Code</label>
-            <input id="stream-code" class="half-width" placeholder="code"></input>
+            <input id="stream-code" name="stream-code" class="half-width" placeholder="code"></input>
         </div>
         <div class="row buttom-row">
             <button id="stream-connect-button" class="modal-ok button-primary" type="submit">Connect</button>

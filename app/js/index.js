@@ -58,6 +58,10 @@
         },
         'flight-leg-form': {
             'flight-leg-speed': 'between:0,9999'
+        },
+        'connect-form': {
+            'stream-password': 'required',
+            'stream-code': 'requiredIf:leader-checkbox:checked'
         }
     });
 
@@ -835,13 +839,19 @@
                                     var code, response;
                                     var checkbox = document.getElementById('leader-checkbox');
                                     if (checkbox.checked) {
-                                        code = document.getElementById('stream-code').value;
-                                        if (!password || !code) {
+                                        if (V.fails('connect-form')) {
                                             var errorElement = document.getElementById('connect-stream-error');
-                                            errorElement.innerHTML = 'All fields are required. Please try again.';
+                                            errorElement.innerHTML = 'Password and code are required to connect.';
                                             util.removeClass(errorElement, 'hidden-section');
                                             return;
                                         }
+                                        code = document.getElementById('stream-code').value;
+                                        // if (!password || !code) {
+                                        //     var errorElement = document.getElementById('connect-stream-error');
+                                        //     errorElement.innerHTML = 'All fields are required. Please try again.';
+                                        //     util.removeClass(errorElement, 'hidden-section');
+                                        //     return;
+                                        // }
                                         response = webdis.getStreamReconnect(selectedStream, password, code);
                                         if (response[0] !== 'SUCCESS') {
                                             var errorElement = document.getElementById('connect-stream-error');
@@ -856,12 +866,18 @@
                                         state.streaming = true;
                                         util.addClass(document.querySelector('a.fa-share-alt'), 'streaming');
                                     } else {
-                                        if (!password) {
+                                        if (V.fails('connect-form')) {
                                             var errorElement = document.getElementById('connect-stream-error');
-                                            errorElement.innerHTML = 'All fields are required. Please try again.';
+                                            errorElement.innerHTML = 'Password is required to connect.';
                                             util.removeClass(errorElement, 'hidden-section');
                                             return;
                                         }
+                                        // if (!password) {
+                                        //     var errorElement = document.getElementById('connect-stream-error');
+                                        //     errorElement.innerHTML = 'All fields are required. Please try again.';
+                                        //     util.removeClass(errorElement, 'hidden-section');
+                                        //     return;
+                                        // }
                                         response = webdis.getStreamInfo(selectedStream, password);
                                         if (response[0] !== 'SUCCESS') {
                                             var errorElement = document.getElementById('connect-stream-error');
