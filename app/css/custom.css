@@ -94,11 +94,11 @@ h3.help-header {
 }
 
 a.streaming {
-    color: #00CC00;
+    color: green;
 }
 
 a.streaming:hover {
-    color: #00CC00;
+    color: green;
 }
 
 a.connected {
