@@ -832,7 +832,7 @@
                                     console.log('connect confirm button');
                                     var selectedStream = streamSelect.options[streamSelect.selectedIndex].value;
                                     var password = document.getElementById('stream-password').value;
-                                    var code = null;
+                                    var code, response;
                                     var checkbox = document.getElementById('leader-checkbox');
                                     if (checkbox.checked) {
                                         code = document.getElementById('stream-code').value;
@@ -842,7 +842,7 @@
                                             util.removeClass(errorElement, 'hidden-section');
                                             return;
                                         }
-                                        var response = webdis.getStreamReconnect(selectedStream, password, code);
+                                        response = webdis.getStreamReconnect(selectedStream, password, code);
                                         if (response[0] !== 'SUCCESS') {
                                             var errorElement = document.getElementById('connect-stream-error');
                                             errorElement.innerHTML = response[1];
@@ -851,6 +851,8 @@
                                         }
                                         state.streamInfo.code = code;
                                         console.log('leader reconnect');
+                                        clearMap();
+                                        importMapState(JSON.parse(response[2]));
                                         state.streaming = true;
                                         util.addClass(document.querySelector('a.fa-share-alt'), 'streaming');
                                     } else {
@@ -860,7 +862,7 @@
                                             util.removeClass(errorElement, 'hidden-section');
                                             return;
                                         }
-                                        var response = webdis.getStreamInfo(selectedStream, password);
+                                        response = webdis.getStreamInfo(selectedStream, password);
                                         if (response[0] !== 'SUCCESS') {
                                             var errorElement = document.getElementById('connect-stream-error');
                                             errorElement.innerHTML = response[1];
@@ -869,6 +871,8 @@
                                         }
                                         console.log('viewer connect');
                                         webdis.subscribe(response[1]);
+                                        clearMap();
+                                        importMapState(JSON.parse(response[2]));
                                         state.connected = response[1];
                                         util.addClass(document.querySelector('a.fa-share-alt'), 'connected');
                                         startConnectedMode();
@@ -878,8 +882,6 @@
                                         password: password,
                                         code: code
                                     };
-                                    clearMap();
-                                    importMapState(JSON.parse(response[2]));
                                     checkButtonsDisabled();
                                     e.modal.hide();
                                 });
