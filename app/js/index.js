@@ -6,6 +6,7 @@
     var calc = require('./calc.js');
     var util = require('./util.js');
     var icons = require('./icons.js')(L);
+    var webdis = require('./webdis.js');
     require('./controls.js');
 
     // VARS
@@ -26,14 +27,19 @@
         DEFAULT_FLIGHT_NAME = 'New Flight'
     ;
 
-    var map, mapTiles, mapConfig, drawnItems, hiddenLayers;
+    var map, mapTiles, mapConfig, drawnItems, hiddenLayers, drawControl;
     var mapConfig = util.getSelectedMapConfig(window.location.hash, content.maps);
     var selectedMapIndex = mapConfig.selectIndex;
     var isEmpty = true;
 
     var state = {
         colorsInverted: false,
-        showBackground: true
+        showBackground: true,
+        streaming: false,
+        connected: false,
+        changing: false,
+        streamInfo: {},
+        streamingAvailable: webdis.init() ? true : false
     };
 
     // PATCHING
@@ -43,6 +49,21 @@
 
     // Patch leaflet content with custom language
     L.drawLocal = content.augmentedLeafletDrawLocal;
+
+    // VALIDATINATOR
+
+    var V = new Validatinator({
+        'grid-jump-form': {
+            'grid-input': 'digitsLength:4'
+        },
+        'flight-leg-form': {
+            'flight-leg-speed': 'between:0,9999'
+        },
+        'connect-form': {
+            'stream-password': 'required',
+            'stream-code': 'requiredIf:leader-checkbox:checked'
+        }
+    });
 
     // FUNCTIONS
 
@@ -65,6 +86,9 @@
     }
 
     function applyCustomFlightLeg(marker) {
+        if (state.changing || state.connected) {
+            return;
+        }
         var parentRoute = drawnItems.getLayer(marker.parentId);
         map.openModal({
             speed: parentRoute.speeds[marker.index],
@@ -75,11 +99,18 @@
                 element.focus();
                 element.select();
                 L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
-                    var newSpeed = parseInt(element.value);
-                    parentRoute.speeds[marker.index] = newSpeed;
-                    marker.options.speed = newSpeed;
-                    applyCustomFlightLegCallback(marker);
-                    e.modal.hide();
+                    if (V.passes('flight-leg-form')) {
+                        var newSpeed = parseInt(element.value);
+                        parentRoute.speeds[marker.index] = newSpeed;
+                        marker.options.speed = newSpeed;
+                        applyCustomFlightLegCallback(marker);
+                        e.modal.hide();
+                    } else {
+                        var errorElement = document.getElementById('flight-leg-error');
+                        errorElement.innerHTML = 'Please input a valid speed in kilometers per hour.';
+                        util.removeClass(errorElement, 'hidden-section');
+                        errorElement.focus();
+                    }
                 });
                 L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
                     e.modal.hide();
@@ -93,17 +124,24 @@
         var newContent = util.formatFlightLegMarker(
                 marker.options.distance, marker.options.heading, marker.options.speed, marker.options.time);
         marker.setIcon(icons.textIconFactory(newContent, 'flight-leg ' + getMapTextClasses(state)));
+        publishMapState();
     }
 
     function applyFlightPlanCallback(route, newFlight) {
         function routeClickHandlerFactory(clickedRoute) {
             return function() {
+                if (state.changing || state.connected) {
+                    return;
+                }
                 deleteAssociatedLayers(L.layerGroup([clickedRoute]));
                 applyFlightPlan(clickedRoute);
             };
         }
         function markerClickHandlerFactory(clickedMarker) {
             return function() {
+                if (state.changing || state.connected) {
+                    return;
+                }
                 applyCustomFlightLeg(clickedMarker);
             };
         }
@@ -154,9 +192,13 @@
         nameMarker.parentId = id;
         nameMarker.on('click', routeClickHandlerFactory(route));
         nameMarker.addTo(map);
+        publishMapState();
     }
 
     function applyFlightPlan(route) {
+        if (state.changing || state.connected) {
+            return;
+        }
         var newFlight = false;
         if (typeof route.speed === 'undefined') {
             route.speed = DEFAULT_FLIGHT_SPEED;
@@ -203,6 +245,9 @@
     function applyTargetInfoCallback(target, newTarget) {
         function targetClickHandlerFactory(clickedTarget) {
             return function() {
+                if (state.changing || state.connected) {
+                    return;
+                }
                 deleteAssociatedLayers(L.layerGroup([clickedTarget]));
                 applyTargetInfo(clickedTarget);
             };
@@ -226,9 +271,13 @@
                 direction: 'left'
             }).addTo(map);
         }
+        publishMapState();
     }
 
     function applyTargetInfo(target) {
+        if (state.changing || state.connected) {
+            return;
+        }
         var newTarget = false;
         if (typeof target.name === 'undefined') {
             target.name = DEFAULT_POINT_NAME;
@@ -317,22 +366,31 @@
         transferChildLayers(map, hiddenLayers);
     }
 
+    function disableButtons(buttonList) {
+        for (var i = 0; i < buttonList.length; i++) {
+            var element = document.getElementById(buttonList[i]);
+            element.classList.add('leaflet-disabled');
+        }
+    }
+
+    function enableButtons(buttonList) {
+        for (var i = 0; i < buttonList.length; i++) {
+            var element = document.getElementById(buttonList[i]);
+            element.classList.remove('leaflet-disabled');
+        }
+    }
+
     function checkButtonsDisabled() {
-        var elements = [
-            document.getElementById('clear-button'),
-            document.getElementById('export-button'),
-            document.getElementById('missionhop-button')
-        ];
+        var buttons = ['export-button', 'missionhop-button'];
+        if (!state.connected) {
+            buttons.push('clear-button');
+        }
         if (drawnItems.getLayers().length === 0) {
             isEmpty = true;
-            for (var i = 0; i < elements.length; i++) {
-                elements[i].classList.add('leaflet-disabled');
-            }
+            disableButtons(buttons);
         } else {
             isEmpty = false;
-            for (var i = 0; i < elements.length; i++) {
-                elements[i].classList.remove('leaflet-disabled');
-            }
+            enableButtons(buttons);
         }
     }
 
@@ -340,6 +398,7 @@
         drawnItems.clearLayers();
         hideChildLayers();
         hiddenLayers.clearLayers();
+        publishMapState();
     }
 
     function exportMapState() {
@@ -369,16 +428,19 @@
     }
 
     function selectMap(mapConfig) {
-        selectedMapIndex = mapConfig.selectIndex;
-        window.location.hash = mapConfig.hash;
-        deleteAssociatedLayers(drawnItems);
-        drawnItems.clearLayers();
-        hiddenLayers.clearLayers();
-        mapTiles.setUrl(mapConfig.tileUrl);
-        map.setMaxBounds(calc.maxBounds(mapConfig));
-        map.setView(calc.center(mapConfig), 3);
-        mapTiles.redraw();
-        mapTiles.addTo(map);
+        var newIndex = mapConfig.selectIndex;
+        if (newIndex !== selectedMapIndex) {
+            selectedMapIndex = mapConfig.selectIndex;
+            window.location.hash = mapConfig.hash;
+            deleteAssociatedLayers(drawnItems);
+            drawnItems.clearLayers();
+            hiddenLayers.clearLayers();
+            mapTiles.setUrl(mapConfig.tileUrl);
+            map.setMaxBounds(calc.maxBounds(mapConfig));
+            map.setView(calc.center(mapConfig), 3);
+            mapTiles.redraw();
+            mapTiles.addTo(map);
+        }
     }
 
     function fitViewToMission() {
@@ -394,6 +456,71 @@
             classes += ' nobg';
         }
         return classes;
+    }
+
+    function importMapState(saveData) {
+        var importedMapConfig = util.getSelectedMapConfig(saveData.mapHash, content.maps);
+        window.location.hash = importedMapConfig.hash;
+        selectMap(importedMapConfig);
+        for (var i = 0; i < saveData.routes.length; i++) {
+            var route = saveData.routes[i];
+            var newRoute = L.polyline(route.latLngs, LINE_OPTIONS);
+            newRoute.name = route.name;
+            newRoute.speed = route.speed;
+            newRoute.speeds = route.speeds;
+            drawnItems.addLayer(newRoute);
+            applyFlightPlanCallback(newRoute);
+        }
+        for (var i = 0; i < saveData.points.length; i++) {
+            var point = saveData.points[i];
+            var newPoint = L.marker(point.latLng, {
+                icon: icons.factory(point.type, point.color)
+            });
+            newPoint.name = point.name;
+            newPoint.type = point.type;
+            newPoint.color = point.color;
+            newPoint.notes = point.notes;
+            drawnItems.addLayer(newPoint);
+            applyTargetInfoCallback(newPoint);
+        }
+    }
+
+    function publishMapState() {
+        if (state.streaming) {
+            console.log(state.streamInfo);
+            var saveData = exportMapState();
+            console.log(saveData);
+            webdis.publish(state.streamInfo.name, state.streamInfo.password,
+                    state.streamInfo.code, window.escape(JSON.stringify(saveData)));
+        }
+    }
+
+    function startConnectedMode() {
+        map.removeControl(drawControl);
+        map.removeControl(clearButton);
+    }
+
+    function endConnectedMode() {
+        map.removeControl(gridToolbar);
+        map.removeControl(importExportToolbar);
+        map.addControl(drawControl);
+        map.addControl(gridToolbar);
+        map.addControl(clearButton);
+        map.addControl(importExportToolbar);
+        checkButtonsDisabled();
+    }
+
+    function setupCheckboxTogglableElement(checkboxId, elementId) {
+        var checkbox = document.getElementById(checkboxId);
+        var element = document.getElementById(elementId);
+        L.DomEvent.on(checkbox, 'click', function() {
+            if (checkbox.checked) {
+                util.removeClass(element, 'hidden-section');
+
+            } else {
+                util.addClass(element, 'hidden-section');
+            }
+        });
     }
 
     // MAP SETUP
@@ -420,7 +547,7 @@
 
     // BUTTONS
 
-    var drawControl = new L.Control.Draw({
+    drawControl = new L.Control.Draw({
         draw: {
             polygon: false,
             rectangle: false,
@@ -503,10 +630,10 @@
                             mapSelect.focus();
                             L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
                                 if (mapSelect.selectedIndex !== originalIndex) {
-                                    selectedMapIndex = mapSelect.selectedIndex;
-                                    var selectedMap = mapSelect.options[selectedMapIndex].value;
+                                    var selectedMap = mapSelect.options[mapSelect.selectedIndex].value;
                                     mapConfig = content.maps[selectedMap];
                                     selectMap(mapConfig);
+                                    selectedMapIndex = mapSelect.selectedIndex;
                                 }
                                 if (invertCheckbox.checked !== state.colorsInverted) {
                                     state.colorsInverted = invertCheckbox.checked;
@@ -588,30 +715,7 @@
                             });
                             L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
                                 var saveData = JSON.parse(fileContent);
-                                var importedMapConfig = util.getSelectedMapConfig(saveData.mapHash, content.maps);
-                                window.location.hash = importedMapConfig.hash;
-                                selectMap(importedMapConfig);
-                                for (var i = 0; i < saveData.routes.length; i++) {
-                                    var route = saveData.routes[i];
-                                    var newRoute = L.polyline(route.latLngs, LINE_OPTIONS);
-                                    newRoute.name = route.name;
-                                    newRoute.speed = route.speed;
-                                    newRoute.speeds = route.speeds;
-                                    drawnItems.addLayer(newRoute);
-                                    applyFlightPlanCallback(newRoute);
-                                }
-                                for (var i = 0; i < saveData.points.length; i++) {
-                                    var point = saveData.points[i];
-                                    var newPoint = L.marker(point.latLng, {
-                                        icon: icons.factory(point.type, point.color)
-                                    });
-                                    newPoint.name = point.name;
-                                    newPoint.type = point.type;
-                                    newPoint.color = point.color;
-                                    newPoint.notes = point.notes;
-                                    drawnItems.addLayer(newPoint);
-                                    applyTargetInfoCallback(newPoint);
-                                }
+                                importMapState(saveData);
                                 e.modal.hide();
                                 fitViewToMission();
                             });
@@ -638,6 +742,217 @@
                     }
                 }
             },
+            {
+                id: 'stream-button',
+                icon: 'fa-share-alt',
+                tooltip: content.streamTooltip,
+                clickFn: function() {
+                    var template;
+                    if (!state.streaming && !state.connected) {
+                        template = content.streamModalTemplate;
+                        fireStreamModal();
+                    } else if (state.streaming && !state.connected) {
+                        template = content.alreadyStreamingModalTemplate;
+                        fireAlreadyStreamingModal();
+                    } else if (!state.streaming && state.connected) {
+                        template = content.alreadyConnectedModalTemplate;
+                        fireAlreadyConnectedModal();
+                    }
+                    function fireStreamModal() {
+                        map.openModal({
+                            template: template,
+                            onShow: function(e) {
+                                document.getElementById('stream-start-button').focus();
+                                L.DomEvent.on(document.getElementById('stream-start-button'), 'click', function() {
+                                    console.log('start button');
+                                    e.modal.hide();
+                                    fireStartModal();
+                                });
+                                L.DomEvent.on(document.getElementById('stream-connect-button'), 'click', function() {
+                                    console.log('connect button');
+                                    e.modal.hide();
+                                    fireConnectModal();
+                                });
+                                L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
+                                    console.log('cancel button');
+                                    e.modal.hide();
+                                });
+                            }
+                        });
+                    }
+                    function fireStartModal() {
+                        map.openModal({
+                            template: content.startStreamModalTemplate,
+                            onShow: function(e) {
+                                document.getElementById('stream-start-confirm-button').focus();
+                                L.DomEvent.on(document.getElementById('stream-start-confirm-button'), 'click', function() {
+                                    var streamName = document.getElementById('stream-name').value;
+                                    var streamPassword = document.getElementById('stream-password').value;
+                                    var streamCode = document.getElementById('stream-leader-code').value;
+                                    if (!streamName || !streamPassword || !streamCode) {
+                                        var errorElement = document.getElementById('start-stream-error');
+                                        errorElement.innerHTML = 'All fields are required. Try again.';
+                                        util.removeClass(errorElement, 'hidden-section');
+                                        return;
+                                    }
+                                    var mapState = window.escape(JSON.stringify(exportMapState()));
+                                    var response = webdis.startStream(streamName, streamPassword, streamCode, mapState);
+                                    console.log(response);
+                                    if (response[0] !== 'SUCCESS')  {
+                                        var errorElement = document.getElementById('start-stream-error');
+                                        errorElement.innerHTML = response[1];
+                                        util.removeClass(errorElement, 'hidden-section');
+                                        return;
+                                    }
+                                    state.streaming = true;
+                                    util.addClass(document.querySelector('a.fa-share-alt'), 'streaming');
+                                    state.streamInfo = {
+                                        name: streamName,
+                                        password: streamPassword,
+                                        code: streamCode
+                                    };
+                                    e.modal.hide();
+                                });
+                                L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
+                                    console.log('start cancel button');
+                                    e.modal.hide();
+                                });
+                            }
+                        });
+                    }
+                    function fireConnectModal() {
+                        map.openModal({
+                            template: content.connectStreamModalTemplate,
+                            onShow: function(e) {
+                                var streamSelect = document.getElementById('stream-select');
+                                var streams = webdis.getStreamList();
+                                streamSelect.options.length = 0;
+                                for (var i=0; i < streams.length; i++) {
+                                    streamSelect.options[i] = new Option(streams[i].substring(7), streams[i].substring(7));
+                                }
+                                setupCheckboxTogglableElement('leader-checkbox', 'leader-hidden');
+                                document.getElementById('stream-connect-button').focus();
+                                L.DomEvent.on(document.getElementById('stream-connect-button'), 'click', function() {
+                                    console.log('connect confirm button');
+                                    var selectedStream = streamSelect.options[streamSelect.selectedIndex].value;
+                                    var password = document.getElementById('stream-password').value;
+                                    var code, response;
+                                    var checkbox = document.getElementById('leader-checkbox');
+                                    if (checkbox.checked) {
+                                        if (V.fails('connect-form')) {
+                                            var errorElement = document.getElementById('connect-stream-error');
+                                            errorElement.innerHTML = 'Password and code are required to connect.';
+                                            util.removeClass(errorElement, 'hidden-section');
+                                            return;
+                                        }
+                                        code = document.getElementById('stream-code').value;
+                                        // if (!password || !code) {
+                                        //     var errorElement = document.getElementById('connect-stream-error');
+                                        //     errorElement.innerHTML = 'All fields are required. Please try again.';
+                                        //     util.removeClass(errorElement, 'hidden-section');
+                                        //     return;
+                                        // }
+                                        response = webdis.getStreamReconnect(selectedStream, password, code);
+                                        if (response[0] !== 'SUCCESS') {
+                                            var errorElement = document.getElementById('connect-stream-error');
+                                            errorElement.innerHTML = response[1];
+                                            util.removeClass(errorElement, 'hidden-section');
+                                            return;
+                                        }
+                                        state.streamInfo.code = code;
+                                        console.log('leader reconnect');
+                                        clearMap();
+                                        importMapState(JSON.parse(response[2]));
+                                        state.streaming = true;
+                                        util.addClass(document.querySelector('a.fa-share-alt'), 'streaming');
+                                    } else {
+                                        if (V.fails('connect-form')) {
+                                            var errorElement = document.getElementById('connect-stream-error');
+                                            errorElement.innerHTML = 'Password is required to connect.';
+                                            util.removeClass(errorElement, 'hidden-section');
+                                            return;
+                                        }
+                                        // if (!password) {
+                                        //     var errorElement = document.getElementById('connect-stream-error');
+                                        //     errorElement.innerHTML = 'All fields are required. Please try again.';
+                                        //     util.removeClass(errorElement, 'hidden-section');
+                                        //     return;
+                                        // }
+                                        response = webdis.getStreamInfo(selectedStream, password);
+                                        if (response[0] !== 'SUCCESS') {
+                                            var errorElement = document.getElementById('connect-stream-error');
+                                            errorElement.innerHTML = response[1];
+                                            util.removeClass(errorElement, 'hidden-section');
+                                            return;
+                                        }
+                                        console.log('viewer connect');
+                                        webdis.subscribe(response[1]);
+                                        clearMap();
+                                        importMapState(JSON.parse(response[2]));
+                                        state.connected = response[1];
+                                        util.addClass(document.querySelector('a.fa-share-alt'), 'connected');
+                                        startConnectedMode();
+                                    }
+                                    state.streamInfo = {
+                                        name: selectedStream,
+                                        password: password,
+                                        code: code
+                                    };
+                                    checkButtonsDisabled();
+                                    e.modal.hide();
+                                });
+                                L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
+                                    console.log('connect cancel button');
+                                    e.modal.hide();
+                                });
+                            }
+                        });
+                    }
+                    function fireAlreadyConnectedModal() {
+                        map.openModal({
+                            streamName: state.streamInfo.name,
+                            template: content.alreadyConnectedModalTemplate,
+                            onShow: function(e) {
+                                document.getElementById('disconnect-button').focus();
+                                L.DomEvent.on(document.getElementById('disconnect-button'), 'click', function() {
+                                    console.log('already connected disconnect button');
+                                    webdis.unsubscribe(state.connected);
+                                    state.connected = false;
+                                    util.removeClass(document.querySelector('a.fa-share-alt'), 'connected');
+                                    endConnectedMode();
+                                    e.modal.hide();
+                                });
+                                L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
+                                    console.log('already connected cancel button');
+                                    e.modal.hide();
+                                });
+                            }
+                        });
+                    }
+                    function fireAlreadyStreamingModal() {
+                        map.openModal({
+                            streamName: state.streamInfo.name,
+                            streamPassword: state.streamInfo.password,
+                            streamCode: state.streamInfo.code,
+                            template: content.alreadyStreamingModalTemplate,
+                            onShow: function(e) {
+                                document.getElementById('stop-streaming-button').focus();
+                                setupCheckboxTogglableElement('already-streaming-checkbox', 'already-streaming-hidden');
+                                L.DomEvent.on(document.getElementById('stop-streaming-button'), 'click', function() {
+                                    console.log('already streaming stop button');
+                                    e.modal.hide();
+                                    state.streaming = false;
+                                    util.removeClass(document.querySelector('a.fa-share-alt'), 'streaming');
+                                });
+                                L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
+                                    console.log('already streaming cancel button');
+                                    e.modal.hide();
+                                });
+                            }
+                        });
+                    }
+                }
+            }
         ]
     });
     map.addControl(importExportToolbar);
@@ -656,10 +971,17 @@
                             var gridElement = document.getElementById('grid-input');
                             gridElement.focus();
                             L.DomEvent.on(e.modal._container.querySelector('.modal-ok'), 'click', function() {
-                                var grid = gridElement.value;
-                                var viewLatLng = calc.gridLatLng(grid, mapConfig);
-                                map.setView(viewLatLng, mapConfig.gridHopZoom);
-                                e.modal.hide();
+                                if (V.passes('grid-jump-form')) {
+                                    var grid = gridElement.value;
+                                    var viewLatLng = calc.gridLatLng(grid, mapConfig);
+                                    map.setView(viewLatLng, mapConfig.gridHopZoom);
+                                    e.modal.hide();
+                                } else {
+                                    var errorElement = document.getElementById('grid-jump-error');
+                                    errorElement.innerHTML = 'Please input a valid four digit grid number.';
+                                    util.removeClass(errorElement, 'hidden-section');
+                                    errorElement.focus();
+                                }
                             });
                             L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
                                 e.modal.hide();
@@ -682,7 +1004,7 @@
     });
     map.addControl(gridToolbar);
 
-    // MAP.ON EVENTS
+    // EVENT LISTENERS
 
     map.on('draw:created', function(e) {
         drawnItems.addLayer(e.layer);
@@ -696,6 +1018,7 @@
 
     map.on('draw:deleted', function(e) {
         deleteAssociatedLayers(e.layers);
+        publishMapState();
         checkButtonsDisabled();
     });
 
@@ -709,27 +1032,53 @@
                 applyTargetInfoCallback(layer);
             }
         });
+        publishMapState();
     });
 
     map.on('draw:editstart', function() {
+        state.changing = true;
         hideChildLayers();
     });
 
     map.on('draw:editstop', function() {
+        state.changing = false;
         showChildLayers();
         checkButtonsDisabled();
     });
 
     map.on('draw:deletestart', function() {
+        state.changing = true;
         hideChildLayers();
     });
 
     map.on('draw:deletestop', function() {
+        state.changing = false;
         showChildLayers();
         checkButtonsDisabled();
     });
 
-    // END EVENTS
+    window.addEventListener('il2:streamerror', function (e) {
+        if (!state.connected) {
+            return;
+        }
+        console.log('il2:streamerror');
+        util.addClass(document.querySelector('a.fa-share-alt'), 'stream-error');
+    });
+
+    window.addEventListener('il2:streamupdate', function (e) {
+        if (!state.connected) {
+            return;
+        }
+        var saveData = e.detail;
+        console.log('il2:streamupdate: ' + saveData);
+        if (saveData !== 1) {
+            clearMap();
+            importMapState(JSON.parse(saveData));
+        }
+        checkButtonsDisabled();
+    });
+
+    // MISC
 
     checkButtonsDisabled();
 

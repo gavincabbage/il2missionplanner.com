@@ -93,21 +93,46 @@ h3.help-header {
     font-weight: 700;
 }
 
-/*.modal-item {
-    width: 100%;
-    padding-bottom: 10px;
+a.streaming {
+    color: green;
 }
 
-.modal-item-label {
-    display: inline-block;
-    text-align: right;
+a.streaming:hover {
+    color: green;
 }
 
-.modal-item-text {
-    height: 100px;
-    resize: none;
-    vertical-align: top;
-}*/
+a.connected {
+    color: blue;
+}
+
+a.connected:hover {
+    color: blue;
+}
+
+a.stream-error {
+    color: #9A070B;
+}
+
+a.stream-error:hover {
+    color: #9A070B;
+}
+
+div.error-message {
+    display: block;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-left: 5px solid #9A070B;
+    background-color: #FEE7E7;
+    color: #9A070B;
+}
+
+div.hidden-section {
+    display: none;
+}
+
+label.checkbox-label {
+    font-weight: 400;
+}
 
 button.button-primary {
     background-color: #9A070B;
@@ -127,6 +152,10 @@ img.modal-image {
 
 #point-type-select {
     margin-left: 0%;
+}
+
+#already-streaming-hidden {
+    margin-top: 14px;
 }
 
 @media(max-width: 1600px) {
