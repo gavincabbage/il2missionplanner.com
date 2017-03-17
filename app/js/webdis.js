@@ -1,5 +1,7 @@
 module.exports = (function() {
 
+    var util = require('./util.js');
+
     const
         WEBDIS_HOST = 'http://stream.il2missionplanner.com:7379'
     ;
@@ -27,12 +29,11 @@ module.exports = (function() {
 
         publish: function(stream, password, code, state) {
             var url = this._buildEvalshaUrl(this.scripts.publishState, [stream, password, code, state]);
-            var xhr = this._buildWebdisXhr(url, function(){
+            var xhr = util.buildGetXhr(url, function(){
                 if (xhr.readyState === 4) {
                     var responseBody = JSON.parse(xhr.responseText).EVALSHA;
                     if (responseBody[0] !== 'SUCCESS') {
-                        console.log('publishing error: ' + responseBody[1]);
-                        // TODO fire an event here to turn stream icon red or something
+                        this._errorHandler();
                     }
                 }
             });
@@ -40,66 +41,58 @@ module.exports = (function() {
 
         hmget: function(key, fields) {
             var url = this._buildHmgetUrl(key, fields);
-            var response = this._buildSyncWebdisXhr(url);
+            var response = util.buildSyncGetXhr(url);
             return JSON.parse(response.responseText).HMGET;
         },
 
         subscribe: function(channel) {
-            console.log('subscribing to channel: '+channel);
             var prev_length = 0;
             var url = this._buildSubscribeUrl(channel);
-            var xhr = this._buildWebdisXhr(url, function() {
-                function subscribeErrorHandler() {
-                    var evt = new CustomEvent('il2:streamerror');
-                    window.dispatchEvent(evt);
-                }
+            var xhr = util.buildGetXhr(url, function() {
                 if (xhr.readyState === 3) {
                     var response = xhr.responseText;
                     try {
                         var chunk = JSON.parse(response.slice(prev_length));
                         if (!chunk || typeof chunk !== 'object') {
-                            subscribeErrorHandler();
+                            this._errorHandler();
                         }
                     } catch(e) {
-                        subscribeErrorHandler();
+                        this._errorHandler();
                     }
-                    console.log(chunk);
                     var newState = chunk.SUBSCRIBE[2];
                     prev_length = response.length;
                     var evt = new CustomEvent('il2:streamupdate', {detail: newState});
                     window.dispatchEvent(evt);
-                } else if (xhr.readyState === 4) {
-                    console.log('subscribe ended');
                 }
             });
         },
 
         unsubscribe: function(channel) {
             var url = this._buildUnsubscribeUrl(channel);
-            this._buildWebdisXhr(url, function(){});
+            util.buildGetXhr(url, function(){});
         },
 
         getStreamList: function() {
             var url = this._buildKeysUrl('stream:*');
-            var response = this._buildSyncWebdisXhr(url);
+            var response = util.buildSyncGetXhr(url);
             return JSON.parse(response.responseText).KEYS;
         },
 
         getStreamInfo: function(stream, password) {
             var url = this._buildEvalshaUrl(this.scripts.getChannel, [stream, password]);
-            var response = this._buildSyncWebdisXhr(url);
+            var response = util.buildSyncGetXhr(url);
             return JSON.parse(response.responseText).EVALSHA;
         },
 
         getStreamReconnect: function(stream, password, code) {
             var url = this._buildEvalshaUrl(this.scripts.getReconnect, [stream, password, code]);
-            var response = this._buildSyncWebdisXhr(url);
+            var response = util.buildSyncGetXhr(url);
             return JSON.parse(response.responseText).EVALSHA;
         },
 
         startStream: function(name, password, code, state) {
             var url = this._buildEvalshaUrl(this.scripts.newStream, [name, password, code, state]);
-            var response = this._buildSyncWebdisXhr(url);
+            var response = util.buildSyncGetXhr(url);
             return JSON.parse(response.responseText).EVALSHA;
         },
 
@@ -135,19 +128,9 @@ module.exports = (function() {
             return WEBDIS_HOST + '/UNSUBSCRIBE/' + channel;
         },
 
-        _buildWebdisXhr: function(url, updateFn) {
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', url, true);
-            xhr.onreadystatechange = updateFn;
-            xhr.send(null);
-            return xhr;
-        },
-
-        _buildSyncWebdisXhr: function(url) {
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', url, false);
-            xhr.send(null);
-            return xhr;
+        _errorHandler() {
+            var evt = new CustomEvent('il2:streamerror');
+            window.dispatchEvent(evt);
         }
     };
 })();
