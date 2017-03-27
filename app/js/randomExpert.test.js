@@ -12,10 +12,10 @@ describe('randomExpert', function() {
         assert.isDefined(randomExpert);
     });
 
-    describe('webdis.getMapConfig', function() {
+    describe('webdis.getMapState', function() {
 
         it('must be defined', function() {
-            assert.isDefined(randomExpert.getMapConfig);
+            assert.isDefined(randomExpert.getMapState);
         });
     });
 

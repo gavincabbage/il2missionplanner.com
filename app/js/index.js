@@ -19,12 +19,13 @@
         }
     ;
 
-    var map, mapTiles, mapConfig, drawnItems, hiddenLayers, drawControl, hash;
+    var map, mapTiles, mapConfig, drawnItems, hiddenLayers,
+            drawControl, hash, randomExpertState;
 
     if (window.location.hash === randomExpert.HASH) {
-        // and then at the end import?
-        console.log('HERE');
-        console.log(randomExpert.getMapConfig());
+        randomExpertState = randomExpert.getMapState();
+        console.log(randomExpertState);
+        hash = randomExpertState.mapHash;
     } else {
         hash = window.location.hash;
     }
