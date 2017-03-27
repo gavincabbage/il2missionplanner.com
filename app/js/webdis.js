@@ -128,7 +128,7 @@ module.exports = (function() {
             return WEBDIS_HOST + '/UNSUBSCRIBE/' + channel;
         },
 
-        _errorHandler() {
+        _errorHandler: function() {
             var evt = new CustomEvent('il2:streamerror');
             window.dispatchEvent(evt);
         }
