@@ -3,7 +3,7 @@ module.exports = (function() {
     var util = require('./util.js');
 
     const
-        RANDOM_EXPERT_HOST = 'http://tiles.il2missionplanner.com.s3-website-us-east-1.amazonaws.com/img/map-state.json'
+        RANDOM_EXPERT_HOST = 'http://72ag-ded.ru/static/il2missionplanner.json'
     ;
 
     return {
