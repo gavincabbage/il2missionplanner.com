@@ -1,5 +1,7 @@
 (function() {
 
+    var fs = require('fs');
+
     var content = require('./content.js');
     var calc = require('./calc.js');
     var util = require('./util.js');
@@ -11,6 +13,8 @@
     const
         SAVE_HEADER = 'data:text/json;charset=utf-8,',
         RED = '#9A070B',
+        RED_FRONT = '#BD0101',
+        BLUE_FRONT = '#4D4B40',
         FLIGHT_OPACITY = 0.8,
         LINE_OPTIONS = {
             color: RED,
@@ -21,16 +25,6 @@
 
     var map, mapTiles, mapConfig, drawnItems, hiddenLayers,
             drawControl, hash, randomExpertState;
-
-    if (window.location.hash === randomExpert.HASH) {
-        randomExpertState = randomExpert.getMapState();
-        console.log(randomExpertState);
-        hash = randomExpertState.mapHash;
-    } else {
-        hash = window.location.hash;
-    }
-    var mapConfig = util.getSelectedMapConfig(hash, content.maps);
-    var selectedMapIndex = mapConfig.selectIndex;
 
     var state = {
         colorsInverted: false,
@@ -448,26 +442,41 @@
         var importedMapConfig = util.getSelectedMapConfig(saveData.mapHash, content.maps);
         window.location.hash = importedMapConfig.hash;
         selectMap(importedMapConfig);
-        for (var i = 0; i < saveData.routes.length; i++) {
-            var route = saveData.routes[i];
-            var newRoute = L.polyline(route.latLngs, LINE_OPTIONS);
-            newRoute.name = route.name;
-            newRoute.speed = route.speed;
-            newRoute.speeds = route.speeds;
-            drawnItems.addLayer(newRoute);
-            applyFlightPlanCallback(newRoute);
+        if (saveData.routes) {
+            for (var i = 0; i < saveData.routes.length; i++) {
+                var route = saveData.routes[i];
+                var newRoute = L.polyline(route.latLngs, LINE_OPTIONS);
+                newRoute.name = route.name;
+                newRoute.speed = route.speed;
+                newRoute.speeds = route.speeds;
+                drawnItems.addLayer(newRoute);
+                applyFlightPlanCallback(newRoute);
+            }
         }
-        for (var i = 0; i < saveData.points.length; i++) {
-            var point = saveData.points[i];
-            var newPoint = L.marker(point.latLng, {
-                icon: icons.factory(point.type, point.color)
-            });
-            newPoint.name = point.name;
-            newPoint.type = point.type;
-            newPoint.color = point.color;
-            newPoint.notes = point.notes;
-            drawnItems.addLayer(newPoint);
-            applyTargetInfoCallback(newPoint);
+        if (saveData.points) {
+            for (var i = 0; i < saveData.points.length; i++) {
+                var point = saveData.points[i];
+                var newPoint = L.marker(point.latLng, {
+                    icon: icons.factory(point.type, point.color)
+                });
+                newPoint.name = point.name;
+                newPoint.type = point.type;
+                newPoint.color = point.color;
+                newPoint.notes = point.notes;
+                drawnItems.addLayer(newPoint);
+                applyTargetInfoCallback(newPoint);
+            }
+        }
+        if (saveData.frontline) { // random expert frontline
+            for (var frontNdx = 0; frontNdx < saveData.frontline.length; frontNdx++) { // for each frontline
+                var blueFront = saveData.frontline[frontNdx][0];
+                var redFront = saveData.frontline[frontNdx][1];
+                console.log(blueFront);
+                console.log(redFront);
+                L.polyline(blueFront, {color: BLUE_FRONT, opacity: 1}).addTo(map);
+                L.polyline(redFront, {color: RED_FRONT, opacity: 1}).addTo(map);
+            }
+
         }
     }
 
@@ -507,6 +516,19 @@
         });
     }
 
+    // start "main" sorta... christ this code sucks... "someday"
+
+    if (window.location.hash === randomExpert.HASH) {
+        //randomExpertState = JSON.parse(fs.readFileSync('app/html/randomExpert.json', 'utf8'));
+        randomExpertState = randomExpert.getMapState();
+        console.log(randomExpertState);
+        hash = randomExpertState.mapHash;
+    } else {
+        hash = window.location.hash;
+    }
+    var mapConfig = util.getSelectedMapConfig(hash, content.maps);
+    var selectedMapIndex = mapConfig.selectIndex;
+
     map = L.map('map', {
         crs: L.CRS.Simple,
         attributionControl: false
@@ -526,6 +548,10 @@
     drawnItems = L.featureGroup();
     map.addLayer(drawnItems);
     hiddenLayers = L.featureGroup();
+
+    if (randomExpertState) {
+        importMapState(randomExpertState);
+    }
 
     drawControl = new L.Control.Draw({
         draw: {
@@ -614,6 +640,7 @@
                                     mapConfig = content.maps[selectedMap];
                                     selectMap(mapConfig);
                                     selectedMapIndex = mapSelect.selectedIndex;
+                                    publishMapState();
                                 }
                                 if (invertCheckbox.checked !== state.colorsInverted) {
                                     state.colorsInverted = invertCheckbox.checked;
