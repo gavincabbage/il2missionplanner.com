@@ -151,9 +151,32 @@ module.exports = (function() {
         }
     };
 
+    var defaults = {
+      flightName: 'New Flight',
+      flightSpeed: 300,
+      pointType: 'marker',
+      pointColor: 'black',
+      pointName: 'New Marker'
+    };
+
+    var validatinatorConfig = {
+        'grid-jump-form': {
+            'grid-input': 'digitsLength:4'
+        },
+        'flight-leg-form': {
+            'flight-leg-speed': 'between:0,9999'
+        },
+        'connect-form': {
+            'stream-password': 'required',
+            'stream-code': 'requiredIf:leader-checkbox:checked'
+        }
+    };
+
     return {
         augmentedLeafletDrawLocal: augmentedLeafletDrawLocal,
         maps: mapConfigs,
+        default: defaults,
+        validatinatorConfig: validatinatorConfig,
         titleText: 'Il-2 Mission Planner',
         helpTooltip: 'How to use this tool',
         clearTooltip: 'Clear the map',
