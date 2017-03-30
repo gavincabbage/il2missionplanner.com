@@ -41,6 +41,21 @@ module.exports = (function() {
             return typeof layer.getLatLng !== 'undefined';
         },
 
+        buildGetXhr: function(url, updateFn) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            xhr.onreadystatechange = updateFn;
+            xhr.send(null);
+            return xhr;
+        },
+
+        buildSyncGetXhr: function(url) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', url, false);
+            xhr.send(null);
+            return xhr;
+        },
+
         // Class functions taken from here: http://jaketrent.com/post/addremove-classes-raw-javascript/
         hasClass: function(el, className) {
             if (el.classList) {

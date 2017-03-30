@@ -1,36 +1,30 @@
 (function() {
 
-    // IMPORTS
+    var fs = require('fs');
 
     var content = require('./content.js');
     var calc = require('./calc.js');
     var util = require('./util.js');
     var icons = require('./icons.js')(L);
     var webdis = require('./webdis.js');
+    var randomExpert = require('./randomExpert.js');
     require('./controls.js');
-
-    // VARS
 
     const
         SAVE_HEADER = 'data:text/json;charset=utf-8,',
         RED = '#9A070B',
-        DEFAULT_FLIGHT_SPEED = 300,
+        RED_FRONT = '#BD0101',
+        BLUE_FRONT = '#4D4B40',
         FLIGHT_OPACITY = 0.8,
         LINE_OPTIONS = {
             color: RED,
             weight: 2,
             opacity: FLIGHT_OPACITY
-        },
-        DEFAULT_POINT_TYPE = 'marker',
-        DEFAULT_POINT_COLOR = 'black',
-        DEFAULT_POINT_NAME = 'New Marker',
-        DEFAULT_FLIGHT_NAME = 'New Flight'
+        }
     ;
 
-    var map, mapTiles, mapConfig, drawnItems, hiddenLayers, drawControl;
-    var mapConfig = util.getSelectedMapConfig(window.location.hash, content.maps);
-    var selectedMapIndex = mapConfig.selectIndex;
-    var isEmpty = true;
+    var map, mapTiles, mapConfig, drawnItems, hiddenLayers,
+            drawControl, hash, randomExpertState;
 
     var state = {
         colorsInverted: false,
@@ -42,30 +36,18 @@
         streamingAvailable: webdis.init() ? true : false
     };
 
-    // PATCHING
-
     // Patch a leaflet bug, see https://github.com/bbecquet/Leaflet.PolylineDecorator/issues/17
     L.PolylineDecorator.include(L.Mixin.Events);
 
     // Patch leaflet content with custom language
     L.drawLocal = content.augmentedLeafletDrawLocal;
 
-    // VALIDATINATOR
+    // Initialize form validation
+    var V = new Validatinator(content.validatinatorConfig);
 
-    var V = new Validatinator({
-        'grid-jump-form': {
-            'grid-input': 'digitsLength:4'
-        },
-        'flight-leg-form': {
-            'flight-leg-speed': 'between:0,9999'
-        },
-        'connect-form': {
-            'stream-password': 'required',
-            'stream-code': 'requiredIf:leader-checkbox:checked'
-        }
-    });
-
-    // FUNCTIONS
+    function mapIsEmpty() {
+      return drawnItems.getLayers().length === 0;
+    }
 
     function newFlightDecorator(route) {
         return L.polylineDecorator(route, {
@@ -201,11 +183,11 @@
         }
         var newFlight = false;
         if (typeof route.speed === 'undefined') {
-            route.speed = DEFAULT_FLIGHT_SPEED;
+            route.speed = content.default.flightSpeed;
             newFlight = true;
         }
         if (typeof route.name === 'undefined') {
-            route.name = DEFAULT_FLIGHT_NAME;
+            route.name = content.default.flightName;
         }
         var initialSpeed = route.speed;
         var clickedOk = false;
@@ -280,17 +262,17 @@
         }
         var newTarget = false;
         if (typeof target.name === 'undefined') {
-            target.name = DEFAULT_POINT_NAME;
+            target.name = content.default.pointName;
             var newTarget = true;
         }
         if (typeof target.notes === 'undefined') {
             target.notes = '';
         }
         if (typeof target.type === 'undefined') {
-            target.type = DEFAULT_POINT_TYPE;
+            target.type = content.default.pointType;
         }
         if (typeof target.color === 'undefined') {
-            target.color = DEFAULT_POINT_COLOR;
+            target.color = content.default.pointColor;
         }
         var clickedOk = false;
         map.openModal({
@@ -385,11 +367,9 @@
         if (!state.connected) {
             buttons.push('clear-button');
         }
-        if (drawnItems.getLayers().length === 0) {
-            isEmpty = true;
+        if (mapIsEmpty()) {
             disableButtons(buttons);
         } else {
-            isEmpty = false;
             enableButtons(buttons);
         }
     }
@@ -462,34 +442,47 @@
         var importedMapConfig = util.getSelectedMapConfig(saveData.mapHash, content.maps);
         window.location.hash = importedMapConfig.hash;
         selectMap(importedMapConfig);
-        for (var i = 0; i < saveData.routes.length; i++) {
-            var route = saveData.routes[i];
-            var newRoute = L.polyline(route.latLngs, LINE_OPTIONS);
-            newRoute.name = route.name;
-            newRoute.speed = route.speed;
-            newRoute.speeds = route.speeds;
-            drawnItems.addLayer(newRoute);
-            applyFlightPlanCallback(newRoute);
+        if (saveData.routes) {
+            for (var i = 0; i < saveData.routes.length; i++) {
+                var route = saveData.routes[i];
+                var newRoute = L.polyline(route.latLngs, LINE_OPTIONS);
+                newRoute.name = route.name;
+                newRoute.speed = route.speed;
+                newRoute.speeds = route.speeds;
+                drawnItems.addLayer(newRoute);
+                applyFlightPlanCallback(newRoute);
+            }
         }
-        for (var i = 0; i < saveData.points.length; i++) {
-            var point = saveData.points[i];
-            var newPoint = L.marker(point.latLng, {
-                icon: icons.factory(point.type, point.color)
-            });
-            newPoint.name = point.name;
-            newPoint.type = point.type;
-            newPoint.color = point.color;
-            newPoint.notes = point.notes;
-            drawnItems.addLayer(newPoint);
-            applyTargetInfoCallback(newPoint);
+        if (saveData.points) {
+            for (var i = 0; i < saveData.points.length; i++) {
+                var point = saveData.points[i];
+                var newPoint = L.marker(point.latLng, {
+                    icon: icons.factory(point.type, point.color)
+                });
+                newPoint.name = point.name;
+                newPoint.type = point.type;
+                newPoint.color = point.color;
+                newPoint.notes = point.notes;
+                drawnItems.addLayer(newPoint);
+                applyTargetInfoCallback(newPoint);
+            }
+        }
+        if (saveData.frontline) { // random expert frontline
+            for (var frontNdx = 0; frontNdx < saveData.frontline.length; frontNdx++) { // for each frontline
+                var blueFront = saveData.frontline[frontNdx][0];
+                var redFront = saveData.frontline[frontNdx][1];
+                console.log(blueFront);
+                console.log(redFront);
+                L.polyline(blueFront, {color: BLUE_FRONT, opacity: 1}).addTo(map);
+                L.polyline(redFront, {color: RED_FRONT, opacity: 1}).addTo(map);
+            }
+
         }
     }
 
     function publishMapState() {
         if (state.streaming) {
-            console.log(state.streamInfo);
             var saveData = exportMapState();
-            console.log(saveData);
             webdis.publish(state.streamInfo.name, state.streamInfo.password,
                     state.streamInfo.code, window.escape(JSON.stringify(saveData)));
         }
@@ -523,7 +516,18 @@
         });
     }
 
-    // MAP SETUP
+    // start "main" sorta... christ this code sucks... "someday"
+
+    if (window.location.hash === randomExpert.HASH) {
+        //randomExpertState = JSON.parse(fs.readFileSync('app/html/randomExpert.json', 'utf8'));
+        randomExpertState = randomExpert.getMapState();
+        console.log(randomExpertState);
+        hash = randomExpertState.mapHash;
+    } else {
+        hash = window.location.hash;
+    }
+    var mapConfig = util.getSelectedMapConfig(hash, content.maps);
+    var selectedMapIndex = mapConfig.selectIndex;
 
     map = L.map('map', {
         crs: L.CRS.Simple,
@@ -545,7 +549,9 @@
     map.addLayer(drawnItems);
     hiddenLayers = L.featureGroup();
 
-    // BUTTONS
+    if (randomExpertState) {
+        importMapState(randomExpertState);
+    }
 
     drawControl = new L.Control.Draw({
         draw: {
@@ -557,7 +563,7 @@
                 shapeOptions: LINE_OPTIONS
             },
             marker: {
-                icon: icons.factory(DEFAULT_POINT_TYPE, DEFAULT_POINT_COLOR)
+                icon: icons.factory(content.default.pointType, content.default.pointColor)
             }
         },
         edit: {
@@ -584,7 +590,7 @@
                 icon: 'fa-trash',
                 tooltip: content.clearTooltip,
                 clickFn: function() {
-                    if (!isEmpty) {
+                    if (!mapIsEmpty()) {
                         map.openModal({
                             template: content.confirmClearModalTemplate,
                             onShow: function(e) {
@@ -634,6 +640,7 @@
                                     mapConfig = content.maps[selectedMap];
                                     selectMap(mapConfig);
                                     selectedMapIndex = mapSelect.selectedIndex;
+                                    publishMapState();
                                 }
                                 if (invertCheckbox.checked !== state.colorsInverted) {
                                     state.colorsInverted = invertCheckbox.checked;
@@ -734,7 +741,7 @@
                 icon: 'fa-download',
                 tooltip: content.exportTooltip,
                 clickFn: function() {
-                    if (!isEmpty) {
+                    if (!mapIsEmpty()) {
                         var saveData = exportMapState();
                         var escapedData = window.escape(JSON.stringify(saveData));
                         var formattedData = SAVE_HEADER + escapedData;
@@ -764,17 +771,14 @@
                             onShow: function(e) {
                                 document.getElementById('stream-start-button').focus();
                                 L.DomEvent.on(document.getElementById('stream-start-button'), 'click', function() {
-                                    console.log('start button');
                                     e.modal.hide();
                                     fireStartModal();
                                 });
                                 L.DomEvent.on(document.getElementById('stream-connect-button'), 'click', function() {
-                                    console.log('connect button');
                                     e.modal.hide();
                                     fireConnectModal();
                                 });
                                 L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
-                                    console.log('cancel button');
                                     e.modal.hide();
                                 });
                             }
@@ -797,7 +801,6 @@
                                     }
                                     var mapState = window.escape(JSON.stringify(exportMapState()));
                                     var response = webdis.startStream(streamName, streamPassword, streamCode, mapState);
-                                    console.log(response);
                                     if (response[0] !== 'SUCCESS')  {
                                         var errorElement = document.getElementById('start-stream-error');
                                         errorElement.innerHTML = response[1];
@@ -814,7 +817,6 @@
                                     e.modal.hide();
                                 });
                                 L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
-                                    console.log('start cancel button');
                                     e.modal.hide();
                                 });
                             }
@@ -833,7 +835,6 @@
                                 setupCheckboxTogglableElement('leader-checkbox', 'leader-hidden');
                                 document.getElementById('stream-connect-button').focus();
                                 L.DomEvent.on(document.getElementById('stream-connect-button'), 'click', function() {
-                                    console.log('connect confirm button');
                                     var selectedStream = streamSelect.options[streamSelect.selectedIndex].value;
                                     var password = document.getElementById('stream-password').value;
                                     var code, response;
@@ -846,12 +847,6 @@
                                             return;
                                         }
                                         code = document.getElementById('stream-code').value;
-                                        // if (!password || !code) {
-                                        //     var errorElement = document.getElementById('connect-stream-error');
-                                        //     errorElement.innerHTML = 'All fields are required. Please try again.';
-                                        //     util.removeClass(errorElement, 'hidden-section');
-                                        //     return;
-                                        // }
                                         response = webdis.getStreamReconnect(selectedStream, password, code);
                                         if (response[0] !== 'SUCCESS') {
                                             var errorElement = document.getElementById('connect-stream-error');
@@ -860,7 +855,6 @@
                                             return;
                                         }
                                         state.streamInfo.code = code;
-                                        console.log('leader reconnect');
                                         clearMap();
                                         importMapState(JSON.parse(response[2]));
                                         state.streaming = true;
@@ -872,12 +866,6 @@
                                             util.removeClass(errorElement, 'hidden-section');
                                             return;
                                         }
-                                        // if (!password) {
-                                        //     var errorElement = document.getElementById('connect-stream-error');
-                                        //     errorElement.innerHTML = 'All fields are required. Please try again.';
-                                        //     util.removeClass(errorElement, 'hidden-section');
-                                        //     return;
-                                        // }
                                         response = webdis.getStreamInfo(selectedStream, password);
                                         if (response[0] !== 'SUCCESS') {
                                             var errorElement = document.getElementById('connect-stream-error');
@@ -885,7 +873,6 @@
                                             util.removeClass(errorElement, 'hidden-section');
                                             return;
                                         }
-                                        console.log('viewer connect');
                                         webdis.subscribe(response[1]);
                                         clearMap();
                                         importMapState(JSON.parse(response[2]));
@@ -902,7 +889,6 @@
                                     e.modal.hide();
                                 });
                                 L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
-                                    console.log('connect cancel button');
                                     e.modal.hide();
                                 });
                             }
@@ -915,7 +901,6 @@
                             onShow: function(e) {
                                 document.getElementById('disconnect-button').focus();
                                 L.DomEvent.on(document.getElementById('disconnect-button'), 'click', function() {
-                                    console.log('already connected disconnect button');
                                     webdis.unsubscribe(state.connected);
                                     state.connected = false;
                                     util.removeClass(document.querySelector('a.fa-share-alt'), 'connected');
@@ -923,7 +908,6 @@
                                     e.modal.hide();
                                 });
                                 L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
-                                    console.log('already connected cancel button');
                                     e.modal.hide();
                                 });
                             }
@@ -939,13 +923,11 @@
                                 document.getElementById('stop-streaming-button').focus();
                                 setupCheckboxTogglableElement('already-streaming-checkbox', 'already-streaming-hidden');
                                 L.DomEvent.on(document.getElementById('stop-streaming-button'), 'click', function() {
-                                    console.log('already streaming stop button');
                                     e.modal.hide();
                                     state.streaming = false;
                                     util.removeClass(document.querySelector('a.fa-share-alt'), 'streaming');
                                 });
                                 L.DomEvent.on(e.modal._container.querySelector('.modal-cancel'), 'click', function() {
-                                    console.log('already streaming cancel button');
                                     e.modal.hide();
                                 });
                             }
@@ -995,7 +977,7 @@
                 icon: 'fa-crop',
                 tooltip: content.missionHopTooltip,
                 clickFn: function() {
-                    if (!isEmpty) {
+                    if (!mapIsEmpty()) {
                         fitViewToMission();
                     }
                 }
@@ -1003,8 +985,6 @@
         ]
     });
     map.addControl(gridToolbar);
-
-    // EVENT LISTENERS
 
     map.on('draw:created', function(e) {
         drawnItems.addLayer(e.layer);
@@ -1061,7 +1041,6 @@
         if (!state.connected) {
             return;
         }
-        console.log('il2:streamerror');
         util.addClass(document.querySelector('a.fa-share-alt'), 'stream-error');
     });
 
@@ -1070,15 +1049,13 @@
             return;
         }
         var saveData = e.detail;
-        console.log('il2:streamupdate: ' + saveData);
         if (saveData !== 1) {
             clearMap();
             importMapState(JSON.parse(saveData));
         }
+        util.removeClass(document.querySelector('a.fa-share-alt'), 'stream-error');
         checkButtonsDisabled();
     });
-
-    // MISC
 
     checkButtonsDisabled();
 

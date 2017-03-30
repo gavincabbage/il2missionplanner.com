@@ -12,9 +12,11 @@ module.exports = function(leaflet) {
 
     return {
         factory: function(type, color) {
+            if (color === 'black' && this._isRandomExpertIcon(type)) {
+                color = 'blue';
+            }
             var iconOpts = {
-                iconSize: [32, 32],
-                iconAnchor: [16, 16],
+                iconSize: type === 're-point-active' ? [40, 60] : [32, 32],
                 iconUrl: buildIconUrl(type, color),
             };
             return leaflet.icon(iconOpts);
@@ -25,6 +27,9 @@ module.exports = function(leaflet) {
                 html: text,
                 iconSize: [200, 0]
             });
+        },
+        _isRandomExpertIcon: function(type) {
+            return type.substring(0, 2) === 're';
         }
     };
 };
