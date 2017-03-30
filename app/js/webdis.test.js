@@ -1,8 +1,5 @@
 var assert = require('chai').assert;
 
-var xhrMock = require('xhr-mock');
-xhrMock.setup();
-
 if (!CustomEvent) {
   var CustomEvent = function(name, params){ return params;};
 }
@@ -65,7 +62,5 @@ describe('webdis', function() {
                     'http://stream.il2missionplanner.com:7379/UNSUBSCRIBE/test');
         });
     });
-
-    xhrMock.teardown();
 
 });

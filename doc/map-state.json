@@ -1,0 +1,54 @@
+{
+  "mapHash": "",
+  "routes": [
+    {
+      "latLngs": [
+        {
+          "lat": 101.875,
+          "lng": 66.625
+        },
+        {
+          "lat": 101.375,
+          "lng": 125.375
+        },
+        {
+          "lat": 117,
+          "lng": 139.5
+        },
+        {
+          "lat": 78.5,
+          "lng": 159.75
+        }
+      ],
+      "name": "New Flight",
+      "speed": 300,
+      "speeds": [
+        300,
+        450,
+        300
+      ]
+    }
+  ],
+  "points": [
+    {
+      "latLng": {
+        "lat": 83,
+        "lng": 91
+      },
+      "name": "New Marker",
+      "type": "marker",
+      "color": "black",
+      "notes": ""
+    },
+    {
+      "latLng": {
+        "lat": 82,
+        "lng": 119.625
+      },
+      "name": "Other Marker",
+      "type": "bomb-target",
+      "color": "red",
+      "notes": "Some notes on this target"
+    }
+  ]
+}
