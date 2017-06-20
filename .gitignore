@@ -9,3 +9,4 @@ coverage/
 sandbox/
 secrets/
 lambda/requests/
+.idea/
