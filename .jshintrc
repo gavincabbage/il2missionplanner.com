@@ -22,6 +22,7 @@
         "XMLHttpRequest": true,
         "CustomEvent": true,
         "Option": true,
-        "Validatinator": true
+        "Validatinator": true,
+        "process": true
     }
 }

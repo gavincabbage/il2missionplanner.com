@@ -14,19 +14,22 @@
   },
   "homepage": "https://github.com/gavincabbage/il2missionplanner.com#readme",
   "devDependencies": {
+    "bower": "^1.8.0",
     "brfs": "^1.4.3",
-    "bower": "^1.7.7",
     "browserify": "^13.0.0",
     "chai": "^3.5.0",
     "clean-css": "^3.4.12",
+    "concurrently": "^3.4.0",
     "istanbul": "^0.4.3",
     "jshint": "^2.9.1",
     "livereload": "^0.4.1",
     "mocha": "^2.4.5",
     "uglify-js": "^2.6.2",
-    "watch-run": "^1.2.4"
+    "watch-run": "^1.2.4",
+    "xhr-mock": "^1.6.0"
   },
   "scripts": {
+    "build-travis-branch": "if [ \"${TRAVIS_BRANCH}\" != \"develop\" ] && [ \"${TRAVIS_BRANCH}\" != \"beta\" ] && [ \"${TRAVIS_BRANCH}\" != \"master\" ]; then export CONF_DIR=\"\"; else export CONF_DIR=\"${TRAVIS_BRANCH}/\"; fi",
     "coverage": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha app/js/**/*.test.js",
     "uglify": "./node_modules/.bin/uglifyjs dist/index.tmp.js -o dist/index.js && rm dist/index.tmp.js",
     "test": "mocha app/js/**/*.test.js",
@@ -37,7 +40,8 @@
     "copy:vendor": "cp -R app/vendor dist/vendor",
     "copy:img": "mkdir -p dist/img; cp app/img/dist/* dist/img/",
     "copy:html": "cp app/index.html dist/index.html",
-    "copy": "mkdir -p dist && npm run copy:vendor && npm run copy:img && npm run copy:html",
+    "copy:conf": "npm run build-travis-branch && cp conf/${CONF_DIR}conf.json dist/conf.json",
+    "copy": "mkdir -p dist && npm run copy:vendor && npm run copy:img && npm run copy:html && npm run copy:conf",
     "dist:js:dev": "npm run lint && npm test && npm run browserify:dev",
     "dist:js": "npm run lint && npm test && npm run browserify && npm run uglify",
     "dist:dev": "npm run copy && npm run dist:js:dev && npm run dist:css",
@@ -47,12 +51,9 @@
     "watch:js": "watch-run -p 'app/js/**/*.js' npm run dist:js:dev",
     "watch:html": "watch-run -p 'app/html/**/*.html' npm run dist:js:dev",
     "watch:img": "watch-run -p 'app/img/dist/*' npm run copy:img",
-    "develop": "npm run clean && npm run dist:dev && concurrently \"npm run watch:css\" \"npm run watch:index\" \"npm run watch:js\"  \"npm run watch:html\" \"npm run watch:img\" \"npm run reload\"",
+    "develop": "npm run clean && npm run dist:dev && concurrently \"npm run watch:css\" \"npm run watch:index\" \"npm run watch:js\" \"npm run watch:html\" \"npm run watch:img\" \"npm run reload\" \"serve dist\"",
     "dist:css": "cleancss -o dist/index.css app/css/index.css",
     "nodist": "npm run lint && npm test",
     "reload": "livereload ./dist/"
-  },
-  "dependencies": {
-    "xhr-mock": "^1.6.0"
   }
 }
