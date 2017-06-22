@@ -8,7 +8,7 @@
     var webdis = require('./webdis.js');
     require('./controls.js');
 
-    var conf = fs.readFileSync('dist/conf.json', 'utf8');
+    var conf = JSON.parse(fs.readFileSync('dist/conf.json', 'utf8'));
 
     const
         SAVE_HEADER = 'data:text/json;charset=utf-8,',
@@ -521,7 +521,7 @@
     // if hash is not in map list, try to get json for that server
     if (window.location.hash !== '' && !util.isAvailableMapHash(window.location.hash, content.maps)) {
         var responseBody = null;
-        var xhr = util.buildGetXhr('https://api.il2missionplanner.com/servers/' + window.location.hash.substr(1), function() {
+        var xhr = util.buildGetXhr(conf.apiUrl + '/servers/' + window.location.hash.substr(1), function() {
             if (xhr.readyState === 4) {
                 responseBody = JSON.parse(xhr.responseText);
                 console.log(responseBody);
