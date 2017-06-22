@@ -29,6 +29,7 @@
     "xhr-mock": "^1.6.0"
   },
   "scripts": {
+    "build-travis-branch": "if [ \"${TRAVIS_BRANCH}\" != \"develop\" ] && [ \"${TRAVIS_BRANCH}\" != \"beta\" ] && [ \"${TRAVIS_BRANCH}\" != \"master\" ]; then export CONF_DIR=\"\"; else export CONF_DIR=\"${TRAVIS_BRANCH}/\"; fi",
     "coverage": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha app/js/**/*.test.js",
     "uglify": "./node_modules/.bin/uglifyjs dist/index.tmp.js -o dist/index.js && rm dist/index.tmp.js",
     "test": "mocha app/js/**/*.test.js",
@@ -39,7 +40,7 @@
     "copy:vendor": "cp -R app/vendor dist/vendor",
     "copy:img": "mkdir -p dist/img; cp app/img/dist/* dist/img/",
     "copy:html": "cp app/index.html dist/index.html",
-    "copy:conf": "TRAVIS_BRANCH=\"${TRAVIS_BRANCH}/\" && cp conf/${TRAVIS_BRANCH}conf.json dist/conf.json",
+    "copy:conf": "npm run build-travis-branch && cp conf/${CONF_DIR}conf.json dist/conf.json",
     "copy": "mkdir -p dist && npm run copy:vendor && npm run copy:img && npm run copy:html && npm run copy:conf",
     "dist:js:dev": "npm run lint && npm test && npm run browserify:dev",
     "dist:js": "npm run lint && npm test && npm run browserify && npm run uglify",
