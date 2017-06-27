@@ -521,7 +521,9 @@
     // if hash is not in map list, try to get json for that server
     if (window.location.hash !== '' && !util.isAvailableMapHash(window.location.hash, content.maps)) {
         var responseBody = null;
-        var xhr = util.buildGetXhr(conf.apiUrl + '/servers/' + window.location.hash.substr(1), function() {
+        var url = conf.apiUrl + '/servers/' + window.location.hash.substr(1);
+        console.log(url);
+        var xhr = util.buildGetXhr(url, function() {
             if (xhr.readyState === 4) {
                 responseBody = JSON.parse(xhr.responseText);
                 console.log(responseBody);
