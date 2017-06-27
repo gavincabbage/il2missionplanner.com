@@ -1,14 +1,14 @@
 (function() {
 
     var fs = require('fs');
-
     var content = require('./content.js');
     var calc = require('./calc.js');
     var util = require('./util.js');
     var icons = require('./icons.js')(L);
     var webdis = require('./webdis.js');
-    var randomExpert = require('./randomExpert.js');
     require('./controls.js');
+
+    var conf = JSON.parse(fs.readFileSync('dist/conf.json', 'utf8'));
 
     const
         SAVE_HEADER = 'data:text/json;charset=utf-8,',
@@ -20,11 +20,12 @@
             color: RED,
             weight: 2,
             opacity: FLIGHT_OPACITY
+
         }
     ;
 
     var map, mapTiles, mapConfig, drawnItems, hiddenLayers,
-            drawControl, hash, randomExpertState;
+            drawControl, hash, selectedMapIndex;
 
     var state = {
         colorsInverted: false,
@@ -33,7 +34,7 @@
         connected: false,
         changing: false,
         streamInfo: {},
-        streamingAvailable: webdis.init() ? true : false
+        streamingAvailable: webdis.init()
     };
 
     // Patch a leaflet bug, see https://github.com/bbecquet/Leaflet.PolylineDecorator/issues/17
@@ -516,18 +517,21 @@
         });
     }
 
-    // start "main" sorta... christ this code sucks... "someday"
 
-    if (window.location.hash === randomExpert.HASH) {
-        //randomExpertState = JSON.parse(fs.readFileSync('app/html/randomExpert.json', 'utf8'));
-        randomExpertState = randomExpert.getMapState();
-        console.log(randomExpertState);
-        hash = randomExpertState.mapHash;
-    } else {
-        hash = window.location.hash;
+    // if hash is not in map list, try to get json for that server
+    if (window.location.hash !== '' && !util.isAvailableMapHash(window.location.hash, content.maps)) {
+        var responseBody = null;
+        var xhr = util.buildGetXhr(conf.apiUrl + '/servers/' + window.location.hash.substr(1), function() {
+            if (xhr.readyState === 4) {
+                responseBody = JSON.parse(xhr.responseText);
+                console.log(responseBody);
+                importMapState(responseBody.data);
+            }
+        });
     }
-    var mapConfig = util.getSelectedMapConfig(hash, content.maps);
-    var selectedMapIndex = mapConfig.selectIndex;
+
+    mapConfig = util.getSelectedMapConfig(window.location.hash , content.maps);
+    selectedMapIndex = mapConfig.selectIndex;
 
     map = L.map('map', {
         crs: L.CRS.Simple,
@@ -548,10 +552,6 @@
     drawnItems = L.featureGroup();
     map.addLayer(drawnItems);
     hiddenLayers = L.featureGroup();
-
-    if (randomExpertState) {
-        importMapState(randomExpertState);
-    }
 
     drawControl = new L.Control.Draw({
         draw: {
