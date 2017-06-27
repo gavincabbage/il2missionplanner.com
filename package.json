@@ -30,7 +30,7 @@
   },
   "scripts": {
     "coverage": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha app/js/**/*.test.js",
-    "uddglify": "./node_modules/.bin/uglifyjs dist/index.tmp.js -o dist/index.js && rm dist/index.tmp.js",
+    "uglify": "./node_modules/.bin/uglifyjs dist/index.tmp.js -o dist/index.js && rm dist/index.tmp.js",
     "test": "mocha app/js/**/*.test.js",
     "lint": "jshint app/js/**.js",
     "clean": "rm -rf dist",
