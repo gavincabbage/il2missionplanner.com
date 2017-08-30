@@ -143,7 +143,6 @@
         }
         for (var i = 0; i < coords.length-1; i++) {
             var distance = mapConfig.scale * calc.distance(coords[i], coords[i+1]);
-            console.log(distance);
             var heading = calc.heading(coords[i], coords[i+1]);
             var midpoint = calc.midpoint(coords[i], coords[i+1]);
             var time = util.formatTime(calc.time(route.speeds[i], distance));
@@ -744,7 +743,6 @@
                 clickFn: function() {
                     if (!mapIsEmpty()) {
                         var saveData = exportMapState();
-                        console.log(saveData);
                         var escapedData = window.escape(JSON.stringify(saveData));
                         var formattedData = SAVE_HEADER + escapedData;
                         window.open(formattedData);
