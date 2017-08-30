@@ -34,7 +34,7 @@ describe('webdis', function() {
 
         it('must build subscribe url based on channel', function() {
             assert.equal(webdis._buildSubscribeUrl('test'),
-                    'http://stream.il2missionplanner.com/SUBSCRIBE/test');
+                    'http://stream.il2missionplanner.com:7379/SUBSCRIBE/test');
         });
     });
 
@@ -46,7 +46,7 @@ describe('webdis', function() {
 
         it('must build publish url based on channel and message', function() {
             assert.equal(webdis._buildPublishUrl('test', 'value'),
-                    'http://stream.il2missionplanner.com/PUBLISH/test/value');
+                    'http://stream.il2missionplanner.com:7379/PUBLISH/test/value');
         });
     });
 
@@ -58,7 +58,7 @@ describe('webdis', function() {
 
         it('must build publish url based on channel and message', function() {
             assert.equal(webdis._buildUnsubscribeUrl('test'),
-                    'http://stream.il2missionplanner.com/UNSUBSCRIBE/test');
+                    'http://stream.il2missionplanner.com:7379/UNSUBSCRIBE/test');
         });
     });
 
