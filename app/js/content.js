@@ -115,7 +115,7 @@ module.exports = (function() {
             lngGridMax: 37,
             gridHopZoom: 5,
             defaultZoom: 3,
-            tileUrl: 'http://tiles.il2missionplanner.com/stalingrad/{z}/{x}/{y}.png'
+            tileUrl: 'https://tiles.il2missionplanner.com/stalingrad/{z}/{x}/{y}.png'
             //tileUrl: 'file:///Users/fkc930/Development/personal/tiles.il2missionplanner.com/dist/stalingrad/{z}/{x}/{y}.png'
         },
         moscow: {
@@ -132,7 +132,7 @@ module.exports = (function() {
             lngGridMax: 29,
             gridHopZoom: 5,
             defaultZoom: 3,
-            tileUrl: 'http://tiles.il2missionplanner.com/moscow/{z}/{x}/{y}.png'
+            tileUrl: 'https://tiles.il2missionplanner.com/moscow/{z}/{x}/{y}.png'
             //tileUrl: 'file:///Users/fkc930/Development/personal/tiles.il2missionplanner.com/dist/moscow/{z}/{x}/{y}.png'
         },
         luki: {
@@ -149,7 +149,7 @@ module.exports = (function() {
             lngGridMax: 17.6,
             gridHopZoom: 4,
             defaultZoom: 3,
-            tileUrl: 'http://tiles.il2missionplanner.com/luki/{z}/{x}/{y}.png'
+            tileUrl: 'https://tiles.il2missionplanner.com/luki/{z}/{x}/{y}.png'
             //tileUrl: 'file:///Users/fkc930/Development/personal/tiles.il2missionplanner.com/dist/luki/{z}/{x}/{y}.png'
         },
         kuban: {
@@ -166,7 +166,7 @@ module.exports = (function() {
             lngGridMax: 42.5,
             gridHopZoom: 6,
             defaultZoom: 4,
-            tileUrl: 'http://tiles.il2missionplanner.com/kuban/{z}/{x}/{y}.png'
+            tileUrl: 'https://tiles.il2missionplanner.com/kuban/{z}/{x}/{y}.png'
             //tileUrl: 'http://localhost:5001//kuban/{z}/{x}/{y}.png'
         }
     };
