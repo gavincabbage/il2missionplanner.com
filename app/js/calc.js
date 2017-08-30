@@ -65,7 +65,6 @@ module.exports = (function() {
             var gridSideLength = (gridWidth + gridHeight) / 2;
             var gridLat = parseInt(grid.substring(0, 2));
             var gridLng = parseInt(grid.substring(2, 4));
-            var halfSideLength = gridSideLength / 2;
             var lat = mapConfig.latMax - (gridLat*gridSideLength);
             var lng = (gridLng*gridSideLength);
             return [lat, lng];

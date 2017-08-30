@@ -114,7 +114,8 @@ module.exports = (function() {
             lngMax: 252,
             lngGridMax: 37,
             gridHopZoom: 5,
-            tileUrl: 'http://tiles.il2missionplanner.com/stalingrad/{z}/{x}/{y}.png'
+            defaultZoom: 3,
+            tileUrl: 'https://tiles.il2missionplanner.com/stalingrad/{z}/{x}/{y}.png'
             //tileUrl: 'file:///Users/fkc930/Development/personal/tiles.il2missionplanner.com/dist/stalingrad/{z}/{x}/{y}.png'
         },
         moscow: {
@@ -130,7 +131,8 @@ module.exports = (function() {
             lngMax: 192,
             lngGridMax: 29,
             gridHopZoom: 5,
-            tileUrl: 'http://tiles.il2missionplanner.com/moscow/{z}/{x}/{y}.png'
+            defaultZoom: 3,
+            tileUrl: 'https://tiles.il2missionplanner.com/moscow/{z}/{x}/{y}.png'
             //tileUrl: 'file:///Users/fkc930/Development/personal/tiles.il2missionplanner.com/dist/moscow/{z}/{x}/{y}.png'
         },
         luki: {
@@ -143,11 +145,29 @@ module.exports = (function() {
             latMax: 160,
             latGridMax: 10.4,
             lngMin: 0,
-            lngMax: 224,
-            lngGridMax: 16.6,
+            lngMax: 254,
+            lngGridMax: 17.6,
             gridHopZoom: 4,
-            tileUrl: 'http://tiles.il2missionplanner.com/luki/{z}/{x}/{y}.png'
+            defaultZoom: 3,
+            tileUrl: 'https://tiles.il2missionplanner.com/luki/{z}/{x}/{y}.png'
             //tileUrl: 'file:///Users/fkc930/Development/personal/tiles.il2missionplanner.com/dist/luki/{z}/{x}/{y}.png'
+        },
+        kuban: {
+            fullName: 'Kuban',
+            name: 'kuban',
+            hash: '#kuban',
+            selectIndex: 3,
+            scale: 2.876397232, // TODO 18882 19327 -> 445px per 10km | 18477w 12792h
+            latMin: 0,
+            latMax: 103, // TODO
+            latGridMax: 29.7,
+            lngMin: 0,
+            lngMax: 148, // TODO
+            lngGridMax: 42.5,
+            gridHopZoom: 6,
+            defaultZoom: 4,
+            tileUrl: 'https://tiles.il2missionplanner.com/kuban/{z}/{x}/{y}.png'
+            //tileUrl: 'http://localhost:5001//kuban/{z}/{x}/{y}.png'
         }
     };
 

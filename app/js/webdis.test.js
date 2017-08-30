@@ -3,7 +3,6 @@ var assert = require('chai').assert;
 if (!CustomEvent) {
   var CustomEvent = function(name, params){ return params;};
 }
-//window.dispatchEvent = function(){};
 
 var webdis = require('./webdis.js');
 

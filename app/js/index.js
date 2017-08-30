@@ -1,5 +1,7 @@
 (function() {
 
+    'use strict';
+
     var fs = require('fs');
     var content = require('./content.js');
     var calc = require('./calc.js');
@@ -472,8 +474,6 @@
             for (var frontNdx = 0; frontNdx < saveData.frontline.length; frontNdx++) { // for each frontline
                 var blueFront = saveData.frontline[frontNdx][0];
                 var redFront = saveData.frontline[frontNdx][1];
-                console.log(blueFront);
-                console.log(redFront);
                 L.polyline(blueFront, {color: BLUE_FRONT, opacity: 1}).addTo(map);
                 L.polyline(redFront, {color: RED_FRONT, opacity: 1}).addTo(map);
             }
@@ -521,10 +521,10 @@
     // if hash is not in map list, try to get json for that server
     if (window.location.hash !== '' && !util.isAvailableMapHash(window.location.hash, content.maps)) {
         var responseBody = null;
-        var xhr = util.buildGetXhr(conf.apiUrl + '/servers/' + window.location.hash.substr(1), function() {
+        var url = conf.apiUrl + '/servers/' + window.location.hash.substr(1);
+        var xhr = util.buildGetXhr(url, function() {
             if (xhr.readyState === 4) {
                 responseBody = JSON.parse(xhr.responseText);
-                console.log(responseBody);
                 importMapState(responseBody.data);
             }
         });
@@ -540,13 +540,13 @@
 
     mapTiles = L.tileLayer(mapConfig.tileUrl, {
         minZoom: 2,
-        maxZoom: 6,
+        maxZoom: 7,
         noWrap: true,
         tms: true,
         continuousWorld: true
     }).addTo(map);
 
-    map.setView(calc.center(mapConfig), 3);
+    map.setView(calc.center(mapConfig), mapConfig.defaultZoom);
     map.setMaxBounds(calc.maxBounds(mapConfig));
 
     drawnItems = L.featureGroup();
