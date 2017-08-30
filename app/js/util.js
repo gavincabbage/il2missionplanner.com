@@ -10,6 +10,15 @@ module.exports = (function() {
             return Math.floor(minutes).toFixed(0) + ':' + calc.pad(seconds, 2);
         },
 
+        isAvailableMapHash: function(hash, maps) {
+            for (var map in maps) {
+                if (maps[map].hash === hash) {
+                    return true;
+                }
+            }
+            return false;
+        },
+
         getSelectedMapConfig: function(hash, maps) {
             for (var map in maps) {
                 if (maps[map].hash === hash) {

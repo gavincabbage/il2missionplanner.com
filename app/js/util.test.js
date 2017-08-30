@@ -42,6 +42,41 @@ describe('util', function() {
         });
     });
 
+    describe('util.isAvailableMapHash', function() {
+
+        it('must be defined', function() {
+            assert.isDefined(util.isAvailableMapHash);
+        });
+
+        var mockMaps = {
+            stalingrad: {
+                hash: '#stalingrad',
+                selectIndex: 0
+            },
+            other: {
+                hash: '#other',
+                selectIndex: 1
+            }
+        };
+
+        var tests = [
+            {
+                given: '#stalingrad',
+                expected: true
+            },
+            {
+                given: '#none',
+                expected: false
+            }
+        ]
+
+        tests.forEach(function(test) {
+            it('must return '+test.expected+' given '+test.given, function() {
+                assert.strictEqual(util.isAvailableMapHash(test.given, mockMaps), test.expected);
+            });
+        });
+    });
+
     describe('util.getSelectedMapConfig', function() {
 
         it('must be defined', function() {
