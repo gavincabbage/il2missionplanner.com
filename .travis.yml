@@ -14,7 +14,7 @@ deploy:
     local_dir: dist
     skip_cleanup: true
     on:
-      branch: random-expert
+      branch: beta-revert
       repo: gavincabbage/il2missionplanner.com
   - provider: s3
     access_key_id: AKIAIVOD3WGLQHXFCTTQ
