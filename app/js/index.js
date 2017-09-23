@@ -572,8 +572,8 @@
         },
         edit: {
             featureGroup: drawnItems,
-            //edit: L.Browser.touch ? false : {
-            edit: { selectedPathOptions: {
+            edit: L.Browser.touch ? false : {
+                selectedPathOptions: {
                     maintainColor: true,
                     opacity: 0.4,
                     fill: false
