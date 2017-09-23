@@ -13,7 +13,6 @@
     var conf = JSON.parse(fs.readFileSync('dist/conf.json', 'utf8'));
 
     const
-        SAVE_HEADER = 'data:text/json;charset=utf-8,',
         RED = '#9A070B',
         RED_FRONT = '#BD0101',
         BLUE_FRONT = '#4D4B40',
@@ -27,7 +26,7 @@
     ;
 
     var map, mapTiles, mapConfig, drawnItems, hiddenLayers,
-            drawControl, hash, selectedMapIndex;
+            drawControl, selectedMapIndex;
 
     var state = {
         colorsInverted: false,
@@ -418,11 +417,15 @@
             deleteAssociatedLayers(drawnItems);
             drawnItems.clearLayers();
             hiddenLayers.clearLayers();
-            mapTiles.setUrl(mapConfig.tileUrl);
+            mapTiles = L.tileLayer(mapConfig.tileUrl, {
+                minZoom: mapConfig.minZoom,
+                maxZoom: mapConfig.maxZoom,
+                noWrap: true,
+                tms: true,
+                continuousWorld: true
+            }).addTo(map);
             map.setMaxBounds(calc.maxBounds(mapConfig));
-            map.setView(calc.center(mapConfig), 3);
-            mapTiles.redraw();
-            mapTiles.addTo(map);
+            map.setView(calc.center(mapConfig), mapConfig.defaultZoom);
         }
     }
 
@@ -442,6 +445,7 @@
     }
 
     function importMapState(saveData) {
+        clearMap();
         var importedMapConfig = util.getSelectedMapConfig(saveData.mapHash, content.maps);
         window.location.hash = importedMapConfig.hash;
         selectMap(importedMapConfig);
@@ -470,7 +474,7 @@
                 applyTargetInfoCallback(newPoint);
             }
         }
-        if (saveData.frontline) { // random expert frontline
+        if (saveData.frontline) {
             for (var frontNdx = 0; frontNdx < saveData.frontline.length; frontNdx++) { // for each frontline
                 var blueFront = saveData.frontline[frontNdx][0];
                 var redFront = saveData.frontline[frontNdx][1];
@@ -539,8 +543,8 @@
     });
 
     mapTiles = L.tileLayer(mapConfig.tileUrl, {
-        minZoom: 2,
-        maxZoom: 7,
+        minZoom: mapConfig.minZoom,
+        maxZoom: mapConfig.maxZoom,
         noWrap: true,
         tms: true,
         continuousWorld: true
@@ -742,10 +746,7 @@
                 tooltip: content.exportTooltip,
                 clickFn: function() {
                     if (!mapIsEmpty()) {
-                        var saveData = exportMapState();
-                        var escapedData = window.escape(JSON.stringify(saveData));
-                        var formattedData = SAVE_HEADER + escapedData;
-                        window.open(formattedData);
+                        util.download('plan.json', JSON.stringify(exportMapState()));
                     }
                 }
             },
