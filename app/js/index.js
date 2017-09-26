@@ -417,6 +417,7 @@
             deleteAssociatedLayers(drawnItems);
             drawnItems.clearLayers();
             hiddenLayers.clearLayers();
+            map.removeLayer(mapTiles);
             mapTiles = L.tileLayer(mapConfig.tileUrl, {
                 minZoom: mapConfig.minZoom,
                 maxZoom: mapConfig.maxZoom,
