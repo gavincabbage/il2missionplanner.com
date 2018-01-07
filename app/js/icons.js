@@ -12,7 +12,7 @@ module.exports = function(leaflet) {
 
     return {
         factory: function(type, color) {
-            if (color === 'black' && this._isRandomExpertIcon(type)) {
+            if (color === 'black' && (this._isRandomExpertIcon(type) || this._isTawIcon(type)) ) {
                 color = 'blue';
             }
             var iconOpts = {
@@ -28,8 +28,12 @@ module.exports = function(leaflet) {
                 iconSize: [200, 0]
             });
         },
+        // Private methods determine if this icon should default to blue when black is chosen
         _isRandomExpertIcon: function(type) {
             return type.substring(0, 2) === 're';
+        },
+        _isTawIcon: function(type) {
+            return type.substring(0, 3) === 'taw' && type !== 'taw-af';
         }
     };
 };
