@@ -25,7 +25,7 @@
         }
     ;
 
-    var map, mapTiles, mapConfig, drawnItems, hiddenLayers,
+    var map, mapTiles, mapConfig, drawnItems, hiddenLayers, frontline,
             drawControl, selectedMapIndex;
 
     var state = {
@@ -48,7 +48,7 @@
     var V = new Validatinator(content.validatinatorConfig);
 
     function mapIsEmpty() {
-      return drawnItems.getLayers().length === 0;
+      return drawnItems.getLayers().length === 0 && frontline.getLayers().length === 0;
     }
 
     function newFlightDecorator(route) {
@@ -378,6 +378,7 @@
 
     function clearMap() {
         drawnItems.clearLayers();
+        frontline.clearLayers();
         hideChildLayers();
         hiddenLayers.clearLayers();
         publishMapState();
@@ -479,8 +480,8 @@
             for (var frontNdx = 0; frontNdx < saveData.frontline.length; frontNdx++) { // for each frontline
                 var blueFront = saveData.frontline[frontNdx][0];
                 var redFront = saveData.frontline[frontNdx][1];
-                L.polyline(blueFront, {color: BLUE_FRONT, opacity: 1}).addTo(map);
-                L.polyline(redFront, {color: RED_FRONT, opacity: 1}).addTo(map);
+                L.polyline(blueFront, {color: BLUE_FRONT, opacity: 1}).addTo(frontline);
+                L.polyline(redFront, {color: RED_FRONT, opacity: 1}).addTo(frontline);
             }
 
         }
@@ -531,6 +532,7 @@
             if (xhr.readyState === 4) {
                 responseBody = JSON.parse(xhr.responseText);
                 importMapState(responseBody.data);
+                checkButtonsDisabled();
             }
         });
     }
@@ -556,6 +558,8 @@
 
     drawnItems = L.featureGroup();
     map.addLayer(drawnItems);
+    frontline = L.featureGroup();
+    map.addLayer(frontline);
     hiddenLayers = L.featureGroup();
 
     drawControl = new L.Control.Draw({
