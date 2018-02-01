@@ -451,6 +451,7 @@
         clearMap();
         var importedMapConfig = util.getSelectedMapConfig(saveData.mapHash, content.maps);
         window.location.hash = importedMapConfig.hash;
+        mapConfig = content.maps[selectedMap];
         selectMap(importedMapConfig);
         if (saveData.routes) {
             for (var i = 0; i < saveData.routes.length; i++) {
