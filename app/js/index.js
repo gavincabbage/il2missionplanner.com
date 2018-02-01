@@ -411,7 +411,6 @@
     }
 
     function selectMap(selectedMapConfig) {
-        mapConfig = selectedMapConfig;
         var newIndex = selectedMapConfig.selectIndex;
         if (newIndex !== selectedMapIndex) {
             selectedMapIndex = selectedMapConfig.selectIndex;
@@ -450,8 +449,9 @@
     function importMapState(saveData) {
         clearMap();
         var importedMapConfig = util.getSelectedMapConfig(saveData.mapHash, content.maps);
+        mapConfig = importedMapConfig;
+        selectedMapIndex = mapConfig.selectIndex;
         window.location.hash = importedMapConfig.hash;
-        mapConfig = content.maps[selectedMap];
         selectMap(importedMapConfig);
         if (saveData.routes) {
             for (var i = 0; i < saveData.routes.length; i++) {
