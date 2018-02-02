@@ -410,24 +410,24 @@
         return saveData;
     }
 
-    function selectMap(mapConfig) {
-        var newIndex = mapConfig.selectIndex;
+    function selectMap(selectedMapConfig) {
+        var newIndex = selectedMapConfig.selectIndex;
         if (newIndex !== selectedMapIndex) {
-            selectedMapIndex = mapConfig.selectIndex;
-            window.location.hash = mapConfig.hash;
+            selectedMapIndex = selectedMapConfig.selectIndex;
+            window.location.hash = selectedMapConfig.hash;
             deleteAssociatedLayers(drawnItems);
             drawnItems.clearLayers();
             hiddenLayers.clearLayers();
             map.removeLayer(mapTiles);
-            mapTiles = L.tileLayer(mapConfig.tileUrl, {
-                minZoom: mapConfig.minZoom,
-                maxZoom: mapConfig.maxZoom,
+            mapTiles = L.tileLayer(selectedMapConfig.tileUrl, {
+                minZoom: selectedMapConfig.minZoom,
+                maxZoom: selectedMapConfig.maxZoom,
                 noWrap: true,
                 tms: true,
                 continuousWorld: true
             }).addTo(map);
-            map.setMaxBounds(calc.maxBounds(mapConfig));
-            map.setView(calc.center(mapConfig), mapConfig.defaultZoom);
+            map.setMaxBounds(calc.maxBounds(selectedMapConfig));
+            map.setView(calc.center(selectedMapConfig), selectedMapConfig.defaultZoom);
         }
     }
 
@@ -451,6 +451,8 @@
         var importedMapConfig = util.getSelectedMapConfig(saveData.mapHash, content.maps);
         window.location.hash = importedMapConfig.hash;
         selectMap(importedMapConfig);
+        mapConfig = importedMapConfig;
+        selectedMapIndex = mapConfig.selectIndex;
         if (saveData.routes) {
             for (var i = 0; i < saveData.routes.length; i++) {
                 var route = saveData.routes[i];
