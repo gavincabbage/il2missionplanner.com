@@ -449,10 +449,10 @@
     function importMapState(saveData) {
         clearMap();
         var importedMapConfig = util.getSelectedMapConfig(saveData.mapHash, content.maps);
-        mapConfig = importedMapConfig;
-        selectedMapIndex = mapConfig.selectIndex;
         window.location.hash = importedMapConfig.hash;
         selectMap(importedMapConfig);
+        mapConfig = importedMapConfig;
+        selectedMapIndex = mapConfig.selectIndex;
         if (saveData.routes) {
             for (var i = 0; i < saveData.routes.length; i++) {
                 var route = saveData.routes[i];
