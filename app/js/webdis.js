@@ -3,7 +3,7 @@ module.exports = (function() {
     var util = require('./util.js');
 
     const
-        WEBDIS_HOST = 'http://stream.il2missionplanner.com:7379'
+        WEBDIS_HOST = 'https://api.il2missionplanner.com:7379'
     ;
 
     return {
