@@ -231,8 +231,8 @@ module.exports = (function() {
             defaultZoom: 4,
             minZoom: 3,
             maxZoom: 6,
-            //tileUrl: 'https://tiles.il2missionplanner.com/arras/{z}/{x}/{y}.png'
-            tileUrl: 'http://localhost:5001/prokhorovka/{z}/{x}/{y}.png'
+            tileUrl: 'https://tiles.il2missionplanner.com/prokhorovka/{z}/{x}/{y}.png'
+            //tileUrl: 'http://localhost:5001/prokhorovka/{z}/{x}/{y}.png'
         }
     };
 
