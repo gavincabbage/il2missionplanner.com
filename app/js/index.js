@@ -534,6 +534,7 @@
             if (xhr.readyState === 4) {
                 responseBody = JSON.parse(xhr.responseText);
                 importMapState(responseBody.data);
+                fitViewToMission();
                 checkButtonsDisabled();
             }
         });
