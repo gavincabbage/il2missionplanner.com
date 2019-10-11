@@ -163,19 +163,76 @@ module.exports = (function() {
             name: 'kuban',
             hash: '#kuban',
             selectIndex: 3,
-            scale: 2.876397232, // TODO 18882 19327 -> 445px per 10km | 18477w 12792h
+            scale: 2.876397232,
             latMin: 0,
-            latMax: 103, // TODO
+            latMax: 103,
             latGridMax: 29.7,
             lngMin: 0,
-            lngMax: 148, // TODO
+            lngMax: 148,
             lngGridMax: 42.5,
             gridHopZoom: 6,
             defaultZoom: 4,
             minZoom: 2,
             maxZoom: 7,
             tileUrl: 'https://tiles.il2missionplanner.com/kuban/{z}/{x}/{y}.png'
-            //tileUrl: 'http://localhost:5001//kuban/{z}/{x}/{y}.png'
+            //tileUrl: 'http://localhost:5001/kuban/{z}/{x}/{y}.png'
+        },
+        rheinland: {
+            fullName: 'Rheinland',
+            name: 'rheinland',
+            hash: '#rheinland',
+            selectIndex: 4,
+            scale: 2.876397232,
+            latMin: 0,
+            latMax: 113,
+            latGridMax: 32.4437,
+            lngMin: 0,
+            lngMax: 140,
+            lngGridMax: 40.1306,
+            gridHopZoom: 6,
+            defaultZoom: 4,
+            minZoom: 2,
+            maxZoom: 7,
+            tileUrl: 'https://tiles.il2missionplanner.com/rheinland/{z}/{x}/{y}.png'
+            //tileUrl: 'http://localhost:5001/rheinland/{z}/{x}/{y}.png'
+        },
+        arras: {
+            fullName: 'Arras',
+            name: 'arras',
+            hash: '#arras',
+            selectIndex: 5,
+            scale: 0.7191,
+            latMin: 0,
+            latMax: 165,
+            latGridMax: 11.7973,
+            lngMin: 0,
+            lngMax: 165,
+            lngGridMax: 11.7973,
+            gridHopZoom: 5,
+            defaultZoom: 3,
+            minZoom: 3,
+            maxZoom: 5,
+            tileUrl: 'https://tiles.il2missionplanner.com/arras/{z}/{x}/{y}.png'
+            //tileUrl: 'http://localhost:5001/arras/{z}/{x}/{y}.png'
+        },
+        prokhorovka: {
+            fullName: 'Prokhorovka',
+            name: 'prokhorovka',
+            hash: '#prokhorovka',
+            selectIndex: 6,
+            scale: 0.6491,
+            latMin: 0,
+            latMax: 165,
+            latGridMax: 10.6484,
+            lngMin: 0,
+            lngMax: 165,
+            lngGridMax: 10.6484,
+            gridHopZoom: 5,
+            defaultZoom: 4,
+            minZoom: 3,
+            maxZoom: 6,
+            //tileUrl: 'https://tiles.il2missionplanner.com/arras/{z}/{x}/{y}.png'
+            tileUrl: 'http://localhost:5001/prokhorovka/{z}/{x}/{y}.png'
         }
     };
 

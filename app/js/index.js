@@ -238,6 +238,7 @@
         }
         var id = target._leaflet_id;
         var coords = target.getLatLng();
+        console.log(coords);
         target.setIcon(icons.factory(target.type, target.color));
         if (newTarget) {
             target.on('click', targetClickHandlerFactory(target));
@@ -534,6 +535,7 @@
             if (xhr.readyState === 4) {
                 responseBody = JSON.parse(xhr.responseText);
                 importMapState(responseBody.data);
+                fitViewToMission();
                 checkButtonsDisabled();
             }
         });
