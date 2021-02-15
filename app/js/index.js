@@ -152,7 +152,7 @@
             var heading = calc.heading(coords[i], coords[i+1]);
             var midpoint = calc.midpoint(coords[i], coords[i+1]);
             var time = util.formatTime(calc.time(route.speeds[i], distance));
-            var markerContent = util.formatFlightLegMarker(distance, heading, route.speeds[i], time);
+            var markerContent = util.formatFlightLegMarker(distance, heading, route.speeds[i], time, state.units);
             var marker =  L.marker(midpoint, {
                 distance: distance,
                 heading: heading,
@@ -360,10 +360,14 @@
     function changeUnits(units) {
         state.units = units;
         window.localStorage.setItem('units', units);
+        var parentChanged = false;
         map.eachLayer(function (layer) {
             if (layer.options && layer.options.speed) {
-                var parentRoute = drawnItems.getLayer(layer.parentId);
-                parentRoute.speeds = parentRoute.speeds.map((speed) => calc.convertSpeed(speed, units));
+                if (!parentChanged) {
+                    var parentRoute = drawnItems.getLayer(layer.parentId);
+                    parentRoute.speeds = parentRoute.speeds.map((speed) => calc.convertSpeed(speed, units));
+                    parentChanged = true;
+                }
                 layer.options.speed = calc.convertSpeed(layer.options.speed, units);
                 layer.options.distance = calc.convertDistance(layer.options.distance, units);
                 applyCustomFlightLegCallback(layer);
@@ -408,6 +412,7 @@
     function exportMapState() {
         var saveData = {
             mapHash: window.location.hash,
+            units: state.units,
             routes: [],
             points: []
         };
@@ -473,6 +478,7 @@
         selectMap(importedMapConfig);
         mapConfig = importedMapConfig;
         selectedMapIndex = mapConfig.selectIndex;
+        state.units = saveData.units || 'imperial';
         if (saveData.routes) {
             for (var i = 0; i < saveData.routes.length; i++) {
                 var route = saveData.routes[i];
@@ -665,8 +671,8 @@
                             invertCheckbox.checked = state.colorsInverted;
 
                             var unitsSelect = document.getElementById('units-select');
-                            unitsSelect.selectedIndex = state.units === 'metric' ? 0 : 1;
-                            var originalUnitValue = unitsSelect.value;
+                            var originalUnitValue = state.units;
+                            unitsSelect.value = originalUnitValue;
 
                             var backgroundCheckbox = document.getElementById('text-background-checkbox');
                             backgroundCheckbox.checked = state.showBackground;
