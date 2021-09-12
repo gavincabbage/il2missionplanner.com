@@ -1,3 +1,5 @@
+# [DEPRECATED]
+
 # Il-2 Mission Planner
 
 | Branch       | Status         | URL |
