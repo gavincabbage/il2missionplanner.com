@@ -1,3 +1,5 @@
+# OBSOLETE: Succeeded by https://github.com/ServError/IL2-Mission-Planner
+
 # Il-2 Mission Planner
 
 | Branch       | Status         | URL |
